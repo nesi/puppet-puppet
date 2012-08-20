@@ -7,7 +7,7 @@
 # for default install.
 
 class puppet::install(
-	package,
+	packages
 ) {
 	package{$package: ensure => installed}
 }
