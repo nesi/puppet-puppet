@@ -1,7 +1,10 @@
 # This manifests sets the default parameters for installing puppet
 
-case $operatingsystem {
-	Ubuntu:{
-		$puppet_package = 'puppet'
+
+class puppet::params{
+	case $operatingsystem {
+		Ubuntu:{
+			$puppet_package = 'puppet'
+		}
 	}
 }
