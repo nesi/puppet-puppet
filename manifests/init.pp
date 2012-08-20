@@ -6,10 +6,6 @@ class puppet (
 
 	include puppet::params
 
-	if ! $pluginsync in [true,false] {
-		err("Puppet does not recognise the value ${pluginsync} for the pluginsync parameter on ${fqdn}")
-	}
-
 	case $operatingsystem {
 		Ubuntu:{
 			class{'puppet::install':
