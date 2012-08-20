@@ -2,6 +2,6 @@
 
 case $operatingsystem {
 	Ubuntu:{
-		$puppet_package = 'puppet',
+		$puppet_package = 'puppet'
 	}
 }

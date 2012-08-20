@@ -3,6 +3,9 @@
 class puppet (
 
 ){
+
+	include puppet::params
+
 	case $operatingsystem {
 		Ubuntu:{
 			class{'puppet::install':
