@@ -9,7 +9,7 @@ class puppet (
 	case $operatingsystem {
 		Ubuntu:{
 			class{'puppet::install':
-				package => $puppet::params::package,
+				package => $puppet::params::puppet_package,
 			}
 		}
 		default:{
