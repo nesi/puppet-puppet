@@ -8,9 +8,21 @@
 
 class puppet::install(
 	$package,
-	$pluginsync
+	$pluginsync,
+	$puppetlabs_repo
 ) {
 	package{$package: ensure => installed}
+
+	if $puppetlabs_repo == true {
+		require apt
+		apt::source { "puppetlabs":
+		  location          => "http://apt.puppetlabs.com/ubuntu",
+		  release           => $lsbdistcodename,
+		  repos             => "main",
+		  key               => "4BD6EC30",
+		  include_src       => true
+		}
+	}
 
 	augeas{'puppet_main_config':
 		context => '/files/etc/puppet/puppet.conf',
