@@ -13,9 +13,9 @@ class puppet::install(
 	package{$package: ensure => installed}
 
 	augeas{'puppet_main_config':
-		lens	=> "Puppet.lns",
+		lens		=> "Puppet.lns",
 		context => '/files/etc/puppet/puppet.conf',
-		change	=> [
+		changes	=> [
 			"set main/pluginsync ${pluginsync}",
 		],
 	}
