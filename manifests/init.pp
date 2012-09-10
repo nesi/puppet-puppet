@@ -2,17 +2,22 @@
 
 class puppet (
 	$pluginsync 			= false,
-	$puppetlabs_repo	= false
+	$puppetlabs_repo	= false,
+	$web_ui						=false
 ){
 
 	include puppet::params
 
+	if $web_ui != false{
+		require Class['apache']
+	}
+
 	case $operatingsystem {
 		Ubuntu:{
 			class{'puppet::install':
-				package 				=> $puppet::params::puppet_package,
 				pluginsync			=> $pluginsync,
 				puppetlabs_repo => $puppetlabs_repo,
+				web_ui					=> $web_ui,
 			}
 		}
 		default:{

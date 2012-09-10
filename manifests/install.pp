@@ -7,11 +7,20 @@
 # for default install.
 
 class puppet::install(
-	$package,
 	$pluginsync,
-	$puppetlabs_repo
+	$puppetlabs_repo,
+	$web_ui
 ) {
-	package{$package: ensure => installed}
+	package{$puppet::params::puppet_package: ensure => installed}
+
+	file{$puppet::params::conf_dir:
+		ensure 		=> directory,
+		owner			=> $puppet::params::user,
+		group 		=> $web_ui ? {
+			false		=> $puppet::params::group,
+			default => $apache::params::group,
+		}
+	}
 
 	if $puppetlabs_repo == true {
 		require apt
@@ -25,7 +34,7 @@ class puppet::install(
 	}
 
 	augeas{'puppet_main_config':
-		context => '/files/etc/puppet/puppet.conf',
+		context => $puppet::params::conf_path,
 		changes	=> [
 			"set main/pluginsync ${pluginsync}",
 		],
