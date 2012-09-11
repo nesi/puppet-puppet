@@ -7,10 +7,6 @@ class puppet (
 
 	include puppet::params
 
-	if $web_ui != false{
-		require Class['apache']
-	}
-
 	case $operatingsystem {
 		Ubuntu:{
 			class{'puppet::install':
