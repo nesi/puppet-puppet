@@ -9,18 +9,8 @@
 class puppet::install(
 	$pluginsync,
 	$puppetlabs_repo,
-	$web_ui
 ) {
 	package{$puppet::params::puppet_package: ensure => installed}
-
-	file{$puppet::params::conf_dir:
-		ensure 		=> directory,
-		owner			=> $puppet::params::user,
-		group 		=> $web_ui ? {
-			false		=> $puppet::params::group,
-			default => $apache::params::group,
-		}
-	}
 
 	if $puppetlabs_repo == true {
 		require apt

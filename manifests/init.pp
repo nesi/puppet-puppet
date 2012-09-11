@@ -3,7 +3,6 @@
 class puppet (
 	$pluginsync 			= false,
 	$puppetlabs_repo	= false,
-	$web_ui						=false
 ){
 
 	include puppet::params
@@ -17,7 +16,6 @@ class puppet (
 			class{'puppet::install':
 				pluginsync			=> $pluginsync,
 				puppetlabs_repo => $puppetlabs_repo,
-				web_ui					=> $web_ui,
 			}
 		}
 		default:{

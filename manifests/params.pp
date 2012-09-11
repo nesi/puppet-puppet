@@ -6,6 +6,7 @@ class puppet::params{
 		Ubuntu:{
 			$puppet_package = 'puppet',
 			$user 					= 'puppet',
+			$user_home			= '/var/lib/puppet',
 			$group 					= 'puppet',
 			$conf_dir 			= '/etc/puppet',
 			$conf_file 			= 'puppet.conf',
