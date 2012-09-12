@@ -4,6 +4,7 @@ class puppet (
 	$pluginsync 			= false,
 	$puppetlabs_repo	= false,
 	$storeconfig			= false,
+	$user_shell				= false
 ){
 
 	include puppet::params
