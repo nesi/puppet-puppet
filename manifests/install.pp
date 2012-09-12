@@ -8,9 +8,12 @@
 
 class puppet::install(
 	$pluginsync,
+	$storeconfig,
 	$puppetlabs_repo,
 ) {
 	package{$puppet::params::puppet_package: ensure => installed}
+
+	user{'puppet': ensure => present}
 
 	if $puppetlabs_repo == true {
 		require apt
@@ -27,6 +30,7 @@ class puppet::install(
 		context => $puppet::params::conf_path,
 		changes	=> [
 			"set main/pluginsync ${pluginsync}",
+			"set main/storeconfig ${storeconfig}",
 		],
 	}
 }
