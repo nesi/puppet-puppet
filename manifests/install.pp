@@ -10,10 +10,15 @@ class puppet::install(
 	$pluginsync,
 	$storeconfig,
 	$puppetlabs_repo,
+	$user_shell
 ) {
 	package{$puppet::params::puppet_package: ensure => installed}
 
-	user{'puppet': ensure => present}
+	user{'puppet':
+		ensure	=> present,
+		shell 	=> $user_shell,
+		require	=> Package[$puppet::params::puppet_package],
+	}
 
 	if $puppetlabs_repo == true {
 		require apt

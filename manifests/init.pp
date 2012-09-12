@@ -4,6 +4,7 @@ class puppet (
 	$pluginsync 			= false,
 	$puppetlabs_repo	= false,
 	$storeconfig			= false,
+	$user_shell				= false
 ){
 
 	include puppet::params
@@ -14,6 +15,7 @@ class puppet (
 				pluginsync			=> $pluginsync,
 				puppetlabs_repo => $puppetlabs_repo,
 				storeconfig			=> $storeconfig,
+				user_shell			=> $user_shell,
 			}
 		}
 		default:{
