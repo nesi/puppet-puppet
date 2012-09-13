@@ -3,7 +3,7 @@
 class puppet (
 	$pluginsync 			= false,
 	$puppetlabs_repo	= false,
-	$storeconfig			= false,
+	$storeconfigs			= false,
 	$user_shell				= false
 ){
 
@@ -14,7 +14,7 @@ class puppet (
 			class{'puppet::install':
 				pluginsync			=> $pluginsync,
 				puppetlabs_repo => $puppetlabs_repo,
-				storeconfig			=> $storeconfig,
+				storeconfigs		=> $storeconfigs,
 				user_shell			=> $user_shell,
 			}
 		}

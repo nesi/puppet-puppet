@@ -8,7 +8,7 @@
 
 class puppet::install(
 	$pluginsync,
-	$storeconfig,
+	$storeconfigs,
 	$puppetlabs_repo,
 	$user_shell
 ) {
@@ -21,7 +21,6 @@ class puppet::install(
 	}
 
 	if $puppetlabs_repo == true {
-		require apt
 		apt::source { "puppetlabs":
 		  location          => "http://apt.puppetlabs.com/ubuntu",
 		  release           => $lsbdistcodename,
@@ -35,7 +34,7 @@ class puppet::install(
 		context => $puppet::params::conf_path,
 		changes	=> [
 			"set main/pluginsync ${pluginsync}",
-			"set main/storeconfig ${storeconfig}",
+			"set main/storeconfigs ${storeconfigs}",
 		],
 	}
 }
