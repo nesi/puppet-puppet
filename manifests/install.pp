@@ -21,12 +21,11 @@ class puppet::install(
 	}
 
 	if $puppetlabs_repo == true {
-		apt::source { "puppetlabs":
-		  location          => "http://apt.puppetlabs.com/ubuntu",
-		  release           => $lsbdistcodename,
-		  repos             => "main",
-		  key               => "4BD6EC30",
-		  include_src       => true
+		apt::source { 'puppetlabs':
+		  location   => 'http://apt.puppetlabs.com',
+		  repos      => 'main',
+		  key        => '4BD6EC30',
+		  key_server => 'pgp.mit.edu',
 		}
 	}
 
