@@ -10,7 +10,8 @@ class puppet::install(
 	$pluginsync,
 	$storeconfigs,
 	$puppetlabs_repo,
-	$user_shell
+	$user_shell,
+	$hiera_config
 ) {
 
 	if $puppetlabs_repo == true {
@@ -44,4 +45,15 @@ class puppet::install(
 			"set main/storeconfigs ${storeconfigs}",
 		],
 	}
+
+	$hiera_config_augeas = $hiera_config ? {
+		false		=> "rm master/hiera_config",
+		default	=> "set master/hiera_config ${hiera_config}"
+	}
+
+	augeas{'puppet_config_hiera_config':
+		context => $puppet::params::conf_path,
+		changes	=> [$hiera_config_augeas]
+	}
+
 }
