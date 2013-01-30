@@ -11,7 +11,12 @@ class puppet::install(
 	$storeconfigs,
 	$puppetlabs_repo,
 	$user_shell,
-	$hiera_config
+	$hiera_config_file,
+	$hiera_config_source,
+	$hiera_backend_yaml,
+	$hiera_backend_json,
+	$hiera_yaml_datadir,
+	$hiera_json_datadir
 ) {
 
 	if $puppetlabs_repo == true {
@@ -44,16 +49,28 @@ class puppet::install(
 			"set main/pluginsync ${pluginsync}",
 			"set main/storeconfigs ${storeconfigs}",
 		],
-	}
-
-	$hiera_config_augeas = $hiera_config ? {
-		false		=> "rm master/hiera_config",
-		default	=> "set master/hiera_config ${hiera_config}"
+		require	=> Package[$puppet::params::puppet_package],
 	}
 
 	augeas{'puppet_config_hiera_config':
 		context => $puppet::params::conf_path,
-		changes	=> [$hiera_config_augeas]
+		changes	=> ["set master/hiera_config ${hiera_config_file}"],
+		require	=> Package[$puppet::params::puppet_package],
+	}
+
+# I'd rather use augeas for this but there is no lense available for the hiera.yaml format
+	if $hiera_config_source == false {
+		file{$hiera_config_file:
+			ensure => file,
+			content => template($puppet::params::hiera_config_content),
+			require	=> Package[$puppet::params::puppet_package],
+		}
+	} else {
+		file{$hiera_config_file:
+			ensure => file,
+			source => $hiera_config_source,
+			require	=> Package[$puppet::params::puppet_package],
+		}
 	}
 
 }

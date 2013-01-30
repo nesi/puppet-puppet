@@ -1,0 +1,18 @@
+---
+:backends:
+<%- if hiera_backend_yaml then -%>
+   - yaml
+<%- end -%>
+<%- if hiera_backend_json then -%>
+  - json
+<%- end -%>
+<%- if hiera_backend_yaml then -%>
+:yaml:
+  :datadir: <%= hiera_yaml_datadir %>
+<%- end -%>
+<%- if hiera_backend_json then -%>
+:json:
+  :datadir: <%= hira_json_datadir %>
+<%- end -%>
+:hierarchy:
+  - common
