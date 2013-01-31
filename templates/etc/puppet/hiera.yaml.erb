@@ -8,11 +8,11 @@
 <%- end -%>
 <%- if hiera_backend_yaml then -%>
 :yaml:
-  :datadir: <%= hiera_yaml_datadir %>
+  :datadir: <%= scope.lookupvar('puppet::install::hiera_yaml_datadir') %>
 <%- end -%>
 <%- if hiera_backend_json then -%>
 :json:
-  :datadir: <%= hira_json_datadir %>
+  :datadir: <%= scope.lookupvar('puppet::install::hira_json_datadir') %>
 <%- end -%>
 :hierarchy:
   - common
