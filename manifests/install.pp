@@ -11,6 +11,7 @@ class puppet::install(
 	$storeconfigs,
 	$puppetlabs_repo,
 	$user_shell,
+	$environments,
 	$hiera_config_file,
 	$hiera_config_source,
 	$hiera_backend_yaml,
@@ -72,6 +73,18 @@ class puppet::install(
 			ensure => file,
 			source => $hiera_config_source,
 			require	=> Package[$puppet::params::puppet_package],
+		}
+	}
+
+	file{'hiera_datadir':
+		ensure	=> directory,
+		path 		=> $hiera_datadir ? {
+			false		=> $puppet::params::hiera_datadir,
+			default	=> $hiera_datadir,
+		},
+		require => $environments ? {
+			false		=> Package[$puppet::params::puppet_package],
+			default => [Package[$puppet::params::puppet_package],File['environments_dir']],
 		}
 	}
 
