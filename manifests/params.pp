@@ -16,6 +16,7 @@ class puppet::params{
 			$hiera_config_content = "puppet${hiera_config_file}.erb"
 			$hiera_yaml_datadir		= "${conf_dir}/hieradata"
 			$hiera_json_datadir		= "${conf_dir}/hieradata"
+			$ruby_augeas_package	= "libaugeas-ruby"
 		}
 	}
 }

@@ -35,6 +35,9 @@ class puppet::install(
 	} else {
 		package{$puppet::params::puppet_package: ensure => installed}
 	}
+
+	# Other packages
+	package{$puppet::params::ruby_augeas_package: ensure => installed}
 	
 
 	user{'puppet':
