@@ -9,8 +9,7 @@ class puppet (
 	$hiera_config_source	= false,
 	$hiera_backend_yaml		= true,
 	$hiera_backend_json		= false,
-	$hirea_yaml_datadir		= false,
-	$hiera_json_datadir		= false
+	$hirea_datadir				= false,
 ){
 
 	include puppet::params
@@ -29,8 +28,7 @@ class puppet (
 				hiera_config_source	=> $hiera_config_source,
 				hiera_backend_yaml	=> $hiera_backend_yaml,
 				hiera_backend_json	=> $hiera_backend_json,
-				hiera_yaml_datadir	=> $hiera_yaml_datadir,
-				hiera_json_datadir	=> $hiera_json_datadir,
+				hiera_datadir				=> $hiera_datadir,
 			}
 		}
 		default:{

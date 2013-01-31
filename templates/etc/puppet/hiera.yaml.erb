@@ -8,18 +8,18 @@
 <%- end -%>
 <%- if hiera_backend_yaml then -%>
 :yaml:
-<%- if scope.lookupvar('puppet::install::hiera_yaml_datadir') then -%>
-  :datadir: <%= scope.lookupvar('puppet::install::hiera_yaml_datadir') %>
+<%- if scope.lookupvar('puppet::install::hiera_datadir') then -%>
+  :datadir: <%= scope.lookupvar('puppet::install::hiera_datadir') %>
 <%- else -%>
-  :datadir: <%= scope.lookupvar('puppet::params::hiera_yaml_datadir') %>
+  :datadir: <%= scope.lookupvar('puppet::params::hiera_datadir') %>
 <%- end -%>
 <%- end -%>
 <%- if hiera_backend_json then -%>
 :json:
-<%- if scope.lookupvar('puppet::install::hiera_json_datadir') then -%>
-  :datadir: <%= scope.lookupvar('puppet::install::hiera_json_datadir') %>
+<%- if scope.lookupvar('puppet::install::hiera_datadir') then -%>
+  :datadir: <%= scope.lookupvar('puppet::install::hiera_datadir') %>
 <%- else -%>
-  :datadir: <%= scope.lookupvar('puppet::params::hiera_json_datadir') %>
+  :datadir: <%= scope.lookupvar('puppet::params::hiera_datadir') %>
 <%- end -%>
 <%- end -%>
 :hierarchy:

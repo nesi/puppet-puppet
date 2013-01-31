@@ -15,8 +15,7 @@ class puppet::install(
 	$hiera_config_source,
 	$hiera_backend_yaml,
 	$hiera_backend_json,
-	$hiera_yaml_datadir,
-	$hiera_json_datadir
+	$hiera_datadir
 ) {
 
 	if $puppetlabs_repo == true {
