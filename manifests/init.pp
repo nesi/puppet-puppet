@@ -29,14 +29,8 @@ class puppet (
 				hiera_config_source	=> $hiera_config_source,
 				hiera_backend_yaml	=> $hiera_backend_yaml,
 				hiera_backend_json	=> $hiera_backend_json,
-				hiera_yaml_datadir	=> $hiera_yaml_datadir ? {
-					false 	=> $puppet::params::hiera_yaml_datadir,
-					default => $hiera_yaml_datadir,
-				},
-				hiera_json_datadir	=> $hiera_json_datadir ? {
-					false		=> $puppet::params::hiera_json_datadir,
-					default => $hiera_json_datadir,
-				},
+				hiera_yaml_datadir	=> $hiera_yaml_datadir,
+				hiera_json_datadir	=> $hiera_json_datadir,
 			}
 		}
 		default:{
