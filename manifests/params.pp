@@ -11,13 +11,12 @@ class puppet::params{
 			$conf_dir 						= '/etc/puppet'
 			$conf_file 						= 'puppet.conf'
 			$conf_path						= "${conf_dir}/${conf_file}"
+			$environments_dir			= "${conf_dir}/environments"
 			$hiera_package 				= 'heira-puppet'
 			$hiera_config_file		= "${conf_dir}/hiera.yaml"
 			$hiera_config_content = "puppet${hiera_config_file}.erb"
-			$hiera_datadir				= $puppet::environments ? {
-				false		=> "${conf_dir}/hieradata",
-				default => "${conf_dir}/environments/%{environment}/hieradata",
-			}
+			$hiera_datadir				= "${conf_dir}/hieradata"
+			$hiera_envs_datadir		= "${conf_dir}/environments/%{environment}/hieradata"
 			$ruby_augeas_package	= "libaugeas-ruby"
 		}
 	}
