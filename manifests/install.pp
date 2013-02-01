@@ -92,4 +92,13 @@ class puppet::install(
 		}
 	}
 
+	define heira_make_hierarchy {
+		file{"$hiera_datadir/${name}.yaml":
+			ensure	=> file,
+		}
+	}
+
+	hiera_make_hierarchy{$hiera_hierarchy:}
+
 }
+
