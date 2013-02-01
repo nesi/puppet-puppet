@@ -11,6 +11,7 @@ class puppet (
 	$hiera_backend_yaml		= true,
 	$hiera_backend_json		= false,
 	$hiera_datadir				= false,
+	$hiera_hierarchy			= ['commmon']
 ){
 
 	include puppet::params
@@ -37,6 +38,7 @@ class puppet (
 					},
 					default	=> $hiera_datadir,
 				},
+				hiera_hierarchy 			=> $hiera_hierarchy,
 			}
 		}
 		default:{
