@@ -93,8 +93,10 @@ class puppet::install(
 	}
 
 	
-
-	puppet::hiera::make_hierarchy{$hiera_hierarchy:}
+	puppet::hiera::make_hierarchy{$hiera_hierarchy:
+		yaml => $hiera_backend_yaml,
+		json => $hiera_backend_json,
+	}
 
 }
 

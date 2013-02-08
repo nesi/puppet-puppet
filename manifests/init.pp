@@ -1,4 +1,6 @@
 # This manifests does the sanity checking in preparation of installing the puppet client
+# Note, the .json Hiera backend is enabled by default as the usual .yaml backend
+# can not be manipulated with augeas.
 
 class puppet (
 	$pluginsync 					= false,
@@ -8,8 +10,8 @@ class puppet (
 	$environments					= false,
 	$hiera_config_file		= false,
 	$hiera_config_source	= false,
-	$hiera_backend_yaml		= true,
-	$hiera_backend_json		= false,
+	$hiera_backend_yaml		= false,
+	$hiera_backend_json		= true,
 	$hiera_datadir				= false,
 	$hiera_hierarchy			= ['commmon']
 ){
