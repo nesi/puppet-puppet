@@ -6,7 +6,7 @@
 # or
 # class {'puppet::hiera': }
 
-class puppet::heira::install(
+class puppet::hiera::install(
 	$ensure,
 	$hiera_config_file,
 	$hiera_config_source,
@@ -15,9 +15,10 @@ class puppet::heira::install(
 	$hiera_datadir,
 	$hiera_hierarchy
 ) {
+
 	# Hiera is installed with the puppet package with Puppet 3.x
 	# so must only be installed with 2.x
-	if $puppet_version ~= /^2\.*$/ {
+	if $puppet_version =~ /^2\.*$/ {
 		package{$puppet::params::hiera_package:
 			require	=> Package['$puppet::params::puppet_package'],
 		}
@@ -48,7 +49,7 @@ class puppet::heira::install(
 		ensure	=> directory,
 		require => $environments ? {
 			false		=> Package[$puppet::params::puppet_package],
-			default => [Package[$puppet::params::puppet_package],File['environments_dir']],
+			default => [Package[$puppet::params::puppet_package],File[$puppet::params::environments_dir]],
 		}
 	}
 	

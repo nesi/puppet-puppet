@@ -51,7 +51,7 @@ class puppet::install(
 	}
 
 	if $environments {
-		file{'environments_dir':
+		file{$puppet::params::environments_dir:
 			ensure	=> directory,
 			path 		=> $puppet::params::environments_dir,
 		}
