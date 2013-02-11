@@ -7,13 +7,7 @@ class puppet (
 	$puppetlabs_repo			= false,
 	$storeconfigs					= false,
 	$user_shell						= false,
-	$environments					= false,
-	$hiera_config_file		= false,
-	$hiera_config_source	= false,
-	$hiera_backend_yaml		= false,
-	$hiera_backend_json		= true,
-	$hiera_datadir				= false,
-	$hiera_hierarchy			= ['commmon']
+	$environments					= false
 ){
 
 	include puppet::params
@@ -26,21 +20,6 @@ class puppet (
 				storeconfigs				=> $storeconfigs,
 				user_shell					=> $user_shell,
 				environments				=> $environments,
-				hiera_config_file		=> $hiera_config_file ? {
-					false 	=> $puppet::params::hiera_config_file,
-					default	=> $hira_config_file,
-				},
-				hiera_config_source	=> $hiera_config_source,
-				hiera_backend_yaml	=> $hiera_backend_yaml,
-				hiera_backend_json	=> $hiera_backend_json,
-				hiera_datadir				=> $hiera_datadir ? {
-					false		=> $environments ? {
-						false 	=> $puppet::params::hiera_datadir,
-						default	=> $puppet::params::hiera_envs_datadir,
-					},
-					default	=> $hiera_datadir,
-				},
-				hiera_hierarchy 			=> $hiera_hierarchy,
 			}
 		}
 		default:{
