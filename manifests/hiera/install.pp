@@ -47,7 +47,7 @@ class puppet::hiera::install(
 
 	file{$hiera_datadir:
 		ensure	=> directory,
-		require => $environments ? {
+		require => $puppet::environments ? {
 			false		=> Package[$puppet::params::puppet_package],
 			default => [Package[$puppet::params::puppet_package],File[$puppet::params::environments_dir]],
 		}
