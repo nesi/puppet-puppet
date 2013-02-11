@@ -45,6 +45,12 @@ class puppet::hiera::install(
 		}
 	}
 
+	file{"/etc/hiera.yaml":
+		ensure 	=> link,
+		target 	=> $hiera_config_file,
+		require => File[$hiera_config_file],
+	}
+
 	file{$hiera_datadir:
 		ensure	=> directory,
 		require => $puppet::environments ? {
