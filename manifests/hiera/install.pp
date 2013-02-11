@@ -58,10 +58,5 @@ class puppet::hiera::install(
 			default => [Package[$puppet::params::puppet_package],File[$puppet::params::environments_dir]],
 		}
 	}
-	
-	puppet::hiera::make_hierarchy{$hiera_hierarchy:
-		yaml => $hiera_backend_yaml,
-		json => $hiera_backend_json,
-	}
 
 }
