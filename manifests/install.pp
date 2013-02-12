@@ -34,6 +34,10 @@ class puppet::install(
 	# Other packages
 	package{$puppet::params::ruby_augeas_package: ensure => installed}
 	
+	file{$puppet::params::user_home:
+		ensure => directory,
+	}
+
 	user{$puppet::params::user:
 		ensure			=> present,
 		shell 			=> $user_shell,
