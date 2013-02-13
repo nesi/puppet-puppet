@@ -59,7 +59,7 @@ class puppet::install(
 	augeas{'puppet_set_master':
 		context => $puppet::params::conf_path,
 		changes	=> $puppetmaster ? {
-			false		=> "rm main/server",
+			false		=> ["rm main/server",],
 			default	=> ["set main/server ${puppetmaster}",],
 			},
 		require	=> Package[$puppet::params::puppet_package],
