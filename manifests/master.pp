@@ -31,5 +31,14 @@ class puppet::master (
 	# Something should be done here to bring the puppetmaster site configuration
 	# under the management of the Puppet apache module, though the default installed
 	# with the package should just work
+	# It looks like the Apache module does not yet have the sophistication to
+	# configure the puppetmaster application
+
+	apache::vhost{'puppetmaster_dynaguppy':
+		port 			=> 8140,
+		docroot		=> '/usr/share/puppet/rack/puppetmasterd/public/',
+		ssl 			=> true,
+		priority	=> 50,
+	}
 
 }
