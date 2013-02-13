@@ -20,7 +20,7 @@ class puppet::master (
 	}
 
 	augeas{'puppetmaster_ssl_config':
-		context => $puppet::params::conf_path,
+		context => "/files/${puppet::params::conf_path}",
 		changes	=> [
 			"set master/ssl_client_header SSL_CLIENT_S_DN",
 			"set master/ssl_client_verify_header SSL_CLIENT_VERIFY",

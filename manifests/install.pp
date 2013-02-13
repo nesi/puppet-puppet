@@ -48,7 +48,7 @@ class puppet::install(
 	}
 
 	augeas{'puppet_main_config':
-		context => $puppet::params::conf_path,
+		context => "/files/${puppet::params::conf_path}",
 		changes	=> [
 			"set main/pluginsync ${pluginsync}",
 			"set main/storeconfigs ${storeconfigs}",
@@ -57,7 +57,7 @@ class puppet::install(
 	}
 
 	augeas{'puppet_set_master':
-		context => $puppet::params::conf_path,
+		context => "/files/${puppet::params::conf_path}",
 		changes	=> $puppetmaster ? {
 			false		=> ["rm main/server",],
 			default	=> ["set main/server ${puppetmaster}",],
