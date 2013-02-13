@@ -36,7 +36,11 @@ class puppet::install(
 	package{$puppet::params::ruby_augeas_package: ensure => installed}
 	
 	file{$puppet::params::user_home:
-		ensure => directory,
+		owner	 	=> $puppet::params::user,
+		group  	=> $puppet::params::user,
+		recurse	=> true,
+		ensure 	=> directory,
+		require			=> Package[$puppet::params::puppet_package],
 	}
 
 	user{$puppet::params::user:
@@ -44,7 +48,23 @@ class puppet::install(
 		shell 			=> $user_shell,
 		home 				=> $puppet::params::user_home,
 		managehome	=> false,
-		require			=> [Package[$puppet::params::puppet_package],File[$puppet::params::user_home]],
+		require			=> Package[$puppet::params::puppet_package],
+	}
+
+	file{$puppet::params::conf_dir:
+		ensure 	=> directory,
+		owner		=> $puppet::params::user,
+		group 	=> $puppet::params::user,
+		recurse	=> true,
+		require	=> Package[$puppet::params::puppet_package],
+	}
+
+	file{$puppet::params::app_dir:
+		ensure 	=> directory,
+		owner		=> $puppet::params::user,
+		group 	=> $puppet::params::user,
+		recurse	=> true,
+		require	=> Package[$puppet::params::puppet_package],
 	}
 
 	augeas{'puppet_main_config':

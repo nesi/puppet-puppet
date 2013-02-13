@@ -9,6 +9,7 @@ class puppet::params{
 			$user_home						= '/var/lib/puppet'
 			$group 								= 'puppet'
 			$conf_dir 						= '/etc/puppet'
+			$app_dir							= '/usr/share/puppet'
 			$conf_file 						= 'puppet.conf'
 			$conf_path						= "${conf_dir}/${conf_file}"
 			$environments_dir			= "${conf_dir}/environments"
