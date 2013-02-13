@@ -34,9 +34,14 @@ class puppet::master (
 	# It looks like the Apache module does not yet have the sophistication to
 	# configure the puppetmaster application
 
+	file{$puppet::params::puppetmaster_docroot:
+		ensure => directory,
+		require => File[$puppet::params::app_dir],
+	}
+
 	apache::vhost{'puppetmaster_dynaguppy':
 		port 			=> 8140,
-		docroot		=> '/usr/share/puppet/rack/puppetmasterd/public/',
+		docroot		=> $puppet::params::puppetmaster_docroot,
 		ssl 			=> true,
 		priority	=> 50,
 	}
