@@ -11,7 +11,8 @@ class puppet::install(
 	$storeconfigs,
 	$puppetlabs_repo,
 	$user_shell,
-	$environments,
+	$puppetmaster,
+	$environments
 ) {
 
 	if $puppetlabs_repo == true {
@@ -52,6 +53,15 @@ class puppet::install(
 			"set main/pluginsync ${pluginsync}",
 			"set main/storeconfigs ${storeconfigs}",
 		],
+		require	=> Package[$puppet::params::puppet_package],
+	}
+
+	augeas{'puppet_set_master':
+		context => $puppet::params::conf_path,
+		changes	=> $puppetmaster ? {
+			false		=> "rm main/server",
+			default	=> ["set main/server ${puppetmaster}",],
+			},
 		require	=> Package[$puppet::params::puppet_package],
 	}
 

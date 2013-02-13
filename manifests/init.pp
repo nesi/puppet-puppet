@@ -7,7 +7,8 @@ class puppet (
 	$puppetlabs_repo			= false,
 	$storeconfigs					= false,
 	$user_shell						= false,
-	$environments					= false
+	$environments					= false,
+	$puppetmaster					= false
 ){
 
 	include puppet::params
@@ -20,6 +21,7 @@ class puppet (
 				storeconfigs				=> $storeconfigs,
 				user_shell					=> $user_shell,
 				environments				=> $environments,
+				puppetmaster				=> $puppetmaster,
 			}
 		}
 		default:{

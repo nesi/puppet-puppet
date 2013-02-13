@@ -28,4 +28,8 @@ class puppet::master (
 		require	=> Package[$puppet::params::puppetmaster_package],
 	}
 
+	# Something should be done here to bring the puppetmaster site configuration
+	# under the management of the Puppet apache module, though the default installed
+	# with the package should just work
+
 }
