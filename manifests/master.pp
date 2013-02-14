@@ -52,12 +52,24 @@ class puppet::master (
 		require => [File[$puppet::params::app_dir],Package[$puppet::params::puppetmaster_package]],
 	}
 
+	# NOTE: This vitual host declaration requiers the apache module to have the
+	# ssl patch from https://github.com/nesi/puppetlabs-apache/tree/vhost_ssl
+	# merged into it.
+	# The ssl settings have been taken directly from the default vhost
+	# configuration distributed with the puppetmaster-passenger package
+	# some of which are _defaults_ and will not be passed through to the vhost
+	# configuration file.
 	apache::vhost{'puppetmaster_dynaguppy':
-		servername	=> $::fqdn,
-		docroot			=> $puppet::params::puppetmaster_docroot,
-		port 				=> 8140,
-		ssl 				=> true,
-		priority		=> 50,
+		servername				=> $::fqdn,
+		docroot						=> $puppet::params::puppetmaster_docroot,
+		port 							=> 8140,
+		ssl 							=> true,
+		sslprotocol 			=> '-ALL +SSLv3 +TLSv1',
+		sslciphersuite 		=> 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP',
+		sslverifiyclient	=> 'optional',
+		ssloptions				=> '+StdEnvVars +ExportCertData',
+		sslverifydepth		=> 1,
+		priority					=> 50,
 	}
 
 }
