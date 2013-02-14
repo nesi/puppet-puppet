@@ -53,11 +53,11 @@ class puppet::master (
 		require => File[$puppet::params::app_dir],
 	}
 
-	# apache::vhost{'puppetmaster_dynaguppy':
-	# 	port 			=> 8140,
-	# 	docroot		=> $puppet::params::puppetmaster_docroot,
-	# 	ssl 			=> true,
-	# 	priority	=> 50,
-	# }
+	apache::vhost{'puppetmaster_dynaguppy':
+		port 			=> 8140,
+		docroot		=> $puppet::params::puppetmaster_docroot,
+		ssl 			=> true,
+		priority	=> 50,
+	}
 
 }
