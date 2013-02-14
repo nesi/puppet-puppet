@@ -20,7 +20,7 @@ class puppet::params{
 			$hiera_envs_datadir		= "${conf_dir}/environments/${environment}/hieradata"
 			$ruby_augeas_package	= "libaugeas-ruby"
 			$puppetmaster_package	= "puppetmaster-passenger"
-			$puppetmaster_docroot = "${app_dir}/rack/puppetmasterd/public/"
+			$puppetmaster_docroot = "${app_dir}/rack/puppetmasterd/public"
 		}
 	}
 }
