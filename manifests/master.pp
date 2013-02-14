@@ -15,6 +15,20 @@ class puppet::master (
 	require apache
 	require apache::mod::passenger
 
+	# NOTE: If passenger tuning is available it is recommended that the following
+	# tuning parameters are passed to apache::mod::passenger
+	# Look at this fork: https://github.com/nesi/puppetlabs-apache/tree/passenger_tuning
+	# DON'T uncommment this!
+	# class {'apache::mod::passenger': 
+	# 	passengerhighperformance 	=> 'on',
+	# 	passengermaxpoolsize			=> 12,
+	# 	passengerpoolidletime			=> 1500,
+	# 	# passengermaxrequests			=> 1000,
+	# 	passengerstattrottlerate	=> 120,
+	# 	rackautodetect						=> 'off',
+	# 	railsautodetect 					=> 'off',
+	# }
+
 	package{$puppet::params::puppetmaster_package:
 	 ensure 	=> $ensure, 
 	}
@@ -39,11 +53,11 @@ class puppet::master (
 		require => File[$puppet::params::app_dir],
 	}
 
-	apache::vhost{'puppetmaster_dynaguppy':
-		port 			=> 8140,
-		docroot		=> $puppet::params::puppetmaster_docroot,
-		ssl 			=> true,
-		priority	=> 50,
-	}
+	# apache::vhost{'puppetmaster_dynaguppy':
+	# 	port 			=> 8140,
+	# 	docroot		=> $puppet::params::puppetmaster_docroot,
+	# 	ssl 			=> true,
+	# 	priority	=> 50,
+	# }
 
 }
