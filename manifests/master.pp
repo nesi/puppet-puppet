@@ -12,7 +12,6 @@ class puppet::master (
 	# Use the Puppetlabs Apache module (or a fork):
 	# https://forge.puppetlabs.com/puppetlabs/apache
 	# https://github.com/puppetlabs/puppetlabs-apache
-	require apache
 	require apache::mod::passenger
 
 	# NOTE: If passenger tuning is available it is recommended that the following
@@ -30,7 +29,7 @@ class puppet::master (
 	# }
 
 	package{$puppet::params::puppetmaster_package:
-	 ensure 	=> $ensure, 
+	 ensure 	=> $ensure,
 	}
 
 	augeas{'puppetmaster_ssl_config':
@@ -50,14 +49,15 @@ class puppet::master (
 
 	file{$puppet::params::puppetmaster_docroot:
 		ensure => directory,
-		require => File[$puppet::params::app_dir],
+		require => [File[$puppet::params::app_dir],Package[$puppet::params::puppetmaster_package]],
 	}
 
 	apache::vhost{'puppetmaster_dynaguppy':
-		port 			=> 8140,
-		docroot		=> $puppet::params::puppetmaster_docroot,
-		ssl 			=> true,
-		priority	=> 50,
+		servername	=> $::fqdn,
+		docroot			=> $puppet::params::puppetmaster_docroot,
+		port 				=> 8140,
+		ssl 				=> true,
+		priority		=> 50,
 	}
 
 }
