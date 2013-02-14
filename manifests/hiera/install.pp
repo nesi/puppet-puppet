@@ -25,7 +25,7 @@ class puppet::hiera::install(
 	}
 
 	augeas{'puppet_config_hiera_config':
-		context => "/files/${puppet::params::conf_path}",
+		context => "/files${puppet::params::conf_path}",
 		changes	=> ["set master/hiera_config ${hiera_config_file}"],
 		require	=> Package[$puppet::params::puppet_package],
 	}
