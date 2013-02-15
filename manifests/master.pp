@@ -66,9 +66,13 @@ class puppet::master (
 		ssl 							=> true,
 		sslprotocol 			=> '-ALL +SSLv3 +TLSv1',
 		sslciphersuite 		=> 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP',
-		sslverifiyclient	=> 'optional',
+		sslverifyclient	=> 'optional',
 		ssloptions				=> '+StdEnvVars +ExportCertData',
 		sslverifydepth		=> 1,
+		ssl_public_cert_dir	=> '/var/lib/puppet/ssl/certs',
+		ssl_private_key_dir	=> '/var/lib/puppet/ssl/private_keys',
+		ssl_public_cert 		=> "${::fqdn}.pem",
+		ssl_private_key 		=> "${::fqdn}.pem",
 		priority					=> 50,
 	}
 
