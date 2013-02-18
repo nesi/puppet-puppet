@@ -77,6 +77,17 @@ class puppet::master (
 		ssl_ca_cert					=> 'ca.pem',
 		ssl_ca_chain_cert		=> 'ca.pem',
 		priority						=> 50,
+		servername		=> $::fqdn,
+		docroot				=> $puppet::params::puppetmaster_docroot,
+		port 					=> 8140,
+		ssl 					=> true,
+		priority			=> 50,
+		requestheader => [
+			'unset X-Forwarded-For',
+			'set X-SSL-Subject %{SSL_CLIENT_S_DN}e',
+			'set X-Client-DN %{SSL_CLIENT_S_DN}e',
+			'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
+		],
 	}
 
 }
