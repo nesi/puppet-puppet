@@ -18,7 +18,7 @@ class puppet::master (
 	# tuning parameters are passed to apache::mod::passenger
 	# Look at this fork: https://github.com/nesi/puppetlabs-apache/tree/passenger_tuning
 	# DON'T uncommment this!
-	# class {'apache::mod::passenger': 
+	# class {'apache::mod::passenger':
 	# 	passengerhighperformance 	=> 'on',
 	# 	passengermaxpoolsize			=> 12,
 	# 	passengerpoolidletime			=> 1500,
@@ -51,6 +51,9 @@ class puppet::master (
 		ensure => directory,
 		require => [File[$puppet::params::app_dir],Package[$puppet::params::puppetmaster_package]],
 	}
+
+  # The web server user needs access to the puppet directories!
+  User[$apache::params::user]{ groups +> $puppet::params::group}
 
 	# NOTE: This vitual host declaration requiers the apache module to have the
 	# ssl patch from https://github.com/nesi/puppetlabs-apache/tree/vhost_ssl
