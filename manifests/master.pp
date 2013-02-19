@@ -49,11 +49,10 @@ class puppet::master (
 
 	file{$puppet::params::puppetmaster_docroot:
 		ensure => directory,
+    group   => $apache::params::group,
+    recurse => true,
 		require => [File[$puppet::params::app_dir],Package[$puppet::params::puppetmaster_package]],
 	}
-
-  # The web server user needs access to the puppet directories!
-  User[$apache::params::user]{ groups +> $puppet::params::group}
 
 	# NOTE: This vitual host declaration requiers the apache module to have the
 	# ssl patch from https://github.com/nesi/puppetlabs-apache/tree/vhost_ssl
