@@ -51,6 +51,7 @@ class puppet::master (
 		ensure => directory,
     group   => $apache::params::group,
     recurse => true,
+    ignore  => '.git',
 		require => [File[$puppet::params::app_dir],Package[$puppet::params::puppetmaster_package]],
 	}
 

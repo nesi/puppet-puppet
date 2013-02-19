@@ -3,7 +3,7 @@
 # This manifest should NOT be called directly, use:
 #
 # include puppet
-# 
+#
 # for default install.
 
 class puppet::install(
@@ -34,13 +34,14 @@ class puppet::install(
 
 	# Other packages
 	package{$puppet::params::ruby_augeas_package: ensure => installed}
-	
+
 	file{$puppet::params::user_home:
 		owner	 	=> $puppet::params::user,
 		group  	=> $puppet::params::user,
 		recurse	=> true,
 		ensure 	=> directory,
 		require			=> Package[$puppet::params::puppet_package],
+    ignore  => '.git',
 	}
 
 	user{$puppet::params::user:
@@ -57,6 +58,7 @@ class puppet::install(
 		group 	=> $puppet::params::user,
 		recurse	=> true,
 		require	=> Package[$puppet::params::puppet_package],
+    ignore  => '.git',
 	}
 
 	file{$puppet::params::app_dir:
@@ -65,6 +67,7 @@ class puppet::install(
 		group 	=> $puppet::params::user,
 		recurse	=> true,
 		require	=> Package[$puppet::params::puppet_package],
+    ignore  => '.git',
 	}
 
 	augeas{'puppet_main_config':
@@ -89,6 +92,7 @@ class puppet::install(
 		file{$puppet::params::environments_dir:
 			ensure	=> directory,
 			path 		=> $puppet::params::environments_dir,
+      ignore  => '.git',
 		}
 	}
 
