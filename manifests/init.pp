@@ -3,29 +3,29 @@
 # can not be manipulated with augeas.
 
 class puppet (
-	$pluginsync 					= false,
-	$puppetlabs_repo			= false,
-	$storeconfigs					= false,
-	$user_shell						= false,
-	$environments					= false,
-	$puppetmaster					= false
+  $pluginsync           = false,
+  $puppetlabs_repo      = false,
+  $storeconfigs         = false,
+  $user_shell           = false,
+  $environments         = false,
+  $puppetmaster         = false
 ){
 
-	include puppet::params
+  include puppet::params
 
-	case $operatingsystem {
-		Ubuntu:{
-			class{'puppet::install':
-				pluginsync					=> $pluginsync,
-				puppetlabs_repo 		=> $puppetlabs_repo,
-				storeconfigs				=> $storeconfigs,
-				user_shell					=> $user_shell,
-				environments				=> $environments,
-				puppetmaster				=> $puppetmaster,
-			}
-		}
-		default:{
-			warning("Puppet module is not configured for $operatingsystem on $fqdn.")
-		}
-	}
+  case $operatingsystem {
+    Ubuntu:{
+      class{'puppet::install':
+        pluginsync          => $pluginsync,
+        puppetlabs_repo     => $puppetlabs_repo,
+        storeconfigs        => $storeconfigs,
+        user_shell          => $user_shell,
+        environments        => $environments,
+        puppetmaster        => $puppetmaster,
+      }
+    }
+    default:{
+      warning("Puppet module is not configured for $operatingsystem on $fqdn.")
+    }
+  }
 }

@@ -16,12 +16,12 @@ Clone into your puppet configuration in your `puppet/modules` directory:
 
 Or if you're managing your Puppet configuration with git, in your `puppet` directory:
 
-		git submodule add git://github.com/nesi/puppet-puppet.git modules/puppet --init --recursive
-		cd modules/puppet
-		git checkout master
-		git pull
-		cd ../..
-		git commit -m "added puppet submodule from https://github.com/nesi/puppet-puppet"
+    git submodule add git://github.com/nesi/puppet-puppet.git modules/puppet --init --recursive
+    cd modules/puppet
+    git checkout master
+    git pull
+    cd ../..
+    git commit -m "added puppet submodule from https://github.com/nesi/puppet-puppet"
 
 It might seem bit excessive, but it will make sure the submodule isn't headless...
 
