@@ -75,7 +75,7 @@ class puppet::master (
     ssl_verify_depth    => 1,
     ssl_certs_dir       => "${puppet::params::user_home}/ssl",
     ssl_cert            => "${puppet::params::user_home}/ssl/certs/${::fqdn}.pem",
-    ssl_key             => "${puppet::params::user_home}/ssl/private_keys.${::fqdn}.pem",
+    ssl_key             => "${puppet::params::user_home}/ssl/private_keys/${::fqdn}.pem",
     ssl_ca              => "${puppet::params::user_home}/ssl/certs/ca.pem",
     ssl_chain           => "${puppet::params::user_home}/ssl/certs/ca.pem",
     request_header      =>  [
