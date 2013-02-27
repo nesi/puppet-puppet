@@ -77,7 +77,9 @@ class puppet::master (
     ssl_cert            => "${puppet::params::user_home}/ssl/certs/${::fqdn}.pem",
     ssl_key             => "${puppet::params::user_home}/ssl/private_keys/${::fqdn}.pem",
     ssl_ca              => "${puppet::params::user_home}/ssl/certs/ca.pem",
+    ssl_ca_dir          => "${puppet::params::user_home}/ssl/certs",
     ssl_chain           => "${puppet::params::user_home}/ssl/certs/ca.pem",
+    rack_base_uris      => ['/'],
     request_header      =>  [
                               'unset X-Forwarded-For',
                               'set X-SSL-Subject %{SSL_CLIENT_S_DN}e',
