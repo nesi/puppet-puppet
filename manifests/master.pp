@@ -80,7 +80,7 @@ class puppet::master (
     ssl_ca_dir          => "${puppet::params::user_home}/ssl/certs",
     ssl_chain           => "${puppet::params::user_home}/ssl/certs/ca.pem",
     rack_base_uris      => ['/'],
-    request_header      =>  [
+    request_headers     =>  [
                               'unset X-Forwarded-For',
                               'set X-SSL-Subject %{SSL_CLIENT_S_DN}e',
                               'set X-Client-DN %{SSL_CLIENT_S_DN}e',
