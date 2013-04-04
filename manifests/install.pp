@@ -7,6 +7,7 @@
 # for default install.
 
 class puppet::install(
+  $ensure,
   $pluginsync,
   $storeconfigs,
   $puppetlabs_repo,

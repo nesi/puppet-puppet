@@ -3,6 +3,7 @@
 # can not be manipulated with augeas.
 
 class puppet (
+  $ensure               = 'present',
   $pluginsync           = false,
   $puppetlabs_repo      = false,
   $storeconfigs         = false,
@@ -16,6 +17,7 @@ class puppet (
   case $operatingsystem {
     Ubuntu:{
       class{'puppet::install':
+        ensure              => $ensure,
         pluginsync          => $pluginsync,
         puppetlabs_repo     => $puppetlabs_repo,
         storeconfigs        => $storeconfigs,
