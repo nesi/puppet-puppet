@@ -26,15 +26,15 @@ class puppet::install(
     }
 
     package{$puppet::params::puppet_package:
-     ensure => installed,
+     ensure => $ensure,
      require => Apt::Source['puppetlabs'],
     }
   } else {
-    package{$puppet::params::puppet_package: ensure => installed}
+    package{$puppet::params::puppet_package: ensure => $ensure}
   }
 
   # Other packages
-  package{$puppet::params::ruby_augeas_package: ensure => installed}
+  package{$puppet::params::ruby_augeas_package: ensure => $ensure}
 
   file{$puppet::params::user_home:
     owner   => $puppet::params::user,
