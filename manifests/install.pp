@@ -42,7 +42,7 @@ class puppet::install(
     recurse => true,
     ensure  => directory,
     require     => Package[$puppet::params::puppet_package],
-    ignore  => ['.git','lib','clientbucket'],
+    ignore  => ['.git','lib'],
   }
 
   user{$puppet::params::user:
@@ -59,7 +59,7 @@ class puppet::install(
     group   => $puppet::params::user,
     recurse => true,
     require => Package[$puppet::params::puppet_package],
-    ignore  => '.git',
+    ignore  => ['.git'],
   }
 
   file{$puppet::params::app_dir:

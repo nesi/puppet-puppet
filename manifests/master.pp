@@ -19,7 +19,7 @@ class puppet::master (
   # Look at this fork: https://github.com/nesi/puppetlabs-apache/tree/passenger_tuning
   # DON'T uncommment this!
   # class {'apache::mod::passenger':
-  #   passenger_high_performance    => 'on',
+  #   passenger_high_performance    => 'off',
   #   passenger_max_pool_size       => 12,
   #   passenger_pool_idle_time      => 1500,
   #   # passenger_max_requests        => 1000,
