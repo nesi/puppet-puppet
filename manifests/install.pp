@@ -34,7 +34,7 @@ class puppet::install(
   }
 
   # Other packages
-  package{$puppet::params::ruby_augeas_package: ensure => $ensure}
+  package{$puppet::params::ruby_augeas_package: ensure => installed}
 
   file{$puppet::params::user_home:
     owner   => $puppet::params::user,
@@ -42,7 +42,7 @@ class puppet::install(
     recurse => true,
     ensure  => directory,
     require     => Package[$puppet::params::puppet_package],
-    ignore  => ['.git','lib'],
+    ignore  => ['.git','lib','clientbucket'],
   }
 
   user{$puppet::params::user:
