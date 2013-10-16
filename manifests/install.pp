@@ -26,8 +26,8 @@ class puppet::install(
     }
 
     package{$puppet::params::puppet_package:
-     ensure => $ensure,
-     require => Apt::Source['puppetlabs'],
+      ensure  => $ensure,
+      require => Apt::Source['puppetlabs'],
     }
   } else {
     package{$puppet::params::puppet_package: ensure => $ensure}
@@ -37,11 +37,11 @@ class puppet::install(
   package{$puppet::params::ruby_augeas_package: ensure => installed}
 
   file{$puppet::params::user_home:
+    ensure  => directory,
     owner   => $puppet::params::user,
     group   => $puppet::params::user,
     recurse => true,
-    ensure  => directory,
-    require     => Package[$puppet::params::puppet_package],
+    require => Package[$puppet::params::puppet_package],
     ignore  => ['.git','lib'],
   }
 
@@ -80,12 +80,15 @@ class puppet::install(
     require => Package[$puppet::params::puppet_package],
   }
 
+  if $puppetmaster {
+    $set_master_changes = ["set main/server ${puppetmaster}",]
+  } else {
+    $set_master_changes = ['rm main/server',]
+  }
+
   augeas{'puppet_set_master':
     context => "/files${puppet::params::conf_path}",
-    changes => $puppetmaster ? {
-      false   => ["rm main/server",],
-      default => ["set main/server ${puppetmaster}",],
-      },
+    changes => $set_master_changes,
     require => Package[$puppet::params::puppet_package],
   }
 

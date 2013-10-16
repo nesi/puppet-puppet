@@ -1,6 +1,6 @@
-# puppet-puppet
+# NeSI Puppet Puppet Module
 
-A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.
+NeSI Puppet Puppet Module is a Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.
 
 # Introduction
 

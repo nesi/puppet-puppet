@@ -1,8 +1,6 @@
 # This manifests sets the default parameters for installing puppet
-
-
 class puppet::params{
-  case $operatingsystem {
+  case $::operatingsystem {
     Ubuntu:{
       $puppet_package       = 'puppet'
       $user                 = 'puppet'
@@ -18,8 +16,8 @@ class puppet::params{
       $hiera_config_content = "puppet${hiera_config_file}.erb"
       $hiera_datadir        = "${conf_dir}/hieradata"
       $hiera_envs_datadir   = "${conf_dir}/environments/${environment}/hieradata"
-      $ruby_augeas_package  = "libaugeas-ruby"
-      $puppetmaster_package = "puppetmaster-passenger"
+      $ruby_augeas_package  = 'libaugeas-ruby'
+      $puppetmaster_package = 'puppetmaster-passenger'
       $puppetmaster_docroot = "${app_dir}/rack/puppetmasterd/public"
     }
   }

@@ -5,7 +5,6 @@
 # module
 #
 # This is _not_ required in Puppet 3.x!
-
 class puppet::hiera(
   $ensure               = present,
   $hiera_config_file    = false,
@@ -19,22 +18,29 @@ class puppet::hiera(
   require puppet
   include puppet::params
 
+  if $hiera_config_file {
+    $config_file = $puppet::params::hiera_config_file
+  } else {
+    $config_file = $hiera_config_file
+  }
+
+  if $hiera_datadir {
+    if $puppet::environments {
+      $datadir = $hiera_datadir
+    } else {
+      $datadir = $puppet::params::hiera_envs_datadir
+    }
+  } else {
+    $datadir = $puppet::params::hiera_datadir
+  }
+
   class {'puppet::hiera::install':
     ensure              => $ensure,
-    hiera_config_file   => $hiera_config_file ? {
-      false   => $puppet::params::hiera_config_file,
-      default => $hira_config_file,
-    },
+    hiera_config_file   => $config_file,
     hiera_config_source => $hiera_config_source,
     hiera_backend_yaml  => $hiera_backend_yaml,
     hiera_backend_json  => $hiera_backend_json,
-    hiera_datadir       => $hiera_datadir ? {
-      false   => $puppet::environments ? {
-        false   => $puppet::params::hiera_datadir,
-        default => $puppet::params::hiera_envs_datadir,
-      },
-      default => $hiera_datadir,
-    },
-    hiera_hierarchy       => $hiera_hierarchy,
+    hiera_datadir       => $datadir,
+    hiera_hierarchy     => $hiera_hierarchy,
   }
 }
