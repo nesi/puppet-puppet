@@ -1,12 +1,33 @@
-# blank
+# puppet-puppet
 
-This is a blank puppet module.
+A Puppet module for managing puppet and puppetmaster
 
-*NOTE:* Check README1st.markdown for usage of the blank puppet module template.
+# Introduction
+
+While working on the dynaguppy project it was decided that puppet will have to install and configure puppetmaster. As puppetmaster shares configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required.
+
+...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
+
+# To install into puppet
+
+Clone into your puppet configuration in your `puppet/modules` directory:
+
+ git clone git://github.com/nesi/puppet-puppet.git puppet
+
+Or if you're managing your Puppet configuration with git, in your `puppet` directory:
+
+    git submodule add git://github.com/nesi/puppet-puppet.git modules/puppet --init --recursive
+    cd modules/puppet
+    git checkout master
+    git pull
+    cd ../..
+    git commit -m "added puppet submodule from https://github.com/nesi/puppet-puppet"
+
+It might seem bit excessive, but it will make sure the submodule isn't headless...
 
 # Licensing
 
-Update your license details here.
+Written by Aaron Hicks (hicksa@landcareresearch.co.nz) for the New Zealand eScience Infrastructure.
 
 # Attribution
 
@@ -34,10 +55,10 @@ This will require a copy of the original input files to `spec/fixtures/augeas` u
 
 # Gnu General Public License
 
-This file is part of the blank Puppet module.
+This file is part of the NeSI Puppet Puppet module.
 
-The blank Puppet module is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+The NeSI Puppet Puppet module is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-The blank Puppet module is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+The NeSI Puppet Puppet module is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with the blank Puppet module.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with the NeSI Puppet Puppet module.  If not, see <http://www.gnu.org/licenses/>.
