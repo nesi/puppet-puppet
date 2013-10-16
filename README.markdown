@@ -1,29 +1,29 @@
 # puppet-puppet
 
-A Puppet module for managing puppet and puppetmaster
+A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.
 
 # Introduction
 
-While working on the dynaguppy project it was decided that puppet will have to install and configure puppetmaster. As puppetmaster shares configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required.
+While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project a module was required to install and configure puppet, puppetmaster and hiera. As the puppet agent and puppetmaster share configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required. Hiera is now installed with Puppet as a dependency, it is appropriate that hiera is condfigured with this module.
 
 ...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
 
-# To install into puppet
+# Dependencies
 
-Clone into your puppet configuration in your `puppet/modules` directory:
+* [puppetlabs-sdlib](https://github.com/puppetlabs/puppetlabs-stdlib)
+* [puppetlabs-apache](apache): This module is only a dependency when using the `puppet::master` class.
+[apache]:https://github.com/puppetlabs/puppetlabs-apache
 
- git clone git://github.com/nesi/puppet-puppet.git puppet
+# References
 
-Or if you're managing your Puppet configuration with git, in your `puppet` directory:
+There are other Puppet modules that can be used for puppet and puppetmaster and I may have borrowed components from them. Each has been considered, but found lacking in some area:
+* [puppetlabs\puppetlabs-puppet](https://github.com/puppetlabs/puppetlabs-puppet): Is incomplete and not in active development
+* [stephenrjohnson\puppetlabs-puppet](https://github.com/stephenrjohnson/puppetlabs-puppet): Complete, but bundles in the Puppet Dashboard, uses an out of date version of [puppetlabs-apache](apache), explicitly configures Apache and modules.
+* [ghoneycutt/puppet-module-puppet](https://github.com/ghoneycutt/puppet-module-puppet): Complete, but bundles in the Puppet Dashboard, uses an out of date version of [puppetlabs-apache](apache), and explicitly configures Apache and modules.
 
-    git submodule add git://github.com/nesi/puppet-puppet.git modules/puppet --init --recursive
-    cd modules/puppet
-    git checkout master
-    git pull
-    cd ../..
-    git commit -m "added puppet submodule from https://github.com/nesi/puppet-puppet"
+Bundling Puppet Dashboard is undesireable as it is a separate application from puppet, hence should be managed separately.
 
-It might seem bit excessive, but it will make sure the submodule isn't headless...
+Explicitly configuring Apache, it's modules, or Passenger is not desirable as it makes the Apache configuration too inflexible and can make it difficult to serve other web applications from the same server.
 
 # Licensing
 
@@ -45,13 +45,14 @@ This module has been developed for the use with Open Source Puppet (Apache 2.0 l
 
 This module includes the [Travis](https://travis-ci.org) configuration to use [`rspec-puppet-augeas`](https://github.com/domcleal/rspec-puppet-augeas) to test and verify changes made to files using the [`augeas` resource](http://docs.puppetlabs.com/references/latest/type.html#augeas) available in Puppet. Check the `rspec-puppet-augeas` [documentation](https://github.com/domcleal/rspec-puppet-augeas/blob/master/README.md) for usage.
 
-This will require a copy of the original input files to `spec/fixtures/augeas` using the same filesystem layout that the resource expects:
-
-    $ tree spec/fixtures/augeas/
-    spec/fixtures/augeas/
-    `-- etc
-        `-- ssh
-            `-- sshd_config
+This will require a copy of the original input files to `spec/fixtures/augeas` using the same filesystem layout that the resource expects:  
+```
+$ tree spec/fixtures/augeas/
+spec/fixtures/augeas/
+`-- etc
+    `-- ssh
+        `-- sshd_config
+```
 
 # Gnu General Public License
 
