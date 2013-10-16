@@ -1,7 +1,7 @@
 # This manifests sets the default parameters for installing puppet
 class puppet::params{
-  case $::operatingsystem {
-    Ubuntu:{
+  case $::osfamily {
+    Debian:{
       $puppet_package       = 'puppet'
       $user                 = 'puppet'
       $user_home            = '/var/lib/puppet'
@@ -19,6 +19,9 @@ class puppet::params{
       $ruby_augeas_package  = 'libaugeas-ruby'
       $puppetmaster_package = 'puppetmaster-passenger'
       $puppetmaster_docroot = "${app_dir}/rack/puppetmasterd/public"
+    }
+    default:{
+      fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
     }
   }
 }

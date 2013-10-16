@@ -43,20 +43,14 @@ class puppet (
 
   include puppet::params
 
-  case $::operatingsystem {
-    Ubuntu:{
-      class{'puppet::install':
-        ensure              => $ensure,
-        pluginsync          => $pluginsync,
-        puppetlabs_repo     => $puppetlabs_repo,
-        storeconfigs        => $storeconfigs,
-        user_shell          => $user_shell,
-        environments        => $environments,
-        puppetmaster        => $puppetmaster,
-      }
-    }
-    default:{
-      warning("Puppet module is not configured for ${::operatingsystem}.")
-    }
+  class{'puppet::install':
+    ensure              => $ensure,
+    pluginsync          => $pluginsync,
+    puppetlabs_repo     => $puppetlabs_repo,
+    storeconfigs        => $storeconfigs,
+    user_shell          => $user_shell,
+    environments        => $environments,
+    puppetmaster        => $puppetmaster,
   }
+
 }
