@@ -1,5 +1,7 @@
 # NeSI Puppet Puppet Module
 
+[![Build Status](https://travis-ci.org/nesi/puppet-puppet.png?branch=refactor)](https://travis-ci.org/nesi/puppet-puppet)
+
 NeSI Puppet Puppet Module is a Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.
 
 # Introduction
@@ -16,7 +18,6 @@ Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/lat
 
 # Dependencies
 
-* [puppetlabs-sdlib](https://github.com/puppetlabs/puppetlabs-stdlib)
 * [puppetlabs-apache](apache): This module is only a dependency when using the `puppet::master` class.
 [apache]:https://github.com/puppetlabs/puppetlabs-apache
 

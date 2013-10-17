@@ -14,7 +14,7 @@ class puppet::params{
     Debian:{
       $app_dir              = '/usr/share/puppet'
       $conf_file            = 'puppet.conf'
-      
+
       $environments_dir     = "${conf_dir}/environments"
       $hiera_package        = 'heira-puppet'
       $hiera_config_file    = "${conf_dir}/hiera.yaml"
