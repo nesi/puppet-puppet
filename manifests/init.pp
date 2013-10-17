@@ -34,7 +34,6 @@
 class puppet (
   $ensure               = 'present',
   $pluginsync           = false,
-  $puppetlabs_repo      = false,
   $storeconfigs         = false,
   $user_shell           = false,
   $environments         = false,
@@ -46,7 +45,6 @@ class puppet (
   class{'puppet::install':
     ensure              => $ensure,
     pluginsync          => $pluginsync,
-    puppetlabs_repo     => $puppetlabs_repo,
     storeconfigs        => $storeconfigs,
     user_shell          => $user_shell,
     environments        => $environments,

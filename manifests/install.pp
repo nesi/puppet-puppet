@@ -10,28 +10,10 @@ class puppet::install(
   $ensure,
   $pluginsync,
   $storeconfigs,
-  $puppetlabs_repo,
   $user_shell,
   $puppetmaster,
   $environments
 ) {
-
-  if $puppetlabs_repo == true {
-
-    apt::source { 'puppetlabs':
-      location   => 'http://apt.puppetlabs.com',
-      repos      => 'main',
-      key        => '4BD6EC30',
-      key_server => 'pgp.mit.edu',
-    }
-
-    package{$puppet::params::puppet_package:
-      ensure  => $ensure,
-      require => Apt::Source['puppetlabs'],
-    }
-  } else {
-    package{$puppet::params::puppet_package: ensure => $ensure}
-  }
 
   # Other packages
   package{$puppet::params::ruby_augeas_package: ensure => installed}
