@@ -18,17 +18,10 @@ class puppet::install(
   # Other packages
   package{$puppet::params::ruby_augeas_package: ensure => installed}
 
-  file{$puppet::params::user_home:
-    ensure  => directory,
-    owner   => $puppet::params::user,
-    group   => $puppet::params::user,
-    recurse => true,
-    require => Package[$puppet::params::puppet_package],
-    ignore  => ['.git','lib'],
-  }
-
-  user{$puppet::params::user:
+  user{'puppet':
     ensure      => present,
+    name        => $user,
+    gid         => $gid,
     shell       => $user_shell,
     home        => $puppet::params::user_home,
     managehome  => false,

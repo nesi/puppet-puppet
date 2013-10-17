@@ -1,15 +1,20 @@
 # This manifests sets the default parameters for installing puppet
 class puppet::params{
+
+  # Common variables
+  $puppet_package       = 'puppet'
+  $conf_dir             = '/etc/puppet'
+  $conf_file            = 'puppet.conf'
+  $user                 = 'puppet'
+  $gid                  = 'puppet'
+  $user_home            = '/var/lib/puppet'
+
+
   case $::osfamily {
     Debian:{
-      $puppet_package       = 'puppet'
-      $user                 = 'puppet'
-      $user_home            = '/var/lib/puppet'
-      $group                = 'puppet'
-      $conf_dir             = '/etc/puppet'
       $app_dir              = '/usr/share/puppet'
       $conf_file            = 'puppet.conf'
-      $conf_path            = "${conf_dir}/${conf_file}"
+      
       $environments_dir     = "${conf_dir}/environments"
       $hiera_package        = 'heira-puppet'
       $hiera_config_file    = "${conf_dir}/hiera.yaml"

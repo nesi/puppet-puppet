@@ -8,6 +8,12 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 
 ...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
 
+# Alternative Repositories
+
+This module does not manage repositories, but should install software from any repository (such as the Puppetlabs [Apt](http://apt.puppetlabs.com/) and [Yum](http://yum.puppetlabs.com/) repositories) configured on a machine running the puppet agent.
+
+Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/latest/type.html#yumrepo), and the [Puppetlabs Apr Module](https://github.com/puppetlabs/puppetlabs-apt) provides a suitable resource for managing apt repositories.
+
 # Dependencies
 
 * [puppetlabs-sdlib](https://github.com/puppetlabs/puppetlabs-stdlib)

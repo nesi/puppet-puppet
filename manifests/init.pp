@@ -32,23 +32,74 @@
 
 # [Remember: No empty lines between comments and class definition]
 class puppet (
-  $ensure               = 'present',
-  $pluginsync           = false,
-  $storeconfigs         = false,
-  $user_shell           = false,
-  $environments         = false,
-  $puppetmaster         = false
-){
+  $ensure               = 'installed',
+  $puppet_package       = $puppet::params::puppet_package,
+  $user                 = $puppet::params::user,
+  $gid                  = $puppet::params::gid,
+  $user_home            = $puppet::params::user_home,
+  $conf_dir             = $puppet::params::conf_dir
+) inherits puppet::params {
 
-  include puppet::params
+  $puppet_conf_path = "${conf_dir}/${puppet::params::conf_file}"
 
-  class{'puppet::install':
-    ensure              => $ensure,
-    pluginsync          => $pluginsync,
-    storeconfigs        => $storeconfigs,
-    user_shell          => $user_shell,
-    environments        => $environments,
-    puppetmaster        => $puppetmaster,
+  package{'puppet':
+    ensure  => $ensure,
+    name    => $puppet_package,
+  }
+
+  case $ensure {
+    installed: {
+      $ensure_dir     = 'directory'
+      $ensure_file    = 'file'
+      $ensure_present = 'present'
+    }
+    default: {
+      $ensure_dir     = 'absent'
+      $ensure_file    = 'absent'
+      $ensure_present = 'absent'
+    }
+  }
+
+  file{'puppet_user_home':
+    ensure  => $ensure_dir,
+    path    => $user_home,
+    require => Package['puppet'],
+  }
+
+  user{'puppet_user':
+    ensure      => $ensure_present,
+    name        => $user,
+    gid         => $gid,
+    comment     => 'Puppet configuration management daemon',
+    shell       => '/bin/bash',
+    home        => $user_home,
+    managehome  => false,
+    require     => Package['puppet'],
+  }
+
+  file{'puppet_conf_dir':
+    ensure  => $ensure_dir,
+    path    => $conf_dir,
+    require => Package['puppet'],
+    ignore  => ['.git'],
+  }
+
+  file{'puppet_conf':
+    ensure  => $ensure_file,
+    path    => $puppet_conf_path,
+    require => File['puppet_conf_dir'],
+  }
+
+  $conf_firstline = 'This file is managed by Puppet, modifications may be overwritten.'
+
+  augeas{'puppet_conf_firstline':
+    context => "/files${puppet_conf_path}",
+    changes => [
+      'ins #comment before *[1]',
+      "set #comment[1] '${conf_firstline}'",
+    ],
+    onlyif  => "match #comment[.='${conf_firstline}'] size == 0",
+    require => File['puppet_conf'],
   }
 
 }
