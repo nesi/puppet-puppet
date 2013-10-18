@@ -47,8 +47,9 @@ class puppet (
     name    => $puppet_package,
   }
 
+  # should match 'installed' or valid semantic version numbers
   case $ensure {
-    installed: {
+    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))$/: {
       $ensure_dir     = 'directory'
       $ensure_file    = 'file'
       $ensure_present = 'present'
@@ -71,7 +72,7 @@ class puppet (
     name        => $user,
     gid         => $gid,
     comment     => 'Puppet configuration management daemon',
-    shell       => '/bin/bash',
+    shell       => '/bin/false',
     home        => $user_home,
     managehome  => false,
     require     => Package['puppet'],

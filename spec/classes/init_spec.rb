@@ -24,7 +24,7 @@ describe 'puppet', :type => :class do
           'name'        => 'puppet',
           'gid'         => 'puppet',
           'comment'     => 'Puppet configuration management daemon',
-          'shell'       => '/bin/bash',
+          'shell'       => '/bin/false',
           'home'        => '/var/lib/puppet',
           'managehome'  => false,
           'require'     => 'Package[puppet]'
@@ -69,6 +69,35 @@ describe 'puppet', :type => :class do
       }
       it { should contain_file('puppet_conf').with(
           'ensure'  => 'absent'
+        )
+      }
+    end
+    describe "with ensure => 2.7.18" do
+    # Only needs to check the ensure metaparameter is set correctly
+      let :params do
+        {
+          :ensure => '2.7.18',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_package('puppet').with(
+          'ensure'  => '2.7.18'
+        )
+      }
+      it { should contain_file('puppet_user_home').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_user('puppet_user').with(
+          'ensure'      => 'present'
+        )
+      }
+      it { should contain_file('puppet_conf_dir').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_file('puppet_conf').with(
+          'ensure'  => 'file'
         )
       }
     end
