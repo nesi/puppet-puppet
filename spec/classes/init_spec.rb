@@ -33,6 +33,7 @@ describe 'puppet', :type => :class do
       it { should contain_file('puppet_conf_dir').with(
           'ensure'  => 'directory',
           'path'    => '/etc/puppet',
+          'ignore'  => '.git',
           'require' => 'Package[puppet]'
         )
       }
