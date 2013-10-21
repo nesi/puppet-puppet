@@ -3,7 +3,7 @@
 class puppet::conf (
   $environment     = $::environment,
   $pluginsync      = true,
-  $storeconfig     = false,
+  $storeconfigs    = false,
   $puppetmaster    = 'puppet',
   $report          = true,
   $show_diff       = undef,
@@ -17,20 +17,23 @@ class puppet::conf (
   # This class requires resources and variables provided by
   # the puppet class!
 
-  augeas{'puppet_main_conf':
+  Augeas{
     context => "/files${puppet::puppet_conf_path}",
+    require => File['puppet_conf'],
+  }
+
+  augeas{'puppet_main_conf':
     changes => [
       "set main/pluginsync ${pluginsync}",
       "set main/storeconfigs ${puppet::conf::storeconfigs}",
       "set main/report ${report}",
-      "set main/server ${puppetmaster}",
       "set main/confdir ${puppet::conf_dir}",
       "set main/vardir ${var_dir}",
       "set main/ssldir ${ssl_dir}",
+      "set main/rundir ${run_dir}",
       "set main/factpath ${fact_path}",
       "set main/templatedir ${template_dir}"
     ],
-    require => File['puppet_conf'],
   }
 
   if $show_diff {
@@ -40,12 +43,11 @@ class puppet::conf (
   }
 
   augeas{'puppet_agent_conf':
-    context => "/files${puppet::puppet_conf_path}",
     changes => [
-      "set agent/environment ${puppet::conf::environmet}",
+      "set agent/environment ${puppet::conf::environment}",
+      "set main/server ${puppetmaster}",
       $show_diff_change,
     ],
-    require => File['puppet_conf'],
   }
 
 }

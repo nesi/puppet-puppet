@@ -2,7 +2,7 @@ language: ruby
 bundler_args: --without development
 script: "bundle exec rake validate && bundle exec rake lint && bundle exec rake spec SPEC_OPTS='--format documentation'"
 before_install:
-  - sudo apt-get install -qq augeas-tools augeas-lenses libaugeas-dev
+  - sudo apt-get install -qq augeas-tools augeas-lenses libaugeas-dev libaugeas-ruby
 rvm:
   - 1.8.7
   - 1.9.3
