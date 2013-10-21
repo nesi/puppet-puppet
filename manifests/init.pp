@@ -37,7 +37,8 @@ class puppet (
   $user                 = $puppet::params::user,
   $gid                  = $puppet::params::gid,
   $user_home            = $puppet::params::user_home,
-  $conf_dir             = $puppet::params::conf_dir
+  $conf_dir             = $puppet::params::conf_dir,
+  $environments         = true
 ) inherits puppet::params {
 
   $puppet_conf_path = "${conf_dir}/${puppet::params::conf_file}"
@@ -101,6 +102,14 @@ class puppet (
     ],
     onlyif  => "match #comment[.='${conf_firstline}'] size == 0",
     require => File['puppet_conf'],
+  }
+
+  if $environments {
+    file{'puppet_environments_dir':
+      ensure  => $ensure_dir,
+      path    => "${conf_dir}/environments",
+      require => File['puppet_conf_dir'],
+    }
   }
 
 }

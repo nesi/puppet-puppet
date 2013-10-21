@@ -43,6 +43,12 @@ describe 'puppet', :type => :class do
           'require' => 'File[puppet_conf_dir]'
         )
       }
+      it { should contain_file('puppet_environments_dir').with(
+          'ensure'  => 'directory',
+          'path'    => '/etc/puppet/environments',
+          'require' => 'File[puppet_conf_dir]'
+        )
+      }
     end
     describe "with ensure => absent" do
       let :params do
@@ -68,6 +74,10 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_conf').with(
+          'ensure'  => 'absent'
+        )
+      }
+      it { should contain_file('puppet_environments_dir').with(
           'ensure'  => 'absent'
         )
       }
@@ -98,6 +108,10 @@ describe 'puppet', :type => :class do
       }
       it { should contain_file('puppet_conf').with(
           'ensure'  => 'file'
+        )
+      }
+      it { should contain_file('puppet_environments_dir').with(
+          'ensure'  => 'directory'
         )
       }
     end

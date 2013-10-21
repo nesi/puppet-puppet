@@ -8,12 +8,16 @@ class puppet::params{
   $user                 = 'puppet'
   $gid                  = 'puppet'
   $user_home            = '/var/lib/puppet'
+  $var_dir               = '/var/lib/puppet'
+  $ssl_dir               = "${var_dir}/ssl"
+  $run_dir               = '/var/run/puppet'
+  $fact_path             = "${var_dir}/lib/facter"
+  $template_dir          = '$confdir/templates'
 
 
   case $::osfamily {
     Debian:{
       $app_dir              = '/usr/share/puppet'
-      $environments_dir     = "${conf_dir}/environments"
       $hiera_package        = 'heira-puppet'
       $hiera_config_file    = "${conf_dir}/hiera.yaml"
       $hiera_config_content = "puppet${hiera_config_file}.erb"

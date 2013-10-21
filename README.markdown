@@ -10,6 +10,16 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 
 ...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
 
+# Usage
+
+## Default Usage
+
+The following puppet snippet will install puppet and enforce the default puppet configuration:  
+```puppet
+include puppet
+include puppet::conf
+```
+
 # Alternative Repositories
 
 This module does not manage repositories, but should install software from any repository (such as the Puppetlabs [Apt](http://apt.puppetlabs.com/) and [Yum](http://yum.puppetlabs.com/) repositories) configured on a machine running the puppet agent.
