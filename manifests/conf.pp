@@ -45,7 +45,7 @@ class puppet::conf (
   augeas{'puppet_agent_conf':
     changes => [
       "set agent/environment ${puppet::conf::environment}",
-      "set main/server ${puppetmaster}",
+      "set agent/server ${puppetmaster}",
       $show_diff_change,
     ],
   }
