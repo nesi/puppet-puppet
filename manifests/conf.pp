@@ -50,4 +50,14 @@ class puppet::conf (
     ],
   }
 
+  # clean up commonly 'misplaced' settings
+  augeas{'puppet_clean_conf':
+    changes => [
+      "rm main/server",
+      "rm master/server",
+      "rm main/envionment",
+      "rm master/environment",
+    ],
+  }
+
 }
