@@ -20,6 +20,39 @@ include puppet
 include puppet::conf
 ```
 
+## The `puppet` class
+
+The `puppet` class installs puppet from packages available to whichever repositories have been [previously configured](#Alternative Repositories). The `puppet` class can be called without parameters to install with defaults, or as a parametric class.
+
+### Parameters
+
+* **ensure**: The ensure parameter specifies the installation state of the puppet configuration. If it is `installed` or a valid semantic version number, Puppet will be installed. If it is `absent` then Puppet will be removed, including any configuration files and directories that were set up. The default value is `installed`.
+* **puppet_package**: Specifies the name of the package used to install Puppet. The default value is `puppet`.
+* **user**: Specifies the puppet user account. The default value is `puppet`.
+* **gid**: The primary group identity of the puppet user. The default value is `puppet`.
+* **user_home**: Sets the home directory for the puppet user. The default value is `/var/lib/puppet`.
+* **conf_dir**: Sets the directory where the puppet configuration file is stored. The default is `/etc/puppet`.
+* **environments**: If this is set to true, the puppet configuration will be set to enable the use of puppet environments. The default value is `true`.
+
+## The `puppet::conf` class
+
+The `puppet::conf` class manages the puppet configuration. It is dependent on the `puppet` class and requires that this be called first. The `puppet::conf` class can be called with no parameters for the default values, or called as a parametric class.
+
+### Parameters
+
+The parameters for `puppet::conf` correspond to setting in the [puppet configuration file](http://docs.puppetlabs.com/guides/configuring.html) (usually `/etc/puppet/puppet.conf`). It uses [augeas](http://augeas.net/) to manage the puppet configuration file.
+
+* **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
+* **pluginsync**: If this is set to `true` then plugins from modules will be used. The default value is `true`, and it is recommended that  it is not changed.
+* **puppetmaster**: This sets the name of the puppetmaster in the server value in the agent block. The default value is `puppet`.
+* **report**: This sets the `report` setting in the agent block. If it is set to true the puppet agent will send reports to the puppetmaster. The default value is `true`.
+* **show_diff**: Sets the `show_diff` setting in the agent block, if true the puppet agent will include file diffs in puppet reports. **NOTE:** this may expose security settings in clear text as part of a puppet agent report. The default value is `undef` which will ensure this setting is removed.
+* **var_dir**: This sets the puppet working directory that contains cached data, configurations and reports. The default is `/var/lib/puppet`.
+* **ssl_dir**: This sets the directory where puppet stores SSL state, including certificates and keys. The default is `/var/lib/puppet/ssl`.
+* **run_dir**: This sets the `rundir` setting in the `agent` block of the puppet conf. The default setting is `/var/run/puppet`.
+* **fact_path**: This sets the directory where facter facts are stored. The default is `/var/lib/puppet/facter`.
+* **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`.
+
 # Alternative Repositories
 
 This module does not manage repositories, but should install software from any repository (such as the Puppetlabs [Apt](http://apt.puppetlabs.com/) and [Yum](http://yum.puppetlabs.com/) repositories) configured on a machine running the puppet agent.
