@@ -28,9 +28,6 @@ describe 'puppet::conf', :type => :class do
         it 'pluginsync should be true' do
           aug_get('main/pluginsync').should == 'true'
         end
-        it 'storeconfigs should be false' do
-          aug_get('main/storeconfigs').should == 'false'
-        end
         it 'report should be true' do
           aug_get('main/report').should == 'true'
         end
@@ -103,18 +100,6 @@ describe 'puppet::conf', :type => :class do
         it { should execute.with_change}
         it 'pluginsync should be false' do
           aug_get('main/pluginsync').should == 'false'
-        end
-        it { should execute.idempotently }
-      end
-    end
-    describe 'with storeconfigs => true' do
-      let :params do
-          { :storeconfigs => 'true' }
-      end
-      describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-        it { should execute.with_change}
-        it 'storeconfigs should be true' do
-          aug_get('main/storeconfigs').should == 'true'
         end
         it { should execute.idempotently }
       end

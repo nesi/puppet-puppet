@@ -3,7 +3,6 @@
 class puppet::conf (
   $environment     = $::environment,
   $pluginsync      = true,
-  $storeconfigs    = false,
   $puppetmaster    = 'puppet',
   $report          = true,
   $show_diff       = undef,
@@ -25,7 +24,6 @@ class puppet::conf (
   augeas{'puppet_main_conf':
     changes => [
       "set main/pluginsync ${pluginsync}",
-      "set main/storeconfigs ${puppet::conf::storeconfigs}",
       "set main/report ${report}",
       "set main/confdir ${puppet::conf_dir}",
       "set main/vardir ${var_dir}",
