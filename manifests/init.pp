@@ -92,6 +92,7 @@ class puppet (
     require => File['puppet_conf_dir'],
   }
 
+  # Not convinced that this is the best method for intialising puppet.conf
   $conf_firstline = 'This file is managed by Puppet, modifications may be overwritten.'
 
   augeas{'puppet_conf_firstline':
