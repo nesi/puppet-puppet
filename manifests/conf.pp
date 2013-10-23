@@ -16,6 +16,7 @@ class puppet::conf (
 
   # This class requires resources and variables provided by
   # the puppet class!
+  require puppet
 
   Augeas{
     context => "/files${puppet::puppet_conf_path}",
