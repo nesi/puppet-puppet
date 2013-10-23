@@ -44,7 +44,7 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'directory',
+          'ensure'  => 'absent',
           'path'    => '/etc/puppet/environments',
           'require' => 'File[puppet_conf_dir]'
         )
@@ -125,7 +125,7 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'directory'
+          'ensure'  => 'absent'
         )
       }
     end

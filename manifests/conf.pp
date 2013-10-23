@@ -6,6 +6,7 @@ class puppet::conf (
   $puppetmaster    = 'puppet',
   $report          = true,
   $show_diff       = undef,
+  $module_path     = undef,
   $var_dir         = $puppet::params::var_dir ,
   $ssl_dir         = $puppet::params::ssl_dir,
   $run_dir         = $puppet::params::run_dir,
@@ -21,6 +22,16 @@ class puppet::conf (
     require => File['puppet_conf'],
   }
 
+  if $module_path {
+    $module_path_change = "set main/modulepath ${module_path}"
+  } else {
+    if $puppet::environments {
+        $module_path_change = "set main/modulepath \$confdir/environments/${::environment}/modules:\$confdir/modules"
+      } else {
+        $module_path_change = 'set main/modulepath $confdir/modules'
+      }
+  }
+
   augeas{'puppet_main_conf':
     changes => [
       "set main/pluginsync ${pluginsync}",
@@ -30,7 +41,8 @@ class puppet::conf (
       "set main/ssldir ${ssl_dir}",
       "set main/rundir ${run_dir}",
       "set main/factpath ${fact_path}",
-      "set main/templatedir ${template_dir}"
+      "set main/templatedir ${template_dir}",
+      $module_path_change,
     ],
   }
 

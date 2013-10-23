@@ -32,7 +32,7 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **gid**: The primary group identity of the puppet user. The default value is `puppet`.
 * **user_home**: Sets the home directory for the puppet user. The default value is `/var/lib/puppet`.
 * **conf_dir**: Sets the directory where the puppet configuration file is stored. The default is `/etc/puppet`.
-* **environments**: If this is set to true, the puppet configuration will be set to enable the use of puppet environments. The default value is `true`.
+* **environments**: If this is set to true, the puppet configuration will be set to enable the use of puppet environments. The default value is `false`.
 
 ## The `puppet::conf` class
 
@@ -52,6 +52,8 @@ The parameters for `puppet::conf` correspond to setting in the [puppet configura
 * **run_dir**: This sets the `rundir` setting in the `agent` block of the puppet conf. The default setting is `/var/run/puppet`.
 * **fact_path**: This sets the directory where facter facts are stored. The default is `/var/lib/puppet/facter`.
 * **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`.
+
+**NOTE:** This module does not manage the contents of the directories set by `var_dir`, `ssl_dir`, `run_dir`, `fact_path`, or `template_dir`. These will have to be managed separately. These settings are exposed to allow for customised puppet deployments.
 
 # Alternative Repositories
 
