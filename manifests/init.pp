@@ -50,7 +50,7 @@ class puppet (
 
   # should match 'installed' or valid version numbers
   case $ensure {
-    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))?(-(\S+))$/: {
+    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))?(|-(\S+))$/: {
       $ensure_dir     = 'directory'
       $ensure_file    = 'file'
       $ensure_present = 'present'
@@ -66,6 +66,12 @@ class puppet (
     ensure  => $ensure_dir,
     path    => $user_home,
     require => Package['puppet'],
+  }
+
+  group{'puppet_group':
+    ensure      => $ensure_present,
+    name        => $gid,
+    require     => Package['puppet'],
   }
 
   user{'puppet_user':

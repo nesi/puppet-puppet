@@ -65,31 +65,31 @@ class puppet::conf (
   # clean up duplicated setting entries
   augeas{'puppet_conf_dedup_agent':
     changes => [
-      "rm main/server",
-      "rm master/server",
-      "rm main/envionment",
-      "rm master/environment",
+      'rm main/server',
+      'rm master/server',
+      'rm main/envionment',
+      'rm master/environment',
     ],
   }
 
   augeas{'puppet_conf_dedup_main':
     changes => [
-      "rm master/pluginsync",
-      "rm master/report",
-      "rm master/confdir",
-      "rm master/vardir",
-      "rm master/ssldir",
-      "rm master/rundir",
-      "rm master/factpath",
-      "rm master/templatedir",
-      "rm agent/pluginsync",
-      "rm agent/report",
-      "rm agent/confdir",
-      "rm agent/vardir",
-      "rm agent/ssldir",
-      "rm agent/rundir",
-      "rm agent/factpath",
-      "rm agent/templatedir",
+      'rm master/pluginsync',
+      'rm master/report',
+      'rm master/confdir',
+      'rm master/vardir',
+      'rm master/ssldir',
+      'rm master/rundir',
+      'rm master/factpath',
+      'rm master/templatedir',
+      'rm agent/pluginsync',
+      'rm agent/report',
+      'rm agent/confdir',
+      'rm agent/vardir',
+      'rm agent/ssldir',
+      'rm agent/rundir',
+      'rm agent/factpath',
+      'rm agent/templatedir',
     ],
   }
 

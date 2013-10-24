@@ -19,6 +19,11 @@ describe 'puppet', :type => :class do
           'require' => 'Package[puppet]'
         )
       }
+      it { should contain_group('puppet_group').with(
+          'ensure'      => 'present',
+          'name'        => 'puppet'
+        )
+      }
       it { should contain_user('puppet_user').with(
           'ensure'      => 'present',
           'name'        => 'puppet',
@@ -79,6 +84,10 @@ describe 'puppet', :type => :class do
           'ensure'  => 'absent'
         )
       }
+      it { should contain_group('puppet_group').with(
+          'ensure'  => 'absent'
+        )
+      }
       it { should contain_user('puppet_user').with(
           'ensure'  => 'absent'
         )
@@ -110,6 +119,10 @@ describe 'puppet', :type => :class do
       }
       it { should contain_file('puppet_user_home').with(
           'ensure'  => 'directory'
+        )
+      }
+      it { should contain_group('puppet_group').with(
+          'ensure'      => 'present'
         )
       }
       it { should contain_user('puppet_user').with(
