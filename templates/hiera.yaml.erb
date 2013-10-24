@@ -1,0 +1,7 @@
+---
+:backends:
+  - <%= @hiera_backend %>
+:<%= @hiera_backend %>:
+  :datadir: <%= scope.lookupvar('puppet::hiera::hiera_datadir') %>
+:hierarchy:
+<%= hiera_hierarchy.to_yaml.split("\n")[1..-1].join("\n") %>
