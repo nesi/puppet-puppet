@@ -70,7 +70,7 @@ class puppet::hiera(
     file{'hiera_conf':
       ensure  => $ensure_file,
       path    => $hiera_config_file,
-      content => template('puppet/heira.yml.erb'),
+      content => template('puppet/hiera.yaml.erb'),
       replace => false,
       require => Package['hiera'],
     }

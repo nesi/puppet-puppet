@@ -10,11 +10,15 @@ PuppetLint.configuration.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp"]
 desc "Run puppet in noop mode and check for syntax errors."
 task :validate do
   if ENV['PUPPET_GEM_VERSION'] == '~> 2.6.0'
-    parse_command = 'puppet --parseonly --ignoreimport'
+    puppet_parse_command = 'puppet --parseonly --ignoreimport'
   else
-    parse_command = 'puppet parser validate --noop'
+    puppet_parse_command = 'puppet parser validate --noop'
   end
   Dir['manifests/**/*.pp'].each do |path|
-   sh "#{parse_command} #{path}"
+   sh "#{puppet_parse_command} #{path}"
+  end
+  ruby_parse_command = 'ruby -c'
+  Dir['spec/**/*.rb'].each do |path|
+   sh "#{ruby_parse_command} #{path}"
   end
 end
