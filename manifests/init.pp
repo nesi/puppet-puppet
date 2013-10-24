@@ -48,9 +48,9 @@ class puppet (
     name    => $puppet_package,
   }
 
-  # should match 'installed' or valid semantic version numbers
+  # should match 'installed' or valid version numbers
   case $ensure {
-    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))$/: {
+    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))?(-(\S+))$/: {
       $ensure_dir     = 'directory'
       $ensure_file    = 'file'
       $ensure_present = 'present'
@@ -114,6 +114,7 @@ class puppet (
   file{'puppet_environments_dir':
     ensure  => $environments_ensure,
     path    => "${conf_dir}/environments",
+    force   => true,
     require => File['puppet_conf_dir'],
   }
 

@@ -40,7 +40,7 @@ The `puppet::conf` class manages the puppet configuration. It is dependent on th
 
 ### Parameters
 
-The parameters for `puppet::conf` correspond to setting in the [puppet configuration file](http://docs.puppetlabs.com/guides/configuring.html) (usually `/etc/puppet/puppet.conf`). It uses [augeas](http://augeas.net/) to manage the puppet configuration file.
+The parameters for `puppet::conf` correspond to setting in the [puppet configuration file](http://docs.puppetlabs.com/references/latest/configuration.html) (usually `/etc/puppet/puppet.conf`). It uses [augeas](http://augeas.net/) to manage the puppet configuration file.
 
 * **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
 * **pluginsync**: If this is set to `true` then plugins from modules will be used. The default value is `true`, and it is recommended that  it is not changed.
