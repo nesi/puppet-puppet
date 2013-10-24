@@ -142,6 +142,44 @@ describe 'puppet', :type => :class do
         )
       }
     end
+    describe "with ensure => 3.3.1-1puppetlabs1" do
+    # checking a complex version string
+    # Only needs to check the ensure metaparameter is set correctly
+      let :params do
+        {
+          :ensure => '3.3.1-1puppetlabs1',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_package('puppet').with(
+          'ensure'  => '3.3.1-1puppetlabs1'
+        )
+      }
+      it { should contain_file('puppet_user_home').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_group('puppet_group').with(
+          'ensure'      => 'present'
+        )
+      }
+      it { should contain_user('puppet_user').with(
+          'ensure'      => 'present'
+        )
+      }
+      it { should contain_file('puppet_conf_dir').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_file('puppet_conf').with(
+          'ensure'  => 'file'
+        )
+      }
+      it { should contain_file('puppet_environments_dir').with(
+          'ensure'  => 'absent'
+        )
+      }
+    end
   end
 
   context "on a RedHat OS" do
