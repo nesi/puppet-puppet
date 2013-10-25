@@ -68,6 +68,37 @@ describe 'puppet::hiera', :type => :class do
         end
       end
     end
+    describe 'with hiera_config_file => /some/other/path' do
+      let :params do
+          { :hiera_config_file => '/some/other/path' }
+      end
+      it { should contain_file('hiera_conf').with(
+        'path'    => '/some/other/path'
+      )}
+      describe_augeas 'puppet_conf_hiera_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+        it { should execute.with_change}
+        it 'hiera_config_file should be /some/other/path' do
+          aug_get('master/hiera_config').should == '/some/other/path'
+        end
+        it { should execute.idempotently }
+      end
+    end
+    describe 'with hiera_datadir => /some/other/path' do
+      let :params do
+          { :hiera_datadir => '/some/other/path' }
+      end
+      it { should contain_file('hiera_datadir').with(
+        'path'    => '/some/other/path'
+      )}
+    end
+    describe 'with hiera_config_source => /some/other/path' do
+      let :params do
+          { :hiera_config_source => '/some/other/path' }
+      end
+      it { should contain_file('hiera_conf').with(
+        'source'    => '/some/other/path'
+      )}
+    end
   end
 
   context "on a RedHat OS" do
