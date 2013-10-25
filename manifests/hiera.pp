@@ -33,7 +33,7 @@ class puppet::hiera(
   package{'hiera':
     ensure  => $ensure,
     name    => $puppet::params::hiera_package,
-    require => Package['$puppet::params::puppet_package'],
+    require => Package['puppet'],
   }
 
   if $ensure_present == 'present' {
@@ -44,13 +44,13 @@ class puppet::hiera(
 
   # set the location of the hiera config file in the puppet config
   augeas{'puppet_conf_hiera_config':
-    context => "/files$${puppet::puppet_conf_path}",
+    context => "/files${puppet::puppet_conf_path}",
     changes => [$puppet_conf_hiera_change],
     require => File['puppet_conf','hiera_conf'],
   }
 
   augeas{'puppet_conf_heira_dedup':
-    context => "/files$${puppet::puppet_conf_path}",
+    context => "/files${puppet::puppet_conf_path}",
     changes => [
       'rm main/hiera_config',
       'rm agent/hiera_config',
@@ -78,7 +78,7 @@ class puppet::hiera(
 
   file{'etc_hiera_conf':
     ensure  => $ensure_link,
-    path    => '/etc/hiera,yaml',
+    path    => '/etc/hiera.yaml',
     target  => $hiera_config_file,
     require => File['hiera_conf'],
   }

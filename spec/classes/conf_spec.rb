@@ -51,7 +51,7 @@ describe 'puppet::conf', :type => :class do
             aug_get('main/factpath').should == '/var/lib/puppet/lib/facter'
           end
           it 'templatedir should be set' do
-            aug_get('main/templatedir').should == '$confdir/templates'
+            aug_get('main/templatedir').should == '/etc/puppet/templates'
           end
           it 'modulepath should be set' do
             aug_get('main/modulepath').should == '$confdir/modules'

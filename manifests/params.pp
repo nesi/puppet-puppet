@@ -12,10 +12,10 @@ class puppet::params{
   $ssl_dir              = "${var_dir}/ssl"
   $run_dir              = '/var/run/puppet'
   $fact_path            = "${var_dir}/lib/facter"
-  $template_dir         = '$confdir/templates'
-  $hiera_config_file    = '$confdir/hiera.yaml'
+  $template_dir         = "${conf_dir}/templates"
+  $hiera_config_file    = "${conf_dir}/hiera.yaml"
   $hiera_datadir        = "${conf_dir}/hieradata"
-  $hiera_package        = 'heira'
+  $hiera_package        = 'hiera'
 
 
   case $::osfamily {
