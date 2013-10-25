@@ -33,6 +33,8 @@ describe 'puppet::hiera', :type => :class do
         'path'    => '/etc/puppet/hieradata',
         'require' => 'Package[hiera]'
       )}
+      it { should contain_file('hiera_conf').with_content(/^  - yaml$/)}
+      it { should contain_file('hiera_conf').with_content(/^:yaml:$/)}
       describe_augeas 'puppet_conf_hiera_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
         it { should execute.with_change}
         it 'hiera_config should be set' do
@@ -98,6 +100,13 @@ describe 'puppet::hiera', :type => :class do
       it { should contain_file('hiera_conf').with(
         'source'    => '/some/other/path'
       )}
+    end
+    describe 'with hiera_backend => json' do
+      let :params do
+          { :hiera_backend => 'json' }
+      end
+      it { should contain_file('hiera_conf').with_content(/^  - json$/)}
+      it { should contain_file('hiera_conf').with_content(/^:json:$/)}
     end
   end
 

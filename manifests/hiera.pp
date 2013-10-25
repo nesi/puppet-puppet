@@ -58,6 +58,11 @@ class puppet::hiera(
     require => File['puppet_conf'],
   }
 
+  # This puts up a hiera.yaml template as a config file iff one does
+  # not exist.
+  # augeas is not suitable for managing YAML files as it doen't yet
+  # handle file formats that have meaningful line indentation
+  # ...more complex management could be done with Ruby
   if $hiera_config_source {
     file{'hiera_conf':
       ensure  => $ensure_file,
