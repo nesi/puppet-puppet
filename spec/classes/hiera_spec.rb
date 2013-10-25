@@ -33,6 +33,13 @@ describe 'puppet::hiera', :type => :class do
         'path'    => '/etc/puppet/hieradata',
         'require' => 'Package[hiera]'
       )}
+      describe_augeas 'puppet_conf_hiera_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+        it { should execute.with_change}
+        it 'hiera_config should be set' do
+          aug_get('master/hiera_config').should == '/etc/puppet/hiera.yaml'
+        end
+        it { should execute.idempotently }
+      end
     end
     describe "with ensure => absent" do
       let :params do
@@ -54,6 +61,12 @@ describe 'puppet::hiera', :type => :class do
       it { should contain_file('hiera_datadir').with(
         'ensure'  => 'absent'
       )}
+      describe_augeas 'puppet_conf_hiera_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+        it { should_not execute.with_change}
+        it 'hiera_conf should not be matched' do
+          should_not aug_get('master/hiera_conf')
+        end
+      end
     end
   end
 
