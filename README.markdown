@@ -6,7 +6,7 @@ NeSI Puppet Puppet Module is a Puppet module for installing, configuring and man
 
 # Introduction
 
-While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project a module was required to install and configure puppet, puppetmaster and hiera. As the puppet agent and puppetmaster share configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required. Hiera is now installed with Puppet as a dependency, it is appropriate that hiera is condfigured with this module.
+While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project a module was required to install and configure puppet, puppetmaster and hiera. As the puppet agent and puppetmaster share configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required. Hiera is now installed with Puppet as a dependency, it is appropriate that hiera is configured with this module.
 
 ...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
 
@@ -18,9 +18,10 @@ The following puppet snippet will install puppet and enforce the default puppet 
 ```puppet
 include puppet
 include puppet::conf
+include puppet::hiera
 ```
 
-## The `puppet` class
+## The `puppet` Class
 
 The `puppet` class installs puppet from packages available to whichever repositories have been [previously configured](#Alternative Repositories). The `puppet` class can be called without parameters to install with defaults, or as a parametric class.
 
@@ -34,7 +35,7 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **conf_dir**: Sets the directory where the puppet configuration file is stored. The default is `/etc/puppet`.
 * **environments**: If this is set to true, the puppet configuration will be set to enable the use of puppet environments. The default value is `false`.
 
-## The `puppet::conf` class
+## The `puppet::conf` Class
 
 The `puppet::conf` class manages the puppet configuration. It is dependent on the `puppet` class and requires that this be called first. The `puppet::conf` class can be called with no parameters for the default values, or called as a parametric class.
 
@@ -54,6 +55,25 @@ The parameters for `puppet::conf` correspond to setting in the [puppet configura
 * **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`.
 
 **NOTE:** This module does not manage the contents of the directories set by `var_dir`, `ssl_dir`, `run_dir`, `fact_path`, or `template_dir`. These will have to be managed separately. These settings are exposed to allow for customised puppet deployments.
+
+## The `puppet::hiera` Class
+
+[Hiera](http://projects.puppetlabs.com/projects/hiera) is a simple pluggable hierachical database which is well suited for storing hierachical configuration data for Puppet.
+
+The `puppet::hiera` class confirms the Hiera install that came in as a dependency of the puppet package, and manages it's configuration for puppet. It bootstraps the hiera database witha minimal default configuration file (`/etc/puppet/hiera.yaml`) and creates the hiera datastore. It does not manage hiera any further from here.
+
+When using version control with puppet and hiera, it is recommended that the hiera configuration (`hiera.yaml`) is included in the puppet repository, while the hiera datastore (by default `/etc/puppet/hieradata` with this module) is managed in a separate repository. This segregation allows the puppet configuration to be stored as a public repository, while the hiera data is kept private.
+
+The hiera class creates the configuration file (`hiera.yaml`) on it's first run, then does nothing more to manage it's contents.
+
+### Parameters
+
+* **ensure**: Sets the ensure state of the heira package and configuration. The default is to match the same state as given the `puppet` class.
+* **hiera_config_file**: Sets the path to the file to the hiera configuration in `puppet.conf`. The default is `/etc/puppet/hiera.yaml`.
+* **hiera_datadir**: Sets the path to the directory that holds the Hiera datastore. The default is `/etc/puppet/hiradata`.
+* **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the mimimal bootstrap template.
+* **hiera_backend**: Sets which backend format for the Hiera datastore, which can either be `yaml` or `json`. The default is `yaml`.
+* **hiera_hierarchy**: A list of lists used to create the base Hiera hierachy.
 
 # Alternative Repositories
 
