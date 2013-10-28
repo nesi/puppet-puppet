@@ -49,9 +49,7 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'absent',
-          'path'    => '/etc/puppet/environments',
-          'require' => 'File[puppet_conf_dir]'
+          'ensure'  => 'absent'
         )
       }
       it { should contain_augeas('puppet_conf_firstline').with(
@@ -177,6 +175,97 @@ describe 'puppet', :type => :class do
       }
       it { should contain_file('puppet_environments_dir').with(
           'ensure'  => 'absent'
+        )
+      }
+    end
+    describe "with puppet_package => puppet_custom" do
+      let :params do
+        {
+          :puppet_package => 'puppet_custom',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_package('puppet').with(
+          'name'  => 'puppet_custom'
+        )
+      }
+    end
+    describe "with user => not_puppet" do
+      let :params do
+        {
+          :user => 'not_puppet',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_user('puppet_user').with(
+          'name'  => 'not_puppet'
+        )
+      }
+    end
+    describe "with gid => not_puppet" do
+      let :params do
+        {
+          :gid => 'not_puppet',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_group('puppet_group').with(
+          'name'  => 'not_puppet'
+        )
+      }
+      it { should contain_user('puppet_user').with(
+          'gid'  => 'not_puppet'
+        )
+      }
+    end
+    describe "with user_home => /some/other/path" do
+      let :params do
+        {
+          :user_home => '/some/other/path',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_user('puppet_user').with(
+          'home'  => '/some/other/path'
+        )
+      }
+    end
+    describe "with conf_dir => /some/other/path" do
+      let :params do
+        {
+          :conf_dir     => '/some/other/path',
+          :environments => true
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_file('puppet_conf_dir').with(
+          'path'  => '/some/other/path'
+        )
+      }
+      it { should contain_file('puppet_conf').with(
+          'path'  => '/some/other/path/puppet.conf'
+        )
+      }
+      it { should contain_file('puppet_environments_dir').with(
+          'path'  => '/some/other/path/environments'
+        )
+      }
+      it { should contain_augeas('puppet_conf_firstline').with(
+          'context'  => '/files/some/other/path/puppet.conf'
+        )
+      }
+    end
+    describe "with environments => true" do
+      let :params do
+        {
+          :environments => 'true',
+        }
+      end
+      it { should include_class('puppet::params') }
+      it { should contain_file('puppet_environments_dir').with(
+          'ensure'  => 'directory',
+          'path'    => '/etc/puppet/environments',
+          'require' => 'File[puppet_conf_dir]'
         )
       }
     end
