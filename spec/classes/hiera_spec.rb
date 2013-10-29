@@ -6,9 +6,6 @@ describe 'puppet::hiera', :type => :class do
         :osfamily   => 'Debian',
       }
     end
-    let :pre_condition do 
-      'include puppet'
-    end
     describe "with no parameters" do
       it { should include_class('puppet::params') }
       it { should contain_package('hiera').with(

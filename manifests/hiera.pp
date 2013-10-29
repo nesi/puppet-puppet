@@ -2,7 +2,7 @@
 # configuring hiera http://projects.puppetlabs.com/projects/hiera
 # Hiera is installed as part of the Puppet package, hence it is appropriate
 class puppet::hiera(
-  $ensure               = $puppet::ensure,
+  $ensure               = 'installed',
   $hiera_config_file    = $puppet::params::hiera_config_file,
   $hiera_datadir        = $puppet::params::hiera_datadir,
   $hiera_config_source  = undef,
