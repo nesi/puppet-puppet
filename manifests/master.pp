@@ -74,7 +74,7 @@ class puppet::master (
     priority          => 50,
     ssl               => true,
     ssl_protocol      => '-ALL +SSLv3 +TLSv1',
-    ssl_cipher_suite  => 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP',
+    ssl_cipher        => 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP',
     ssl_verify_client => 'optional',
     ssl_options       => '+StdEnvVars +ExportCertData',
     ssl_verify_depth  => 1,
@@ -82,7 +82,6 @@ class puppet::master (
     ssl_cert          => "${puppet::user_home}/ssl/certs/${servername}.pem",
     ssl_key           => "${puppet::user_home}/ssl/private_keys/${servername}.pem",
     ssl_ca            => "${puppet::user_home}/ssl/certs/ca.pem",
-    ssl_ca_dir        => "${puppet::user_home}/ssl/certs",
     ssl_chain         => "${puppet::user_home}/ssl/certs/ca.pem",
     rack_base_uris    => ['/'],
     request_headers   =>  [
