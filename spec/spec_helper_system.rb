@@ -22,5 +22,17 @@ RSpec.configure do |c|
     # Install modules and dependencies
     puppet_module_install(:source => proj_root, :module_name => 'puppet')
     shell('puppet module install puppetlabs-apache --version 0.9.0')
+
+    # Install the appropriate version of puppetlabs-stdlib
+    case ENV['PUPPET_GEM_VERSION']
+    when '~> 2.6.0'
+      stdlib_ver = '2.5.1'
+    when '~> 2.7.0'
+      stdlib_ver = '3.2.0'
+    else
+      stdlib_ver = '4.1.0'
+    end
+
+    shell("puppet module install puppetlabs-stdlib --version #{stdlib_ver}")
   end
 end
