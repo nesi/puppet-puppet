@@ -1,12 +1,19 @@
 # This class installs and configures a puppet master running on passenger
 
 class puppet::master (
-  $ensure = installed
-){
+  $ensure               = 'installed',
+  $puppetmaster_package = $puppet::params::puppetmaster_package,
+  $puppetmaster_docroot = $puppet::params::puppetmaster_docroot,
+  $servername           = $::fqdn,
+  $httpd_group          = undef
+) inherits puppet::params {
 
   # Puppet needs to be installed and set up beforehand
   require puppet
-  include puppet::params
+
+  if $puppet::ensure == 'absent' {
+    fail('The puppet class ensure parameter must not be "absent"!')
+  }
 
   # Apache and Passenger need to be installed and set up beforehand
   # Use the Puppetlabs Apache module (or a fork):
@@ -14,10 +21,7 @@ class puppet::master (
   # https://github.com/puppetlabs/puppetlabs-apache
   require apache::mod::passenger
 
-  # NOTE: If passenger tuning is available it is recommended that the following
-  # tuning parameters are passed to apache::mod::passenger
-  # Look at this fork:
-  # https://github.com/nesi/puppetlabs-apache/tree/passenger_tuning
+  # NOTE: Use passenger tuning to configure mod_passenger
   # DON'T uncommment this!
   # class {'apache::mod::passenger':
   #   passenger_high_performance    => 'off',
@@ -29,45 +33,43 @@ class puppet::master (
   #   rails_autodetect              => 'off',
   # }
 
-  package{$puppet::params::puppetmaster_package:
-    ensure   => $ensure,
+  # can't alias to puppetmaster because there is already a package of that name
+  package{'puppetmaster_pkg':
+    ensure  => $ensure,
+    name    => $puppetmaster_package,
   }
 
   augeas{'puppetmaster_ssl_config':
-    context => "/files${puppet::params::conf_path}",
+    context => "/files${puppet::puppet_conf_path}",
     changes => [
       'set master/ssl_client_header SSL_CLIENT_S_DN',
       'set master/ssl_client_verify_header SSL_CLIENT_VERIFY',
     ],
-    require => Package[$puppet::params::puppetmaster_package],
+    require => File['puppet_conf'],
   }
 
-  # Something should be done here to bring the puppetmaster site
-  # configuration under the management of the Puppet apache module,
-  # though the default installed with the package should just work
-  # It looks like the Apache module does not yet have the
-  # sophistication to configure the puppetmaster application
+  if $httpd_group {
+    $docroot_group = $httpd_group
+  } else {
+    $docroot_group = $apache::params::group
+  }
 
-  file{$puppet::params::puppetmaster_docroot:
+  file{'puppetmaster_docroot':
     ensure  => directory,
-    group   => $apache::params::group,
+    path    => $puppetmaster_docroot,
+    group   => $docroot_group,
     recurse => true,
     ignore  => '.git',
-    require =>  [ File[$puppet::params::app_dir],
-                  Package[$puppet::params::puppetmaster_package],
+    require =>  [ File['puppet_app_dir'],
+                  Package['puppet'],
                 ],
   }
 
-  # NOTE: This vitual host declaration requiers the apache module to have the
-  # ssl patch from https://github.com/nesi/puppetlabs-apache/tree/vhost_ssl
-  # merged into it.
   # The ssl settings have been taken directly from the default vhost
   # configuration distributed with the puppetmaster-passenger package
-  # some of which are _defaults_ and will not be passed through to the vhost
-  # configuration file.
   apache::vhost{'puppetmaster_dynaguppy':
-    servername        => $::fqdn,
-    docroot           => $puppet::params::puppetmaster_docroot,
+    servername        => $servername,
+    docroot           => $puppetmaster_docroot,
     port              => 8140,
     priority          => 50,
     ssl               => true,
@@ -76,12 +78,12 @@ class puppet::master (
     ssl_verify_client => 'optional',
     ssl_options       => '+StdEnvVars +ExportCertData',
     ssl_verify_depth  => 1,
-    ssl_certs_dir     => "${puppet::params::user_home}/ssl",
-    ssl_cert          => "${puppet::params::user_home}/ssl/certs/${::fqdn}.pem",
-    ssl_key           => "${puppet::params::user_home}/ssl/private_keys/${::fqdn}.pem",
-    ssl_ca            => "${puppet::params::user_home}/ssl/certs/ca.pem",
-    ssl_ca_dir        => "${puppet::params::user_home}/ssl/certs",
-    ssl_chain         => "${puppet::params::user_home}/ssl/certs/ca.pem",
+    ssl_certs_dir     => "${puppet::user_home}/ssl",
+    ssl_cert          => "${puppet::user_home}/ssl/certs/${servername}.pem",
+    ssl_key           => "${puppet::user_home}/ssl/private_keys/${servername}.pem",
+    ssl_ca            => "${puppet::user_home}/ssl/certs/ca.pem",
+    ssl_ca_dir        => "${puppet::user_home}/ssl/certs",
+    ssl_chain         => "${puppet::user_home}/ssl/certs/ca.pem",
     rack_base_uris    => ['/'],
     request_headers   =>  [
                             'unset X-Forwarded-For',

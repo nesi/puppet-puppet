@@ -52,6 +52,12 @@ describe 'puppet', :type => :class do
           'ensure'  => 'absent'
         )
       }
+      it { should contain_file('puppet_app_dir').with(
+          'ensure'  => 'directory',
+          'path'    => '/usr/share/puppet',
+          'require' => 'Package[puppet]'
+        )
+      }
       it { should contain_augeas('puppet_conf_firstline').with(
           'require' => 'File[puppet_conf]',
           'context' => '/files/etc/puppet/puppet.conf'
@@ -98,6 +104,10 @@ describe 'puppet', :type => :class do
           'ensure'  => 'absent'
         )
       }
+      it { should contain_file('puppet_app_dir').with(
+          'ensure'  => 'absent'
+        )
+      }
       it { should contain_file('puppet_environments_dir').with(
           'ensure'  => 'absent'
         )
@@ -128,6 +138,10 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_conf_dir').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_file('puppet_app_dir').with(
           'ensure'  => 'directory'
         )
       }
@@ -166,6 +180,10 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_conf_dir').with(
+          'ensure'  => 'directory'
+        )
+      }
+      it { should contain_file('puppet_app_dir').with(
           'ensure'  => 'directory'
         )
       }

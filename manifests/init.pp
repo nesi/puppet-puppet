@@ -124,5 +124,11 @@ class puppet (
     require => File['puppet_conf_dir'],
   }
 
+  file{'puppet_app_dir':
+    ensure  => $ensure_dir,
+    path    => $puppet::params::app_dir,
+    force   => true,
+    require => Package['puppet'],
+  }
 
 }

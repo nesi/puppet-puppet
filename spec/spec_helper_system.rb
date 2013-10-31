@@ -21,6 +21,6 @@ RSpec.configure do |c|
 
     # Install modules and dependencies
     puppet_module_install(:source => proj_root, :module_name => 'puppet')
-    # shell('puppet module install puppetlabs-stdlib --version 2.4.0')
+    shell('puppet module install puppetlabs-apache --version 0.9.0')
   end
 end
