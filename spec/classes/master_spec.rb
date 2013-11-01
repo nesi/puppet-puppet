@@ -63,6 +63,60 @@ describe 'puppet::master', :type => :class do
           )
         }
       end
+      describe "with puppetmaster_package => not_puppetmaster" do
+        let :params do
+          {
+            :puppetmaster_package => 'not_puppetmaster',
+          }
+        end
+        it { should include_class('puppet::params') }
+        it { should contain_package('puppetmaster_pkg').with(
+            'name'  => 'not_puppetmaster'
+          )
+        }
+      end
+      describe "with puppetmaster_docroot => /some/other/path" do
+        let :params do
+          {
+            :puppetmaster_docroot => '/some/other/path',
+          }
+        end
+        it { should include_class('puppet::params') }
+        it { should contain_file('puppetmaster_docroot').with(
+            'path'  => '/some/other/path'
+          )
+        }
+        it { should contain_apache__vhost('puppetmaster').with(
+            'docroot'       => '/some/other/path'
+          )
+        }
+      end
+      describe "with servername => some.other.name" do
+        let :params do
+          {
+            :servername => 'some.other.name',
+          }
+        end
+        it { should include_class('puppet::params') }
+        it { should contain_apache__vhost('puppetmaster').with(
+            'servername'    => 'some.other.name',
+            'ssl_cert'      => '/var/lib/puppet/ssl/certs/some.other.name.pem',
+            'ssl_key'       => '/var/lib/puppet/ssl/private_keys/some.other.name.pem'
+          )
+        }
+      end
+      describe "with httpd_group => webby" do
+        let :params do
+          {
+            :httpd_group => 'webby',
+          }
+        end
+        it { should include_class('puppet::params') }
+        it { should contain_file('puppetmaster_docroot').with(
+            'group'  => 'webby'
+          )
+        }
+      end
     end
   end
 
