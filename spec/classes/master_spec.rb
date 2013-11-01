@@ -6,6 +6,7 @@ describe 'puppet::master', :type => :class do
         :osfamily   => 'Debian',
         :operatingsystemrelease => '6',
         :concat_basedir         => '/dne',
+        :fqdn                   => 'test.example.org',
       }
     end
     describe 'with default puppet, and apache and mod_passenger' do
@@ -38,6 +39,17 @@ describe 'puppet::master', :type => :class do
             aug_get('master/ssl_client_verify_header').should == 'SSL_CLIENT_VERIFY'
           end
         end
+        # only testing parameters that change
+        it { should contain_apache__vhost('puppetmaster').with(
+            'servername'    => 'test.example.org',
+            'docroot'       => '/usr/share/puppet/rack/puppetmasterd/public',
+            'ssl_certs_dir' => '/var/lib/puppet/ssl',
+            'ssl_cert'      => '/var/lib/puppet/ssl/certs/test.example.org.pem',
+            'ssl_key'       => '/var/lib/puppet/ssl/private_keys/test.example.org.pem',
+            'ssl_ca'        => '/var/lib/puppet/ssl/certs/ca.pem',
+            'ssl_chain'     => '/var/lib/puppet/ssl/certs/ca.pem'
+          )
+        }
       end
       describe "with ensure => absent" do
         let :params do
