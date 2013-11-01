@@ -32,3 +32,4 @@ _ReSharper*/
 .svn/
 *.sublime-project
 *.sublime-workspace
+pkg/

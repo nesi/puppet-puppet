@@ -1,4 +1,4 @@
-name    'aethylred-puppet'
+name    'Aethylred-puppet'
 version '0.2.0'
 source 'https://github.com/nesi/puppet-puppet'
 author 'Aaron Hicks'

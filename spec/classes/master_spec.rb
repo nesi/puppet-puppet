@@ -25,13 +25,6 @@ describe 'puppet::master', :type => :class do
             'context' => '/files/etc/puppet/puppet.conf'
           )
         }
-        it { should contain_file('puppetmaster_docroot').with(
-            'ensure'  => 'directory',
-            'path'    => '/usr/share/puppet/rack/puppetmasterd/public',
-            'group'   => 'www-data',
-            'recurse' => 'true'
-          )
-        }
         describe_augeas 'puppetmaster_ssl_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
           it { should_not execute.with_change}
           it 'master ssl config should be set' do
@@ -82,10 +75,6 @@ describe 'puppet::master', :type => :class do
           }
         end
         it { should include_class('puppet::params') }
-        it { should contain_file('puppetmaster_docroot').with(
-            'path'  => '/some/other/path'
-          )
-        }
         it { should contain_apache__vhost('puppetmaster').with(
             'docroot'       => '/some/other/path'
           )
@@ -102,18 +91,6 @@ describe 'puppet::master', :type => :class do
             'servername'    => 'some.other.name',
             'ssl_cert'      => '/var/lib/puppet/ssl/certs/some.other.name.pem',
             'ssl_key'       => '/var/lib/puppet/ssl/private_keys/some.other.name.pem'
-          )
-        }
-      end
-      describe "with httpd_group => webby" do
-        let :params do
-          {
-            :httpd_group => 'webby',
-          }
-        end
-        it { should include_class('puppet::params') }
-        it { should contain_file('puppetmaster_docroot').with(
-            'group'  => 'webby'
           )
         }
       end

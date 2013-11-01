@@ -5,7 +5,6 @@ class puppet::master (
   $puppetmaster_package = $puppet::params::puppetmaster_package,
   $puppetmaster_docroot = $puppet::params::puppetmaster_docroot,
   $servername           = $::fqdn,
-  $httpd_group          = undef
 ) inherits puppet::params {
 
   # Puppet needs to be installed and set up beforehand
@@ -46,23 +45,6 @@ class puppet::master (
       'set master/ssl_client_verify_header SSL_CLIENT_VERIFY',
     ],
     require => File['puppet_conf'],
-  }
-
-  if $httpd_group {
-    $docroot_group = $httpd_group
-  } else {
-    $docroot_group = $apache::params::group
-  }
-
-  file{'puppetmaster_docroot':
-    ensure  => directory,
-    path    => $puppetmaster_docroot,
-    group   => $docroot_group,
-    recurse => true,
-    ignore  => '.git',
-    require =>  [ File['puppet_app_dir'],
-                  Package['puppet'],
-                ],
   }
 
   # The ssl settings have been taken directly from the default vhost
