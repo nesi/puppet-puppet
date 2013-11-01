@@ -67,7 +67,7 @@ class puppet::master (
 
   # The ssl settings have been taken directly from the default vhost
   # configuration distributed with the puppetmaster-passenger package
-  apache::vhost{'puppetmaster_dynaguppy':
+  apache::vhost{'puppetmaster':
     servername        => $servername,
     docroot           => $puppetmaster_docroot,
     port              => 8140,
