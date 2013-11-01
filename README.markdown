@@ -87,9 +87,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_package**: Sets the name of the puppetmaster package to install. Defaults to `puppetmaster_passenger`.
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
-*`**httpd_group**: Sets the group ownership of the puppetmaster docroot directory. The default value is to use the Apache group as set by the `apache` class.
 
-`# Alterna`ive Repositories
+# Alternaive Repositories
 
 This module does not manage repositories, but should install software from any repository (such as the Puppetlabs [Apt](http://apt.puppetlabs.com/) and [Yum](http://yum.puppetlabs.com/) repositories) configured on a machine running the puppet agent.
 
@@ -97,8 +96,7 @@ Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/lat
 
 # Dependencies
 
-* [puppetlabs-apache](apache): This module is only a dependency when using the `puppet::master` class.
-[apache]:https://github.com/puppetlabs/puppetlabs-apache
+* [puppetlabs-apache](https://github.com/puppetlabs/puppetlabs-apache): This module is only a dependency when using the `puppet::master` class. The current master from the github repository is required until 0.10.0 is released.
 
 # References
 
