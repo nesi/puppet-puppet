@@ -52,6 +52,10 @@ class puppet::master (
   apache::vhost{'puppetmaster':
     servername        => $servername,
     docroot           => $puppetmaster_docroot,
+    access_log        => true,
+    access_log_file   => "puppetmaster_${servername}_access_ssl.log",
+    error_log         => true,
+    error_log_file    => "puppetmaster_${servername}_error_ssl.log",
     port              => 8140,
     priority          => 50,
     ssl               => true,

@@ -40,7 +40,9 @@ describe 'puppet::master', :type => :class do
             'ssl_cert'      => '/var/lib/puppet/ssl/certs/test.example.org.pem',
             'ssl_key'       => '/var/lib/puppet/ssl/private_keys/test.example.org.pem',
             'ssl_ca'        => '/var/lib/puppet/ssl/certs/ca.pem',
-            'ssl_chain'     => '/var/lib/puppet/ssl/certs/ca.pem'
+            'ssl_chain'     => '/var/lib/puppet/ssl/certs/ca.pem',
+            'error_log_file'  => 'puppetmaster_test.example.org_error_ssl.log',
+            'access_log_file' => 'puppetmaster_test.example.org_access_ssl.log'
           )
         }
       end
@@ -88,9 +90,11 @@ describe 'puppet::master', :type => :class do
         end
         it { should include_class('puppet::params') }
         it { should contain_apache__vhost('puppetmaster').with(
-            'servername'    => 'some.other.name',
-            'ssl_cert'      => '/var/lib/puppet/ssl/certs/some.other.name.pem',
-            'ssl_key'       => '/var/lib/puppet/ssl/private_keys/some.other.name.pem'
+            'servername'      => 'some.other.name',
+            'ssl_cert'        => '/var/lib/puppet/ssl/certs/some.other.name.pem',
+            'ssl_key'         => '/var/lib/puppet/ssl/private_keys/some.other.name.pem',
+            'error_log_file'  => 'puppetmaster_some.other.name_error_ssl.log',
+            'access_log_file' => 'puppetmaster_some.other.name_access_ssl.log'
           )
         }
       end
