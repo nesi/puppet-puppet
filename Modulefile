@@ -1,5 +1,5 @@
 name    'Aethylred-puppet'
-version '0.2.1'
+version '0.2.2'
 source 'https://github.com/nesi/puppet-puppet'
 author 'Aaron Hicks'
 license 'GPL3'
