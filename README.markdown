@@ -88,6 +88,21 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
 
+### Troubleshooting
+
+If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenereate the SSL store, and then restart the Apache webserver. As root execute the following commands:  
+```
+$ service apache2 stop
+$ cd /var/lib/puppet
+$ rm -rf ssl
+$ puppet master --no-daemonise
+$ service apache2 start
+```
+
+**WARNING**: This resolution will destroy the ssl store of the Puppetmaster, all clients will need to resubmit certificate requests and have them signed.
+
+This procedure is only suitable for bootstrapping a Puppetmaster and is not good practice for automated deployment. A recommended automation strategy would be to have the certificates pregenerated and stored in a file server, and have them deployed to the server as part of the Puppet automation process. This is outside the scope of this module.
+
 # Alternaive Repositories
 
 This module does not manage repositories, but should install software from any repository (such as the Puppetlabs [Apt](http://apt.puppetlabs.com/) and [Yum](http://yum.puppetlabs.com/) repositories) configured on a machine running the puppet agent.
