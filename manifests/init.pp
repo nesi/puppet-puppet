@@ -108,6 +108,8 @@ class puppet (
       "set #comment[1] '${conf_firstline}'",
     ],
     onlyif  => "match #comment[.='${conf_firstline}'] size == 0",
+    # lens    => 'puppet',
+    # incl    => $puppet_conf_path,
     require => File['puppet_conf'],
   }
 
