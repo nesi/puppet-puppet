@@ -1,9 +1,10 @@
 require 'spec_helper'
 describe 'puppet::conf', :type => :class do
-  context 'on a Debian OS' do
+  context 'on a Debian OS with Puppet 3.4.3' do
     let :facts do
       {
-        :osfamily   => 'Debian',
+        :osfamily       => 'Debian',
+        :puppetversion  => '3.4.3'
       }
     end
     describe 'with default puppet' do
@@ -233,6 +234,69 @@ describe 'puppet::conf', :type => :class do
     end
   end
 
+  context 'on a Debian OS with Puppet 3.5.1' do
+    let :facts do
+      {
+        :osfamily       => 'Debian',
+        :puppetversion  => '3.4.3'
+      }
+    end
+    describe 'with default puppet' do
+      let :pre_condition do 
+        'include puppet'
+      end
+      describe 'with no parameters' do
+        it { should include_class('puppet::params') }
+        it { should contain_augeas('puppet_main_conf').with(
+            'require' => 'File[puppet_conf]',
+            'context' => '/files/etc/puppet/puppet.conf'
+          )
+        }
+        it { should contain_augeas('puppet_agent_conf').with(
+            'require' => 'File[puppet_conf]',
+            'context' => '/files/etc/puppet/puppet.conf'
+          )
+        }
+      end
+      describe 'augeas working on puppet.conf with no parameters' do
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'pluginsync should be true' do
+            aug_get('main/pluginsync').should == 'true'
+          end
+          it 'report should be true' do
+            aug_get('main/report').should == 'true'
+          end
+          it 'confdir should be set' do
+            aug_get('main/confdir').should == '/etc/puppet'
+          end
+          it 'vardir should be set' do
+            aug_get('main/vardir').should == '/var/lib/puppet'
+          end
+          it 'ssldir should be set' do
+            aug_get('main/ssldir').should == '/var/lib/puppet/ssl'
+          end
+          it 'vardir should be set' do
+            aug_get('main/vardir').should == '/var/lib/puppet'
+          end
+          it 'rundir should be set' do
+            aug_get('main/rundir').should == '/var/run/puppet'
+          end
+          it 'factpath should be set' do
+            aug_get('main/factpath').should == '/var/lib/puppet/lib/facter'
+          end
+          it 'templatedir should be set' do
+            aug_get('main/templatedir').should == '/etc/puppet/templates'
+          end
+          it 'modulepath should be set' do
+            aug_get('main/modulepath').should == '$basemodulepath'
+          end
+          it { should execute.idempotently }
+        end
+      end
+    end
+  end
+
   context "on a RedHat OS" do
     let :facts do
       {
@@ -258,5 +322,5 @@ describe 'puppet::conf', :type => :class do
       }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/)
     end
   end
-
+  
 end
