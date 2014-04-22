@@ -51,8 +51,10 @@ The parameters for `puppet::conf` correspond to setting in the [puppet configura
 * **var_dir**: This sets the puppet working directory that contains cached data, configurations and reports. The default is `/var/lib/puppet`.
 * **ssl_dir**: This sets the directory where puppet stores SSL state, including certificates and keys. The default is `/var/lib/puppet/ssl`.
 * **run_dir**: This sets the `rundir` setting in the `agent` block of the puppet conf. The default setting is `/var/run/puppet`.
-* **fact_path**: This sets the directory where facter facts are stored. The default is `/var/lib/puppet/facter`.
+* **fact_path**: This sets the directory where facter facts are stored. The default is `/var/lib/puppet/facter`.q
 * **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`.
+* **module_path**: This sets the directory or list of directories that Puppet will use for the module path. The default is `$confdir/modules` for Puppet versions 3.4.3 or earlier, and `$basemodulepath` for Puppet version 3.5.0 or later.
+* **append_basemodulepath**: If this is set to true, the variable `$basemodulepath` will be appended at the end of the list of module paths. This parameter only works for Puppet versions 3.5.0 or later. The default value is `true`.
 
 **NOTE:** This module does not manage the contents of the directories set by `var_dir`, `ssl_dir`, `run_dir`, `fact_path`, or `template_dir`. These will have to be managed separately. These settings are exposed to allow for customised puppet deployments.
 
@@ -87,6 +89,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_package**: Sets the name of the puppetmaster package to install. Defaults to `puppetmaster_passenger`.
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
+* **manifest**: This sets the manifest file or directory (file only for Puppet versions before 3.5.0) that puppet will use as the root manifest. The default is undefined, which removes the manifest setting from `puppet.conf` and the default value `/etc/puppet/manifests/site.pp` is used.
 
 ### Troubleshooting
 

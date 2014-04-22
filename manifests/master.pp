@@ -5,6 +5,8 @@ class puppet::master (
   $puppetmaster_package = $puppet::params::puppetmaster_package,
   $puppetmaster_docroot = $puppet::params::puppetmaster_docroot,
   $servername           = $::fqdn,
+  $manifest             = undef,
+  $fix_manifestdir      = undef,
 ) inherits puppet::params {
 
   # Puppet needs to be installed and set up beforehand
@@ -38,13 +40,49 @@ class puppet::master (
     name    => $puppetmaster_package,
   }
 
-  augeas{'puppetmaster_ssl_config':
+  Augeas{
     context => "/files${puppet::puppet_conf_path}",
+    require => File['puppet_conf'],
+  }
+
+  augeas{'puppetmaster_ssl_config':
     changes => [
       'set master/ssl_client_header SSL_CLIENT_S_DN',
       'set master/ssl_client_verify_header SSL_CLIENT_VERIFY',
     ],
-    require => File['puppet_conf'],
+  }
+
+  if $manifest {
+    if $fix_manifestdir {
+      if $manifest =~ /^.*\.pp$/ {
+        $manifest_dir = dirname($manifest)
+        $conf_manifest_changes = ["set master/manifest ${manifest}","set master/manifestdir ${manifest_dir}"]
+      } else {
+        $conf_manifest_changes = ["set master/manifest ${manifest}","set master/manifestdir ${manifest}"]
+      }
+    } else {
+      $conf_manifest_changes = ["set master/manifest ${manifest}",'rm master/manifestdir']
+    }
+  } else {
+    $conf_manifest_changes = ['rm master/manifest','rm master/manifestdir']
+  }
+
+  augeas{'puppetmaster_manifest_config':
+    changes => $conf_manifest_changes,
+  }
+
+  # clean up duplicated setting entries
+  augeas{'puppet_conf_dedup_master':
+    changes => [
+      'rm main/ssl_client_header',
+      'rm agent/ssl_client_header',
+      'rm main/ssl_client_verify_header',
+      'rm agent/ssl_client_verify_header',
+      'rm main/manifest',
+      'rm agent/manifest',
+      'rm main/manifestdir',
+      'rm agent/manifestdir',
+    ],
   }
 
   # The ssl settings have been taken directly from the default vhost
