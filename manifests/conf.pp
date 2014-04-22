@@ -1,17 +1,18 @@
 # The puppet::conf class manages the puppet configuration file
 # which is /etc/puppet/puppet.conf by default.
 class puppet::conf (
-  $environment     = $::environment,
-  $pluginsync      = true,
-  $puppetmaster    = 'puppet',
-  $report          = true,
-  $show_diff       = undef,
-  $module_path     = undef,
-  $var_dir         = $puppet::params::var_dir ,
-  $ssl_dir         = $puppet::params::ssl_dir,
-  $run_dir         = $puppet::params::run_dir,
-  $fact_path       = $puppet::params::fact_path,
-  $template_dir    = $puppet::params::template_dir
+  $environment            = $::environment,
+  $pluginsync             = true,
+  $puppetmaster           = 'puppet',
+  $report                 = true,
+  $show_diff              = undef,
+  $module_path            = undef,
+  $append_basemodulepath  = true,
+  $var_dir                = $puppet::params::var_dir ,
+  $ssl_dir                = $puppet::params::ssl_dir,
+  $run_dir                = $puppet::params::run_dir,
+  $fact_path              = $puppet::params::fact_path,
+  $template_dir           = $puppet::params::template_dir
 ) inherits puppet::params {
 
   # This class requires resources and variables provided by
@@ -23,15 +24,40 @@ class puppet::conf (
     require => File['puppet_conf'],
   }
 
-  # module path should be handled in puppet::master
-  if $module_path {
-    $module_path_change = "set main/modulepath ${module_path}"
+  if versioncmp($::puppetversion, '3.5.0') > 0 {
+    if $module_path {
+      if is_array($module_path) {
+        $modulepath_list = join($module_path,':')
+      } else {
+        $modulepath_list = $module_path
+      }
+      if $append_basemodulepath {
+        $module_path_change = "set main/modulepath ${modulepath_list}:\$basemodulepath"
+      } else {
+        $module_path_change = "set main/modulepath ${modulepath_list}"
+      }
+    } else {
+      if $puppet::environments {
+        $module_path_change = "set main/modulepath \$confdir/environments/${::environment}/modules:\$basemodulepath"
+      } else {
+        $module_path_change = 'set main/modulepath $basemodulepath'
+      }
+    }
   } else {
-    if $puppet::environments {
+    if $module_path {
+      if is_array($module_path) {
+        $modulepath_list = join($module_path,':')
+      } else {
+        $modulepath_list = $module_path
+      }
+      $module_path_change = "set main/modulepath ${modulepath_list}"
+    } else {
+      if $puppet::environments {
         $module_path_change = "set main/modulepath \$confdir/environments/${::environment}/modules:\$confdir/modules"
       } else {
         $module_path_change = 'set main/modulepath $confdir/modules'
       }
+    }
   }
 
   augeas{'puppet_main_conf':
