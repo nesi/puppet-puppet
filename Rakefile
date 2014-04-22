@@ -5,9 +5,9 @@ require 'puppet-lint/tasks/puppet-lint'
 PuppetLint.configuration.send('disable_80chars')
 PuppetLint.configuration.send('disable_class_parameter_defaults')
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
-PuppetLint.configuration.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp"]
+PuppetLint.configuration.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp","tests/**/*.pp"]
 
-desc "Run puppet in noop mode and check for syntax errors."
+desc "Check for puppet and ruby syntax errors."
 task :validate do
   if ENV['PUPPET_GEM_VERSION'] == '~> 2.6.0'
     puppet_parse_command = 'puppet --parseonly --ignoreimport'

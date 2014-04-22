@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 group :development, :test do
   gem 'rake',                   :require => false
-  gem 'rspec-puppet',           :require => false
+  gem 'rspec-puppet','0.1.6'
   gem 'puppetlabs_spec_helper', :require => false
   gem 'ruby-augeas',            :require => false
   gem 'rspec-puppet-augeas',    :require => false
