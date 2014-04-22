@@ -238,7 +238,7 @@ describe 'puppet::conf', :type => :class do
     let :facts do
       {
         :osfamily       => 'Debian',
-        :puppetversion  => '3.4.3'
+        :puppetversion  => '3.5.1'
       }
     end
     describe 'with default puppet' do
