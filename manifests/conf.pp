@@ -45,7 +45,12 @@ class puppet::conf (
     }
   } else {
     if $module_path {
-      $module_path_change = "set main/modulepath ${module_path}"
+      if is_array($module_path) {
+        $modulepath_list = join($module_path,':')
+      } else {
+        $modulepath_list = $module_path
+      }
+      $module_path_change = "set main/modulepath ${modulepath_list}"
     } else {
       if $puppet::environments {
         $module_path_change = "set main/modulepath \$confdir/environments/${::environment}/modules:\$confdir/modules"

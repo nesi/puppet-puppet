@@ -231,6 +231,18 @@ describe 'puppet::conf', :type => :class do
           it { should execute.idempotently }
         end
       end
+      describe 'with a list of module paths' do
+        let :params do
+            { :module_path => ['/this/path','/that/path','/some/other/path'] }
+        end
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'modulepath should be /this/path:/that/path:/some/other/path' do
+            aug_get('main/modulepath').should == '/this/path:/that/path:/some/other/path'
+          end
+          it { should execute.idempotently }
+        end
+      end
     end
   end
 
@@ -290,6 +302,58 @@ describe 'puppet::conf', :type => :class do
           end
           it 'modulepath should be set' do
             aug_get('main/modulepath').should == '$basemodulepath'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'when given a module path' do
+        let :params do
+            { :module_path => '/some/other/path' }
+        end
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'modulepath should be /some/other/path:$basemodulepath' do
+            aug_get('main/modulepath').should == '/some/other/path:$basemodulepath'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of module paths' do
+        let :params do
+            { :module_path => ['/this/path','/that/path','/some/other/path'] }
+        end
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'modulepath should be /this/path:/that/path:/some/other/path:$basemodulepath' do
+            aug_get('main/modulepath').should == '/this/path:/that/path:/some/other/path:$basemodulepath'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'when given a module path and disable appending $basemodulepath' do
+        let :params do {
+            :module_path            => '/some/other/path',
+            :append_basemodulepath  => false
+          }
+        end
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'modulepath should be /some/other/path' do
+            aug_get('main/modulepath').should == '/some/other/path'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of module paths and disable appending $basemodulepath' do
+        let :params do {
+            :module_path            => ['/this/path','/that/path','/some/other/path'],
+            :append_basemodulepath  => false
+          }
+        end
+        describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'modulepath should be /this/path:/that/path:/some/other/path' do
+            aug_get('main/modulepath').should == '/this/path:/that/path:/some/other/path'
           end
           it { should execute.idempotently }
         end
