@@ -8,7 +8,7 @@ NeSI Puppet Puppet Module is a Puppet module for installing, configuring and man
 
 While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project a module was required to install and configure puppet, puppetmaster and hiera. As the puppet agent and puppetmaster share configuration files (`/etc/puppet/puppet.conf` in particular), and puppet modules should not attempt to manage files *between* modules, a single puppet and puppetmaster module would be required. Hiera is now installed with Puppet as a dependency, it is appropriate that hiera is configured with this module.
 
-...thus we get puppet recursivley puppetising puppet, which can only end in wonderous singularity, or firey loops of oblivion.
+...thus we get puppet recursively puppetising puppet, which can only end in wondrous singularity, or fiery loops of oblivion.
 
 # Usage
 
@@ -60,9 +60,9 @@ The parameters for `puppet::conf` correspond to setting in the [puppet configura
 
 ## The `puppet::hiera` Class
 
-[Hiera](http://projects.puppetlabs.com/projects/hiera) is a simple pluggable hierachical database which is well suited for storing hierachical configuration data for Puppet.
+[Hiera](http://projects.puppetlabs.com/projects/hiera) is a simple pluggable hierarchical database which is well suited for storing hierarchical configuration data for Puppet.
 
-The `puppet::hiera` class confirms the Hiera install that came in as a dependency of the puppet package, and manages it's configuration for puppet. It bootstraps the hiera database witha minimal default configuration file (`/etc/puppet/hiera.yaml`) and creates the hiera datastore. It does not manage hiera any further from here.
+The `puppet::hiera` class confirms the Hiera install that came in as a dependency of the puppet package, and manages it's configuration for puppet. It bootstraps the hiera database with a minimal default configuration file (`/etc/puppet/hiera.yaml`) and creates the hiera data store. It does not manage hiera any further from here.
 
 When using version control with puppet and hiera, it is recommended that the hiera configuration (`hiera.yaml`) is included in the puppet repository, while the hiera datastore (by default `/etc/puppet/hieradata` with this module) is managed in a separate repository. This segregation allows the puppet configuration to be stored as a public repository, while the hiera data is kept private.
 
@@ -72,14 +72,10 @@ The hiera class creates the configuration file (`hiera.yaml`) on it's first run,
 
 * **ensure**: Sets the ensure state of the heira package and configuration. The default is to match the same state as given the `puppet` class.
 * **hiera_config_file**: Sets the path to the file to the hiera configuration in `puppet.conf`. The default is `/etc/puppet/hiera.yaml`.
-* **hiera_datadir**: Sets the path to the directory that holds the Hiera datastore. The default is `/etc/puppet/hiradata`.
-* **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the mimimal bootstrap template.
-* **hiera_backend**: Sets which backend format for the Hiera datastore, which can either be `yaml` or `json`. The default is `yaml`.
-* **hiera_hierarchy**: A list of lists used to create the base Hiera hierachy.
-* **report_handlers**: This parameter sets a list of report handlers for the Puppet Master to submit reports to. It should handle a list of handlers, or a preformatted string. The default is undefined, which will omit the `reports` setting from the Puppet configuration.
-* **reporturl**: This parameter provides a report submission URL for the `http` report handler. If http is missing from the list of report handlers, it will be appended to the list. The default value is undefined, which will omit the `reporturl` setting from the Puppet configuration.
-
-**NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` paramater may lead to unexpected behaviour by the Puppetmaster.
+* **hiera_datadir**: Sets the path to the directory that holds the Hiera data store. The default is `/etc/puppet/hiradata`.
+* **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
+* **hiera_backend**: Sets which back-end format for the Hiera data store, which can either be `yaml` or `json`. The default is `yaml`.
+* **hiera_hierarchy**: A list of lists used to create the base Hiera hierarchy.
 
 ## The `puppet::master` class
 
@@ -94,11 +90,15 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
 * **manifest**: This sets the manifest file or directory (file only for Puppet versions before 3.5.0) that puppet will use as the root manifest. The default is undefined, which removes the manifest setting from `puppet.conf` and the default value `/etc/puppet/manifests/site.pp` is used.
-* **fix_manifestdir**: When set, this should configure the `manifestdir` setting to be compatible with the `manifest` setting. This should prevent this [bug](https://tickets.puppetlabs.com/browse/PUP-1944) from producing inconsistent behaviour. The default value is undefined. This module does not currently allow setting `manifestdir` directly as it is depreciated in favor of the `manifest` setting.
+* **fix_manifestdir**: When set, this should configure the `manifestdir` setting to be compatible with the `manifest` setting. This should prevent this [bug](https://tickets.puppetlabs.com/browse/PUP-1944) from producing inconsistent behavior. The default value is undefined. This module does not currently allow setting `manifestdir` directly as it is depreciated in favor of the `manifest` setting.
+* **report_handlers**: This parameter sets a list of report handlers for the Puppet Master to submit reports to. It should handle a list of handlers, or a formatted string. The default is undefined, which will omit the `reports` setting from the Puppet configuration.
+* **reporturl**: This parameter provides a report submission URL for the `http` report handler. If http is missing from the list of report handlers, it will be appended to the list. The default value is undefined, which will omit the `reporturl` setting from the Puppet configuration.
+
+**NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behavior by the Puppetmaster.
 
 ### Troubleshooting
 
-If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenereate the SSL store, and then restart the Apache webserver. As root execute the following commands:  
+If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenerate the SSL store, and then restart the Apache web service. As root execute the following commands:  
 ```
 $ service apache2 stop
 $ cd /var/lib/puppet
@@ -128,7 +128,7 @@ There are other Puppet modules that can be used for puppet and puppetmaster and 
 * [stephenrjohnson\puppetlabs-puppet](https://github.com/stephenrjohnson/puppetlabs-puppet): Complete, but bundles in the Puppet Dashboard, uses an out of date version of [puppetlabs-apache](apache), explicitly configures Apache and modules.
 * [ghoneycutt/puppet-module-puppet](https://github.com/ghoneycutt/puppet-module-puppet): Complete, but bundles in the Puppet Dashboard, uses an out of date version of [puppetlabs-apache](apache), and explicitly configures Apache and modules.
 
-Bundling Puppet Dashboard is undesireable as it is a separate application from puppet, hence should be managed separately.
+Bundling Puppet Dashboard is undesirable as it is a separate application from puppet, hence should be managed separately.
 
 Explicitly configuring Apache, it's modules, or Passenger is not desirable as it makes the Apache configuration too inflexible and can make it difficult to serve other web applications from the same server.
 
@@ -152,7 +152,7 @@ This module has been developed for the use with Open Source Puppet (Apache 2.0 l
 
 This module includes the [Travis](https://travis-ci.org) configuration to use [`rspec-puppet-augeas`](https://github.com/domcleal/rspec-puppet-augeas) to test and verify changes made to files using the [`augeas` resource](http://docs.puppetlabs.com/references/latest/type.html#augeas) available in Puppet. Check the `rspec-puppet-augeas` [documentation](https://github.com/domcleal/rspec-puppet-augeas/blob/master/README.md) for usage.
 
-This will require a copy of the original input files to `spec/fixtures/augeas` using the same filesystem layout that the resource expects:  
+This will require a copy of the original input files to `spec/fixtures/augeas` using the same file system layout that the resource expects:  
 ```
 $ tree spec/fixtures/augeas/
 spec/fixtures/augeas/

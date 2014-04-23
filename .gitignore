@@ -33,3 +33,4 @@ _ReSharper*/
 *.sublime-project
 *.sublime-workspace
 pkg/
+Gemfile.lock
