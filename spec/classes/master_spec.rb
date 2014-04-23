@@ -31,6 +31,29 @@ describe 'puppet::master', :type => :class do
             aug_get('master/ssl_client_header').should == 'SSL_CLIENT_S_DN'
             aug_get('master/ssl_client_verify_header').should == 'SSL_CLIENT_VERIFY'
           end
+          it { should execute.idempotently }
+        end
+        describe_augeas 'puppet_conf_dedup_master', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'without duplicate entries in the master block' do
+            should_not aug_get('main/ssl_client_header')
+            should_not aug_get('agent/ssl_client_header')
+            should_not aug_get('main/ssl_client_verify_header')
+            should_not aug_get('agent/ssl_client_verify_header')
+            should_not aug_get('main/manifest')
+            should_not aug_get('agent/manifest')
+            should_not aug_get('main/manifestdir')
+            should_not aug_get('agent/manifestdir')
+          end
+          it { should execute.idempotently }
+        end
+        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'with no manifest or manifestdir entries' do
+            should_not aug_get('master/manifest')
+            should_not aug_get('master/manifestdir')
+          end
+          it { should execute.idempotently }
         end
         # only testing parameters that change
         it { should contain_apache__vhost('puppetmaster').with(

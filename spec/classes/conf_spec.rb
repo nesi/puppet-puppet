@@ -72,6 +72,38 @@ describe 'puppet::conf', :type => :class do
           end
           it { should execute.idempotently }
         end
+        describe_augeas 'puppet_conf_dedup_agent', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'without duplicate entries in the agent block' do
+            should_not aug_get('main/server')
+            should_not aug_get('master/server')
+            should_not aug_get('main/envionment')
+            should_not aug_get('master/environment')
+          end
+          it { should execute.idempotently }
+        end
+        describe_augeas 'puppet_conf_dedup_main', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'without duplicate entries in the main block' do
+            should_not aug_get('master/pluginsync')
+            should_not aug_get('master/report')
+            should_not aug_get('master/confdir')
+            should_not aug_get('master/vardir')
+            should_not aug_get('master/ssldir')
+            should_not aug_get('master/rundir')
+            should_not aug_get('master/factpath')
+            should_not aug_get('master/templatedir')
+            should_not aug_get('agent/pluginsync')
+            should_not aug_get('agent/report')
+            should_not aug_get('agent/confdir')
+            should_not aug_get('agent/vardir')
+            should_not aug_get('agent/ssldir')
+            should_not aug_get('agent/rundir')
+            should_not aug_get('agent/factpath')
+            should_not aug_get('agent/templatedir')
+          end
+          it { should execute.idempotently }
+        end
       end
       describe 'with environment => test' do
         let :params do
