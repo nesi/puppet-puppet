@@ -121,6 +121,62 @@ describe 'puppet::master', :type => :class do
           )
         }
       end
+      describe 'with a manifest file and without fixing manifestdir' do
+        let :params do
+            { :manifest => '/etc/puppet/test/test.pp' }
+        end
+        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the manifest and not set manifestdir' do
+            aug_get('master/manifest').should == '/etc/puppet/test/test.pp'
+            should_not aug_get('master/manifestdir')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a manifest directory and without fixing manifestdir' do
+        let :params do
+            { :manifest => '/etc/puppet/test/test' }
+        end
+        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the manifest and not set manifestdir' do
+            aug_get('master/manifest').should == '/etc/puppet/test/test'
+            should_not aug_get('master/manifestdir')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a manifest file and with fixing manifestdir' do
+        let :params do {
+          :manifest         => '/etc/puppet/test/test.pp',
+          :fix_manifestdir => true,
+        }
+        end
+        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the manifest and set manifestdir' do
+            aug_get('master/manifest').should == '/etc/puppet/test/test.pp'
+            aug_get('master/manifestdir').should == '/etc/puppet/test'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a manifest directory and with fixing manifestdir' do
+        let :params do {
+          :manifest         => '/etc/puppet/test/test',
+          :fix_manifestdir => true,
+        }
+        end
+        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the manifest and set manifestdir' do
+            aug_get('master/manifest').should == '/etc/puppet/test/test'
+            aug_get('master/manifestdir').should == '/etc/puppet/test/test'
+          end
+          it { should execute.idempotently }
+        end
+      end
     end
   end
 

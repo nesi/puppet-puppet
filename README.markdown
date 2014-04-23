@@ -90,6 +90,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
 * **manifest**: This sets the manifest file or directory (file only for Puppet versions before 3.5.0) that puppet will use as the root manifest. The default is undefined, which removes the manifest setting from `puppet.conf` and the default value `/etc/puppet/manifests/site.pp` is used.
+* **fix_manifestdir**: When set, this should configure the `manifestdir` setting to be compatible with the `manifest` setting. This should prevent this [bug](https://tickets.puppetlabs.com/browse/PUP-1944) from producing inconsistent behaviour. The default value is undefined. This module does not currently allow setting `manifestdir` directly as it is depreciated in favor of the `manifest` setting.
 
 ### Troubleshooting
 
