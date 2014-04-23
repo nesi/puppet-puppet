@@ -33,6 +33,14 @@ describe 'puppet::master', :type => :class do
           end
           it { should execute.idempotently }
         end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'master reports and reporturl are not set' do
+            should_not aug_get('master/reports')
+            should_not aug_get('master/reporturl')
+          end
+          it { should execute.idempotently }
+        end
         describe_augeas 'puppet_conf_dedup_master', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
           it { should_not execute.with_change}
           it 'without duplicate entries in the master block' do
@@ -44,6 +52,10 @@ describe 'puppet::master', :type => :class do
             should_not aug_get('agent/manifest')
             should_not aug_get('main/manifestdir')
             should_not aug_get('agent/manifestdir')
+            should_not aug_get('main/reports')
+            should_not aug_get('agent/reports')
+            should_not aug_get('main/reporturl')
+            should_not aug_get('agent/reporturl')
           end
           it { should execute.idempotently }
         end
@@ -173,6 +185,92 @@ describe 'puppet::master', :type => :class do
           it 'set the manifest and set manifestdir' do
             aug_get('master/manifest').should == '/etc/puppet/test/test'
             aug_get('master/manifestdir').should == '/etc/puppet/test/test'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a report handler string' do
+        let :params do {
+          :report_handlers => 'store',
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handlers, but not set reporturl' do
+            aug_get('master/reports').should == 'store'
+            should_not aug_get('master/reporturl')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of report handlers' do
+        let :params do {
+          :report_handlers => ['store','log','tagmail'],
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handlers, but not set reporturl' do
+            aug_get('master/reports').should == 'store,log,tagmail'
+            should_not aug_get('master/reporturl')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of report handlers, including http' do
+        let :params do {
+          :report_handlers => ['store','log','http'],
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handlers, but not set reporturl' do
+            aug_get('master/reports').should == 'store,log,http'
+            should_not aug_get('master/reporturl')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of report handlers, including http, and set report url' do
+        let :params do {
+          :report_handlers  => ['store','log','http'],
+          :reporturl        => 'http://reports.example.org:3000',
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handlers, and set report url' do
+            aug_get('master/reports').should == 'store,log,http'
+            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with a list of report handlers, without http, and set report url' do
+        let :params do {
+          :report_handlers  => ['store','tagmail'],
+          :reporturl        => 'http://reports.example.org:3000',
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handlers, append http, and set report url' do
+            aug_get('master/reports').should == 'store,tagmail,http'
+            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'with report url, and missing report handers' do
+        let :params do {
+          :reporturl        => 'http://reports.example.org:3000',
+        }
+        end
+        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set the report handler to http, and set report url' do
+            aug_get('master/reports').should == 'http'
+            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
           end
           it { should execute.idempotently }
         end

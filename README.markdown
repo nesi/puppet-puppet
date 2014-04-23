@@ -76,6 +76,10 @@ The hiera class creates the configuration file (`hiera.yaml`) on it's first run,
 * **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the mimimal bootstrap template.
 * **hiera_backend**: Sets which backend format for the Hiera datastore, which can either be `yaml` or `json`. The default is `yaml`.
 * **hiera_hierarchy**: A list of lists used to create the base Hiera hierachy.
+* **report_handlers**: This parameter sets a list of report handlers for the Puppet Master to submit reports to. It should handle a list of handlers, or a preformatted string. The default is undefined, which will omit the `reports` setting from the Puppet configuration.
+* **reporturl**: This parameter provides a report submission URL for the `http` report handler. If http is missing from the list of report handlers, it will be appended to the list. The default value is undefined, which will omit the `reporturl` setting from the Puppet configuration.
+
+**NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` paramater may lead to unexpected behaviour by the Puppetmaster.
 
 ## The `puppet::master` class
 

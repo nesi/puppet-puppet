@@ -7,6 +7,8 @@ class puppet::master (
   $servername           = $::fqdn,
   $manifest             = undef,
   $fix_manifestdir      = undef,
+  $report_handlers      = undef,
+  $reporturl            = undef
 ) inherits puppet::params {
 
   # Puppet needs to be installed and set up beforehand
@@ -52,6 +54,7 @@ class puppet::master (
     ],
   }
 
+  # Set up manifest and manifestdir settings
   if $manifest {
     if $fix_manifestdir {
       if $manifest =~ /^.*\.pp$/ {
@@ -71,6 +74,40 @@ class puppet::master (
     changes => $conf_manifest_changes,
   }
 
+  # Set up report handling
+  if $report_handlers or $reporturl {
+    if is_array($report_handlers) {
+      $reports_str = join($report_handlers,',')
+    } else {
+      $reports_str = $report_handlers
+    }
+    if $reports_str =~ /http/ {
+      if $reporturl {
+        $conf_reports_changes = ["set master/reports ${reports_str}","set master/reporturl ${reporturl}"]
+      } else {
+        $conf_reports_changes = ["set master/reports ${reports_str}",'rm master/reporturl']
+        warning('The http report handler has been set, but no URL given to the reporturl parameter!')
+      }
+    } else {
+      if $reporturl {
+        if $reports_str {
+          $reports_with_http_str = join([$reports_str,'http'],',')
+        } else {
+          $reports_with_http_str = 'http'
+        }
+        $conf_reports_changes = ["set master/reports ${reports_with_http_str}","set master/reporturl ${reporturl}"]
+      } else {
+        $conf_reports_changes = ["set master/reports ${reports_str}",'rm master/reporturl']
+      }
+    }
+  } else {
+    $conf_reports_changes = ['rm master/reports','rm master/reporturl']
+  }
+
+  augeas{'puppetmaster_reports_config':
+    changes => $conf_reports_changes,
+  }
+
   # clean up duplicated setting entries
   augeas{'puppet_conf_dedup_master':
     changes => [
@@ -82,6 +119,10 @@ class puppet::master (
       'rm agent/manifest',
       'rm main/manifestdir',
       'rm agent/manifestdir',
+      'rm main/reports',
+      'rm agent/reports',
+      'rm main/reporturl',
+      'rm agent/reporturl',
     ],
   }
 
