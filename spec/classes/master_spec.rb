@@ -41,6 +41,14 @@ describe 'puppet::master', :type => :class do
           end
           it { should execute.idempotently }
         end
+        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should_not execute.with_change}
+          it 'master storeconfigs and storeconfigs_backend are not set' do
+            should_not aug_get('master/storeconfigs')
+            should_not aug_get('master/storeconfigs_backend')
+          end
+          it { should execute.idempotently }
+        end
         describe_augeas 'puppet_conf_dedup_master', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
           it { should_not execute.with_change}
           it 'without duplicate entries in the master block' do
@@ -56,6 +64,10 @@ describe 'puppet::master', :type => :class do
             should_not aug_get('agent/reports')
             should_not aug_get('main/reporturl')
             should_not aug_get('agent/reporturl')
+            should_not aug_get('main/storeconfigs')
+            should_not aug_get('agent/storeconfigs')
+            should_not aug_get('main/storeconfigs_backend')
+            should_not aug_get('agent/storeconfigs_backend')
           end
           it { should execute.idempotently }
         end
@@ -271,6 +283,49 @@ describe 'puppet::master', :type => :class do
           it 'set the report handler to http, and set report url' do
             aug_get('master/reports').should == 'http'
             aug_get('master/reporturl').should == 'http://reports.example.org:3000'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'when storeconfigs is true' do
+        let :params do {
+          :storeconfigs => true,
+        }
+        end
+        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set storeconfigs to true, and but do not set storeconfigs backend' do
+            aug_get('master/storeconfigs').should == 'true'
+            should_not aug_get('master/storeconfigs_backend')
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'when storeconfigs is true and a backend provided' do
+        let :params do {
+          :storeconfigs         => true,
+          :storeconfigs_backend => 'active_record',
+        }
+        end
+        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set storeconfigs to true, and a set storeconfigs backend' do
+            aug_get('master/storeconfigs').should == 'true'
+            aug_get('master/storeconfigs_backend').should == 'active_record'
+          end
+          it { should execute.idempotently }
+        end
+      end
+      describe 'when only a storeconfigs backend provided' do
+        let :params do {
+          :storeconfigs_backend => 'active_record',
+        }
+        end
+        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'set storeconfigs to true, and a set storeconfigs backend' do
+            aug_get('master/storeconfigs').should == 'true'
+            aug_get('master/storeconfigs_backend').should == 'active_record'
           end
           it { should execute.idempotently }
         end

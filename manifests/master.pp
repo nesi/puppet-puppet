@@ -8,7 +8,9 @@ class puppet::master (
   $manifest             = undef,
   $fix_manifestdir      = undef,
   $report_handlers      = undef,
-  $reporturl            = undef
+  $reporturl            = undef,
+  $storeconfigs         = undef,
+  $storeconfigs_backend = undef
 ) inherits puppet::params {
 
   # Puppet needs to be installed and set up beforehand
@@ -108,6 +110,21 @@ class puppet::master (
     changes => $conf_reports_changes,
   }
 
+  # Set up storeconfigs and backends
+  if $storeconfigs or $storeconfigs_backend {
+    if $storeconfigs_backend {
+      $conf_storeconfigs_changes = ['set master/storeconfigs true',"set master/storeconfigs_backend ${storeconfigs_backend}"]
+    } else {
+      $conf_storeconfigs_changes = ['set master/storeconfigs true','rm master/storeconfigs_backend']
+    }
+  } else {
+    $conf_storeconfigs_changes = ['rm master/storeconfigs','rm master/storeconfigs_backend']
+  }
+
+  augeas{'puppetmaster_storeconfigs_config':
+    changes => $conf_storeconfigs_changes,
+  }
+
   # clean up duplicated setting entries
   augeas{'puppet_conf_dedup_master':
     changes => [
@@ -123,6 +140,10 @@ class puppet::master (
       'rm agent/reports',
       'rm main/reporturl',
       'rm agent/reporturl',
+      'rm agent/storeconfigs',
+      'rm main/storeconfigs',
+      'rm agent/storeconfigs_backend',
+      'rm main/storeconfigs_backend'
     ],
   }
 
