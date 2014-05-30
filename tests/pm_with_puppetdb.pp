@@ -16,7 +16,10 @@ class {'apache::mod::passenger':
 }
 
 # Set up the puppetdb
-include puppetdb
+class { 'puppetdb':
+  database        => 'embedded',
+  listen_address  => '0.0.0.0',
+}
 
 # Set up the puppetmaster
 class {'puppet::master':
@@ -25,8 +28,7 @@ class {'puppet::master':
   require               => Class['puppetdb'],
 }
 
-class {'puppet::master::config':
-  manage_storeconfigs     => false,
-  manage_report_processor => false,
-  require                 => Class['puppet::master'],
+class { 'puppetdb::master::routes':
+  puppet_confdir  => '/etc/puppet',
+  require         => Class['puppet::master'],
 }
