@@ -8,20 +8,37 @@ class puppet::conf (
   $show_diff              = undef,
   $module_path            = undef,
   $append_basemodulepath  = true,
-  $var_dir                = $puppet::params::var_dir ,
-  $ssl_dir                = $puppet::params::ssl_dir,
-  $run_dir                = $puppet::params::run_dir,
-  $fact_path              = $puppet::params::fact_path,
-  $template_dir           = $puppet::params::template_dir
+  $var_dir                = $::puppet::params::var_dir ,
+  $ssl_dir                = $::puppet::params::ssl_dir,
+  $run_dir                = $::puppet::params::run_dir,
+  $fact_path              = $::puppet::params::fact_path,
+  $template_dir           = $::puppet::params::template_dir
 ) inherits puppet::params {
 
   # This class requires resources and variables provided by
   # the puppet class!
   require puppet
 
+  file{'puppet_conf':
+    ensure  => file,
+    path    => $::puppet::puppet_conf_path,
+    require => File['puppet_conf_dir'],
+  }
+
   Augeas{
-    context => "/files${puppet::puppet_conf_path}",
+    context => "/files${::puppet::puppet_conf_path}",
     require => File['puppet_conf'],
+  }
+
+  # Not convinced that this is the best method for intialising puppet.conf
+  $conf_firstline = 'This file is managed by Puppet, modifications may be overwritten.'
+
+  augeas{'puppet_conf_firstline':
+    changes => [
+      'ins #comment before *[1]',
+      "set #comment[1] '${conf_firstline}'",
+    ],
+    onlyif  => "match #comment[.='${conf_firstline}'] size == 0",
   }
 
   if versioncmp($::puppetversion, '3.5.0') > 0 {
@@ -82,7 +99,7 @@ class puppet::conf (
 
   augeas{'puppet_agent_conf':
     changes => [
-      "set agent/environment ${puppet::conf::environment}",
+      "set agent/environment ${::puppet::conf::environment}",
       "set agent/server ${puppetmaster}",
       $show_diff_change,
     ],

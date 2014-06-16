@@ -33,15 +33,15 @@
 # [Remember: No empty lines between comments and class definition]
 class puppet (
   $ensure               = 'installed',
-  $puppet_package       = $puppet::params::puppet_package,
-  $user                 = $puppet::params::user,
-  $gid                  = $puppet::params::gid,
-  $user_home            = $puppet::params::user_home,
-  $conf_dir             = $puppet::params::conf_dir,
+  $puppet_package       = $::puppet::params::puppet_package,
+  $user                 = $::puppet::params::user,
+  $gid                  = $::puppet::params::gid,
+  $user_home            = $::puppet::params::user_home,
+  $conf_dir             = $::puppet::params::conf_dir,
   $environments         = undef
 ) inherits puppet::params {
 
-  $puppet_conf_path = "${conf_dir}/${puppet::params::conf_file}"
+  $puppet_conf_path = "${conf_dir}/${::puppet::params::conf_file}"
 
   package{'puppet':
     ensure  => $ensure,
@@ -92,27 +92,6 @@ class puppet (
     ignore  => ['.git'],
   }
 
-  file{'puppet_conf':
-    ensure  => $ensure_file,
-    path    => $puppet_conf_path,
-    require => File['puppet_conf_dir'],
-  }
-
-  # Not convinced that this is the best method for intialising puppet.conf
-  $conf_firstline = 'This file is managed by Puppet, modifications may be overwritten.'
-
-  augeas{'puppet_conf_firstline':
-    context => "/files${puppet_conf_path}",
-    changes => [
-      'ins #comment before *[1]',
-      "set #comment[1] '${conf_firstline}'",
-    ],
-    onlyif  => "match #comment[.='${conf_firstline}'] size == 0",
-    # lens    => 'puppet',
-    # incl    => $puppet_conf_path,
-    require => File['puppet_conf'],
-  }
-
   if $environments {
     $environments_ensure = $ensure_dir
   } else {
@@ -128,7 +107,7 @@ class puppet (
 
   file{'puppet_app_dir':
     ensure  => $ensure_dir,
-    path    => $puppet::params::app_dir,
+    path    => $::puppet::params::app_dir,
     force   => true,
     require => Package['puppet'],
   }

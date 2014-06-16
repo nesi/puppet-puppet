@@ -42,12 +42,6 @@ describe 'puppet', :type => :class do
           'require' => 'Package[puppet]'
         )
       }
-      it { should contain_file('puppet_conf').with(
-          'ensure'  => 'file',
-          'path'    => '/etc/puppet/puppet.conf',
-          'require' => 'File[puppet_conf_dir]'
-        )
-      }
       it { should contain_file('puppet_environments_dir').with(
           'ensure'  => 'absent'
         )
@@ -58,20 +52,6 @@ describe 'puppet', :type => :class do
           'require' => 'Package[puppet]'
         )
       }
-      it { should contain_augeas('puppet_conf_firstline').with(
-          'require' => 'File[puppet_conf]',
-          'context' => '/files/etc/puppet/puppet.conf'
-        )
-      }
-    end
-    describe 'augeas working on puppet.conf with no parameters' do
-      describe_augeas 'puppet_conf_firstline', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-        it { should execute.with_change}
-        it 'first line should match comment' do
-          aug_get('#comment[1]').should == 'This file is managed by Puppet, modifications may be overwritten.'
-        end
-        it { should execute.idempotently }
-      end
     end
     describe "with ensure => absent" do
       let :params do
@@ -93,14 +73,6 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_user('puppet_user').with(
-          'ensure'  => 'absent'
-        )
-      }
-      it { should contain_file('puppet_conf_dir').with(
-          'ensure'  => 'absent'
-        )
-      }
-      it { should contain_file('puppet_conf').with(
           'ensure'  => 'absent'
         )
       }
@@ -137,16 +109,8 @@ describe 'puppet', :type => :class do
           'ensure'      => 'present'
         )
       }
-      it { should contain_file('puppet_conf_dir').with(
-          'ensure'  => 'directory'
-        )
-      }
       it { should contain_file('puppet_app_dir').with(
           'ensure'  => 'directory'
-        )
-      }
-      it { should contain_file('puppet_conf').with(
-          'ensure'  => 'file'
         )
       }
       it { should contain_file('puppet_environments_dir').with(
@@ -185,10 +149,6 @@ describe 'puppet', :type => :class do
       }
       it { should contain_file('puppet_app_dir').with(
           'ensure'  => 'directory'
-        )
-      }
-      it { should contain_file('puppet_conf').with(
-          'ensure'  => 'file'
         )
       }
       it { should contain_file('puppet_environments_dir').with(
@@ -260,16 +220,8 @@ describe 'puppet', :type => :class do
           'path'  => '/some/other/path'
         )
       }
-      it { should contain_file('puppet_conf').with(
-          'path'  => '/some/other/path/puppet.conf'
-        )
-      }
       it { should contain_file('puppet_environments_dir').with(
           'path'  => '/some/other/path/environments'
-        )
-      }
-      it { should contain_augeas('puppet_conf_firstline').with(
-          'context'  => '/files/some/other/path/puppet.conf'
         )
       }
     end

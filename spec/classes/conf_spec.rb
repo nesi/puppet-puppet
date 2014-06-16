@@ -13,12 +13,24 @@ describe 'puppet::conf', :type => :class do
       end
       describe 'with no parameters' do
         it { should include_class('puppet::params') }
+        it { should contain_file('puppet_conf').with(
+            'ensure'  => 'file',
+            'path'    => '/etc/puppet/puppet.conf',
+            'require' => 'File[puppet_conf_dir]'
+          )
+        }
+
         it { should contain_augeas('puppet_main_conf').with(
             'require' => 'File[puppet_conf]',
             'context' => '/files/etc/puppet/puppet.conf'
           )
         }
         it { should contain_augeas('puppet_agent_conf').with(
+            'require' => 'File[puppet_conf]',
+            'context' => '/files/etc/puppet/puppet.conf'
+          )
+        }
+        it { should contain_augeas('puppet_conf_firstline').with(
             'require' => 'File[puppet_conf]',
             'context' => '/files/etc/puppet/puppet.conf'
           )
@@ -291,6 +303,12 @@ describe 'puppet::conf', :type => :class do
       end
       describe 'with no parameters' do
         it { should include_class('puppet::params') }
+        it { should contain_file('puppet_conf').with(
+            'ensure'  => 'file',
+            'path'    => '/etc/puppet/puppet.conf',
+            'require' => 'File[puppet_conf_dir]'
+          )
+        }
         it { should contain_augeas('puppet_main_conf').with(
             'require' => 'File[puppet_conf]',
             'context' => '/files/etc/puppet/puppet.conf'
@@ -301,8 +319,20 @@ describe 'puppet::conf', :type => :class do
             'context' => '/files/etc/puppet/puppet.conf'
           )
         }
+        it { should contain_augeas('puppet_conf_firstline').with(
+            'require' => 'File[puppet_conf]',
+            'context' => '/files/etc/puppet/puppet.conf'
+          )
+        }
       end
       describe 'augeas working on puppet.conf with no parameters' do
+        describe_augeas 'puppet_conf_firstline', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
+          it { should execute.with_change}
+          it 'first line should match comment' do
+            aug_get('#comment[1]').should == 'This file is managed by Puppet, modifications may be overwritten.'
+          end
+          it { should execute.idempotently }
+        end
         describe_augeas 'puppet_main_conf', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
           it { should execute.with_change}
           it 'pluginsync should be true' do
