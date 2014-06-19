@@ -1,7 +1,6 @@
 # Class: puppet
 #
-# This manifests does the sanity checking in preparation of installing
-# the puppet package and configure the puppet agent
+# Installs and manages puppet and the puppet agent service.
 #
 # Parameters:
 #
@@ -38,10 +37,36 @@ class puppet (
   $gid                  = $::puppet::params::gid,
   $user_home            = $::puppet::params::user_home,
   $conf_dir             = $::puppet::params::conf_dir,
-  $environments         = undef
+  $log_dir              = $::puppet::params::log_dir,
+  $ssl_dir              = $::puppet::params::ssl_dir,
+  $fact_paths           = $::puppet::params::fact_paths,
+  $modulepath           = undef,
+  $templatedir          = undef,
+  $server               = undef,
+  $report               = false,
+  $report_server        = undef,
+  $report_port          = undef,
+  $show_diff            = undef,
+  $agent                = 'stopped',
+  $pluginsync           = false,
+  $environment          = 'production'
 ) inherits puppet::params {
 
-  $puppet_conf_path = "${conf_dir}/${::puppet::params::conf_file}"
+  $puppet_conf_path     = "${conf_dir}/${::puppet::params::conf_file}"
+  $auth_conf_path       = "${conf_dir}/${::puppet::params::auth_conf_file}"
+  $fileserver_conf_path = "${conf_dir}/${::puppet::params::fileserver_conf_file}"
+  $autosign_conf_path   = "${conf_dir}/${::puppet::params::autosign_conf_file}"
+  $hiera_conf_path      = "${conf_dir}/${::puppet::params::hiera_conf_file}"
+
+  # Not that it works on Windows yet but...
+  case $osfamily{
+    'Windows':{
+      $factpath   = join($fact_paths, ';')
+    }
+    default:{
+      $factpath = join($fact_paths, ':')
+    }
+  }
 
   package{'puppet':
     ensure  => $ensure,
@@ -60,12 +85,6 @@ class puppet (
       $ensure_file    = 'absent'
       $ensure_present = 'absent'
     }
-  }
-
-  file{'puppet_user_home':
-    ensure  => $ensure_dir,
-    path    => $user_home,
-    require => Package['puppet'],
   }
 
   group{'puppet_group':
@@ -92,17 +111,16 @@ class puppet (
     ignore  => ['.git'],
   }
 
-  if $environments {
-    $environments_ensure = $ensure_dir
-  } else {
-    $environments_ensure = 'absent'
+  file{'puppet_log_dir':
+    ensure  => $ensure_dir,
+    path    => $log_dir,
+    require => Package['puppet'],
   }
 
-  file{'puppet_environments_dir':
-    ensure  => $environments_ensure,
-    path    => "${conf_dir}/environments",
-    force   => true,
-    require => File['puppet_conf_dir'],
+  file{'puppet_ssl_dir':
+    ensure  => $ensure_dir,
+    path    => $ssl_dir,
+    require => Package['puppet'],
   }
 
   file{'puppet_app_dir':
@@ -110,6 +128,69 @@ class puppet (
     path    => $::puppet::params::app_dir,
     force   => true,
     require => Package['puppet'],
+  }
+
+  file{'puppet_var_dir':
+    ensure  => $ensure_dir,
+    path    => $::puppet::params::var_dir,
+    force   => true,
+    require => Package['puppet'],
+  }
+
+  file{'puppet_run_dir':
+    ensure  => $ensure_dir,
+    path    => $::puppet::params::run_dir,
+    force   => true,
+    require => Package['puppet'],
+  }
+
+  # Create the base puppet.conf
+  concat {'puppet_conf':
+    ensure  => $ensure_present,
+    path    => $puppet_conf_path,
+    require => File['puppet_conf_dir'],
+  }
+
+  concat::fragment{'puppet_conf_base':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.main.erb'),
+    order   => '01',
+  }
+
+  # Create the base auth.conf
+
+  if ! defined('puppet::fileserver') {
+    file {$fileserver_conf_path:
+      ensure => absent,
+    }
+  }
+  if ! defined('puppet::autosign') {
+    file {$autosign_conf_path:
+      ensure => absent,
+    }
+  }
+  if ! defined('puppet::hiera') {
+    file {$hiera_conf_path:
+      ensure => absent,
+    }
+  }
+
+  if $agent == 'running' {
+    concat::fragment{'puppet_conf_agent':
+      target  => 'puppet_conf',
+      content => template('puppet/puppet.conf.agent.erb'),
+      order   => '02',
+    }
+  }
+
+  # Configure the puppet agent daemon
+  service{'puppet_agent':
+    ensure      => $agent,
+    name        => 'puppet',
+    enable      => true,
+    hasrestart  => true,
+    hasstatus   => true,
+    require     => Concat['puppet_conf']
   }
 
 }

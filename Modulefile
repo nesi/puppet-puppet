@@ -1,5 +1,5 @@
 name    'Aethylred-puppet'
-version '0.2.6'
+version '1.0.0'
 source 'https://github.com/nesi/puppet-puppet'
 author 'Aaron Hicks'
 license 'GPL3'
@@ -10,3 +10,4 @@ project_page 'https://github.com/nesi/puppet-puppet'
 ## Add dependencies, if any:
 # dependency 'username/name', '>= 1.2.0'
 dependency 'puppetlabs/stdlib', '>= 4.1.0'
+dependency 'puppetlabs/concat', '>= 1.1.0'

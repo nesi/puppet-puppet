@@ -3,7 +3,8 @@ describe 'puppet::hiera', :type => :class do
   context "on a Debian OS" do
     let :facts do
       {
-        :osfamily   => 'Debian',
+        :osfamily       => 'Debian',
+        :concat_basedir => '/dne',
       }
     end
     describe "with no parameters" do
@@ -113,7 +114,8 @@ describe 'puppet::hiera', :type => :class do
   context "on a RedHat OS" do
     let :facts do
       {
-        :osfamily   => 'RedHat',
+        :osfamily       => 'RedHat',
+        :concat_basedir => '/dne',
       }
     end
     it do
@@ -126,7 +128,8 @@ describe 'puppet::hiera', :type => :class do
     context "on an Unknown OS" do
     let :facts do
       {
-        :osfamily   => 'Unknown',
+        :osfamily       => 'Unknown',
+        :concat_basedir => '/dne',
       }
     end
     it do

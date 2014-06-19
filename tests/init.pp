@@ -13,5 +13,5 @@
 #     You should have received a copy of the GNU General Public License
 #     along with the puppet Puppet module.  If not, see <http://www.gnu.org/licenses/>.
 include puppet
-include puppet::conf
-include puppet::hiera
+# include puppet::conf
+# include puppet::hiera
