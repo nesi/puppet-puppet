@@ -2,23 +2,17 @@
 
 class puppet::master (
   $ensure               = 'installed',
-  $puppetmaster_package = $puppet::params::puppetmaster_package,
-  $puppetmaster_docroot = $puppet::params::puppetmaster_docroot,
+  $puppetmaster_package = $::puppet::params::puppetmaster_package,
+  $puppetmaster_docroot = $::puppet::params::puppetmaster_docroot,
   $servername           = $::fqdn,
   $manifest             = undef,
   $fix_manifestdir      = undef,
   $report_handlers      = undef,
   $reporturl            = undef,
   $storeconfigs         = undef,
-  $storeconfigs_backend = undef
+  $storeconfigs_backend = undef,
+  $generate_certs       = true
 ) inherits puppet::params {
-
-  # Puppet needs to be installed and set up beforehand
-  require puppet
-
-  if $puppet::ensure == 'absent' {
-    fail('The puppet class ensure parameter must not be "absent"!')
-  }
 
   # Apache and Passenger need to be installed and set up beforehand
   # Use the Puppetlabs Apache module (or a fork):
@@ -44,107 +38,81 @@ class puppet::master (
     name    => $puppetmaster_package,
   }
 
-  Augeas{
-    context => "/files${puppet::puppet_conf_path}",
-    require => File['puppet_conf'],
+  # The SSL files installed by the package need to be regenerated
+  exec{'puppet_wipe_pkg_ssl':
+    command     => "rm -rf ${::puppet::ssl_dir}",
+    path        => ['/bin'],
+    refreshonly => true,
+    before      => File['puppet_ssl_dir'],
+    subscribe   => Package['puppetmaster_pkg'],
   }
 
-  augeas{'puppetmaster_ssl_config':
-    changes => [
-      'set master/ssl_client_header SSL_CLIENT_S_DN',
-      'set master/ssl_client_verify_header SSL_CLIENT_VERIFY',
-    ],
-  }
-
-  # Set up manifest and manifestdir settings
-  if $manifest {
-    if $fix_manifestdir {
-      if $manifest =~ /^.*\.pp$/ {
-        $manifest_dir = dirname($manifest)
-        $conf_manifest_changes = ["set master/manifest ${manifest}","set master/manifestdir ${manifest_dir}"]
-      } else {
-        $conf_manifest_changes = ["set master/manifest ${manifest}","set master/manifestdir ${manifest}"]
-      }
-    } else {
-      $conf_manifest_changes = ["set master/manifest ${manifest}",'rm master/manifestdir']
+  case $::osfamily {
+    Debian:{
+      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster ${::apache::vhost_enable_dir}/puppetmaster"
     }
-  } else {
-    $conf_manifest_changes = ['rm master/manifest','rm master/manifestdir']
+    default:{
+      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster"
+    }
   }
 
-  augeas{'puppetmaster_manifest_config':
-    changes => $conf_manifest_changes,
+  # Deleting these now so they don't trigger a change in the next puppet run
+  exec{'puppet_wipe_pkg_site_files':
+    command     => "rm ${puppet_pkg_site_files}",
+    path        => ['/bin'],
+    refreshonly => true,
+    subscribe   => Package['puppetmaster_pkg'],
+    before      => Apache::Vhost['puppetmaster'],
+    notify      => Service['httpd'],
   }
+
 
   # Set up report handling
-  if $report_handlers or $reporturl {
-    if is_array($report_handlers) {
-      $reports_str = join($report_handlers,',')
-    } else {
-      $reports_str = $report_handlers
-    }
-    if $reports_str =~ /http/ {
-      if $reporturl {
-        $conf_reports_changes = ["set master/reports ${reports_str}","set master/reporturl ${reporturl}"]
+  if $report_handlers {
+    if $reporturl {
+      if is_array($report_handlers) {
+        $reports_str = join(unique(flatten($report_handlers, ['http'])), ',')
       } else {
-        $conf_reports_changes = ["set master/reports ${reports_str}",'rm master/reporturl']
-        warning('The http report handler has been set, but no URL given to the reporturl parameter!')
+        $report_str = "${report_handlers},http"
       }
     } else {
-      if $reporturl {
-        if $reports_str {
-          $reports_with_http_str = join([$reports_str,'http'],',')
-        } else {
-          $reports_with_http_str = 'http'
-        }
-        $conf_reports_changes = ["set master/reports ${reports_with_http_str}","set master/reporturl ${reporturl}"]
+      if is_array($report_handlers) {
+        $reports_str = join(unique($report_handlers), ',')
       } else {
-        $conf_reports_changes = ["set master/reports ${reports_str}",'rm master/reporturl']
+        $report_str = $report_handlers
       }
     }
   } else {
-    $conf_reports_changes = ['rm master/reports','rm master/reporturl']
+    $report_str = undef
   }
 
-  augeas{'puppetmaster_reports_config':
-    changes => $conf_reports_changes,
+  if ! $reporturl and $reports_str =~ /http/ {
+    warning('The http report handler has been set, but no URL given to the reporturl parameter!')
   }
 
-  # Set up storeconfigs and backends
-  if $storeconfigs or $storeconfigs_backend {
-    if $storeconfigs_backend {
-      $conf_storeconfigs_changes = ['set master/storeconfigs true',"set master/storeconfigs_backend ${storeconfigs_backend}"]
-    } else {
-      $conf_storeconfigs_changes = ['set master/storeconfigs true','rm master/storeconfigs_backend']
+  concat::fragment{'puppet_conf_master':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.master.erb'),
+    order   => '03',
+  }
+
+  if $generate_certs {
+    exec{'puppetmaster_generate_certs':
+      command => 'puppet cert list -a',
+      creates => "${::puppet::ssl_dir}/certs",
+      path    => ['/usr/bin'],
+      before  => Service['puppet','httpd'],
+      require => [File['puppet_ssl_dir'],Exec['puppet_wipe_pkg_ssl']],
+      notify  => Service['httpd'],
     }
-  } else {
-    $conf_storeconfigs_changes = ['rm master/storeconfigs','rm master/storeconfigs_backend']
-  }
-
-  augeas{'puppetmaster_storeconfigs_config':
-    changes => $conf_storeconfigs_changes,
-  }
-
-  # clean up duplicated setting entries
-  augeas{'puppet_conf_dedup_master':
-    changes => [
-      'rm main/ssl_client_header',
-      'rm agent/ssl_client_header',
-      'rm main/ssl_client_verify_header',
-      'rm agent/ssl_client_verify_header',
-      'rm main/manifest',
-      'rm agent/manifest',
-      'rm main/manifestdir',
-      'rm agent/manifestdir',
-      'rm main/reports',
-      'rm agent/reports',
-      'rm main/reporturl',
-      'rm agent/reporturl',
-      'rm agent/storeconfigs',
-      'rm main/storeconfigs',
-      'rm agent/storeconfigs_backend',
-      'rm main/storeconfigs_backend'
-    ],
+    exec{'puppetmaster_generate_master_certs':
+      command     => 'timeout 15 puppet master --no-daemonize || echo \'Timed out as expected.\'',
+      creates     => "${::puppet::ssl_dir}/certs/${servername}.pem",
+      path        => ['/usr/bin','/bin'],
+      before      => Service['puppet','httpd'],
+      require     => Exec['puppetmaster_generate_certs'],
+      notify      => Service['httpd'],
+    }
   }
 
   # The ssl settings have been taken directly from the default vhost
@@ -164,11 +132,11 @@ class puppet::master (
     ssl_verify_client => 'optional',
     ssl_options       => '+StdEnvVars +ExportCertData',
     ssl_verify_depth  => 1,
-    ssl_certs_dir     => "${puppet::user_home}/ssl",
-    ssl_cert          => "${puppet::user_home}/ssl/certs/${servername}.pem",
-    ssl_key           => "${puppet::user_home}/ssl/private_keys/${servername}.pem",
-    ssl_ca            => "${puppet::user_home}/ssl/certs/ca.pem",
-    ssl_chain         => "${puppet::user_home}/ssl/certs/ca.pem",
+    ssl_certs_dir     => $::puppet::ssl_dir,
+    ssl_cert          => "${::puppet::ssl_dir}/certs/${servername}.pem",
+    ssl_key           => "${::puppet::ssl_dir}/private_keys/${servername}.pem",
+    ssl_ca            => "${::puppet::ssl_dir}/certs/ca.pem",
+    ssl_chain         => "${::puppet::ssl_dir}/certs/ca.pem",
     rack_base_uris    => ['/'],
     request_headers   =>  [
                             'unset X-Forwarded-For',
@@ -176,6 +144,8 @@ class puppet::master (
                             'set X-Client-DN %{SSL_CLIENT_S_DN}e',
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
+    subscribe         => Concat['puppet_conf'],
+    require           => Package['puppetmaster_pkg'],
   }
 
 }

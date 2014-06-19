@@ -27,7 +27,7 @@ class puppet::params{
 
   case $::osfamily {
     Debian:{
-      $ruby_augeas_package  = 'libaugeas-ruby'
+      # Do nothing
     }
     default:{
       fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
