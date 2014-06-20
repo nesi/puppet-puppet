@@ -19,7 +19,7 @@ class puppet::params{
   $fact_paths           = ['$vardir/lib/facter','$vardir/facts']
   $template_dir         = "${conf_dir}/templates"
   $hiera_conf_file      = 'hiera.yaml'
-  $hiera_datadir        = "${conf_dir}/hieradata"
+  $hiera_dir            = 'hieradata'
   $hiera_package        = 'hiera'
   $puppetmaster_package = 'puppetmaster-passenger'
   $puppetmaster_docroot = "${app_dir}/rack/puppetmasterd/public"

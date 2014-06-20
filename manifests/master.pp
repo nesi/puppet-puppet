@@ -11,7 +11,7 @@ class puppet::master (
   $reporturl            = undef,
   $storeconfigs         = undef,
   $storeconfigs_backend = undef,
-  $generate_certs       = true
+  $regenerate_certs     = true
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand
@@ -38,65 +38,15 @@ class puppet::master (
     name    => $puppetmaster_package,
   }
 
-  # The SSL files installed by the package need to be regenerated
-  exec{'puppet_wipe_pkg_ssl':
-    command     => "rm -rf ${::puppet::ssl_dir}",
-    path        => ['/bin'],
-    refreshonly => true,
-    before      => File['puppet_ssl_dir'],
-    subscribe   => Package['puppetmaster_pkg'],
-  }
-
-  case $::osfamily {
-    Debian:{
-      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster ${::apache::vhost_enable_dir}/puppetmaster"
+  if $regenerate_certs {
+    # The SSL files installed by the package need to be regenerated
+    exec{'puppet_wipe_pkg_ssl':
+      command     => "rm -rf ${::puppet::ssl_dir}",
+      path        => ['/bin'],
+      refreshonly => true,
+      before      => File['puppet_ssl_dir'],
+      subscribe   => Package['puppetmaster_pkg'],
     }
-    default:{
-      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster"
-    }
-  }
-
-  # Deleting these now so they don't trigger a change in the next puppet run
-  exec{'puppet_wipe_pkg_site_files':
-    command     => "rm ${puppet_pkg_site_files}",
-    path        => ['/bin'],
-    refreshonly => true,
-    subscribe   => Package['puppetmaster_pkg'],
-    before      => Apache::Vhost['puppetmaster'],
-    notify      => Service['httpd'],
-  }
-
-
-  # Set up report handling
-  if $report_handlers {
-    if $reporturl {
-      if is_array($report_handlers) {
-        $reports_str = join(unique(flatten($report_handlers, ['http'])), ',')
-      } else {
-        $report_str = "${report_handlers},http"
-      }
-    } else {
-      if is_array($report_handlers) {
-        $reports_str = join(unique($report_handlers), ',')
-      } else {
-        $report_str = $report_handlers
-      }
-    }
-  } else {
-    $report_str = undef
-  }
-
-  if ! $reporturl and $reports_str =~ /http/ {
-    warning('The http report handler has been set, but no URL given to the reporturl parameter!')
-  }
-
-  concat::fragment{'puppet_conf_master':
-    target  => 'puppet_conf',
-    content => template('puppet/puppet.conf.master.erb'),
-    order   => '03',
-  }
-
-  if $generate_certs {
     exec{'puppetmaster_generate_certs':
       command => 'puppet cert list -a',
       creates => "${::puppet::ssl_dir}/certs",
@@ -106,13 +56,63 @@ class puppet::master (
       notify  => Service['httpd'],
     }
     exec{'puppetmaster_generate_master_certs':
-      command     => 'timeout 15 puppet master --no-daemonize || echo \'Timed out as expected.\'',
+      command     => 'timeout 30 puppet master --no-daemonize || echo \'Timed out is expected.\'',
       creates     => "${::puppet::ssl_dir}/certs/${servername}.pem",
       path        => ['/usr/bin','/bin'],
       before      => Service['puppet','httpd'],
       require     => Exec['puppetmaster_generate_certs'],
       notify      => Service['httpd'],
     }
+  }
+
+  case $::osfamily {
+    Debian:{
+      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster* ${::apache::vhost_enable_dir}/puppetmaster*"
+    }
+    default:{
+      $puppet_pkg_site_files = "${::apache::vhost_dir}/puppetmaster*"
+    }
+  }
+
+  # Deleting the package distributed site files so:
+  # - they don't trigger a change in the next puppet run
+  # - make Apache 2.4 whine about broken conf files
+  exec{'puppet_wipe_pkg_site_files':
+    command     => "rm ${puppet_pkg_site_files}",
+    path        => ['/bin'],
+    refreshonly => true,
+    subscribe   => Package['puppetmaster_pkg'],
+    before      => Apache::Vhost['puppetmaster'],
+    notify      => Service['httpd'],
+  }
+
+  # Set up report handling
+  if $report_handlers {
+    if $reporturl {
+      if is_array($report_handlers) {
+        $reports_str = join(unique(flatten($report_handlers, ['http'])), ',')
+      } else {
+        $reports_str = "${report_handlers},http"
+      }
+    } else {
+      if is_array($report_handlers) {
+        $reports_str = join(unique($report_handlers), ',')
+      } else {
+        $reports_str = $report_handlers
+      }
+    }
+  } else {
+    $reports_str = undef
+  }
+
+  if ! $reporturl and $reports_str =~ /http/ {
+    warning('The http report handler has been set, but no URL given to the reporturl parameter!')
+  }
+
+  concat::fragment{'puppet_conf_master':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.master.erb'),
+    order   => '04',
   }
 
   # The ssl settings have been taken directly from the default vhost

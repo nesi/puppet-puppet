@@ -1,19 +1,21 @@
 # This file is managed by Puppet, changes may be overwritten
 # These settings are set with the puppet base class
 [main]
-  logdir      = <%= @log_dir %>
-  vardir      = <%= scope.lookupvar('::puppet::params::var_dir') %>
-  ssldir      = <%= @ssl_dir %>
-  rundir      = <%= scope.lookupvar('::puppet::params::run_dir') %>
-  factpath    = <%= @factpath %>
+  logdir        = <%= @log_dir %>
+  vardir        = <%= scope.lookupvar('::puppet::params::var_dir') %>
+  ssldir        = <%= @ssl_dir %>
+  rundir        = <%= scope.lookupvar('::puppet::params::run_dir') %>
+  factpath      = <%= @factpath %>
   <%- if @modulepath -%>
   # Setting modulepath is depreciated since version 3.6.0
-  modulepath  = <%= @modulepath %>
+  modulepath    = <%= @modulepath %>
   <%- end -%>
   <%- if @templatedir -%>
   # Setting templatedir is depreciated since version 3.6.0
-  templatedir = <%= @templatedir %>
+  templatedir   = <%= @templatedir %>
   <%- end -%>
   <%- if @server -%>
-  server      = <%= @server %>
+  server        = <%= @server %>
+  <%- else -%>
+  server        = puppet
   <%- end -%>

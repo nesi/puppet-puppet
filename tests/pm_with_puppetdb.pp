@@ -1,6 +1,5 @@
 # this should install a puppetmaster that reports to a PuppetDB
 include puppet
-include puppet::conf
 include puppet::hiera
 
 # Set up apache
@@ -16,19 +15,30 @@ class {'apache::mod::passenger':
 }
 
 # Set up the puppetdb
-class { 'puppetdb':
-  database        => 'embedded',
-  listen_address  => '0.0.0.0',
+class { 'puppetdb::server':
+  database            => 'embedded',
+  listen_address      => '0.0.0.0',
+  ssl_listen_address  => '0.0.0.0',
 }
 
 # Set up the puppetmaster
 class {'puppet::master':
   storeconfigs_backend  => 'puppetdb',
   report_handlers       => ['store','puppetdb'],
-  require               => Class['puppetdb'],
 }
 
-class { 'puppetdb::master::routes':
-  puppet_confdir  => '/etc/puppet',
-  require         => Class['puppet::master'],
+class {'puppetdb::master::config':
+  manage_storeconfigs     => false,
+  manage_report_processor => false,
+  strict_validation       => false,
+  puppet_service_name     => 'httpd',
+  require                 => Class['puppet::master'],
+}
+
+exec{'puppetdb_ssl_setup':
+  command => 'puppetdb ssl-setup',
+  path    => ['/usr/sbin','/usr/bin','/bin'],
+  creates => '/etc/puppetdb/ssl/private.pem',
+  require => Class['puppetdb::master::config','puppet::master'],
+  notify  => Service['puppetdb','httpd']
 }

@@ -10,9 +10,6 @@
 #
 # Sample Usage:
 #
-# Note, the .json Hiera backend is enabled by default as the usual .yaml backend
-# can not be manipulated with augeas.
-
 # This file is part of the puppet Puppet module.
 #
 #     The puppet Puppet module is free software: you can redistribute it and/or
@@ -57,9 +54,10 @@ class puppet (
   $fileserver_conf_path = "${conf_dir}/${::puppet::params::fileserver_conf_file}"
   $autosign_conf_path   = "${conf_dir}/${::puppet::params::autosign_conf_file}"
   $hiera_conf_path      = "${conf_dir}/${::puppet::params::hiera_conf_file}"
+  $hiera_data_dir       = "${conf_dir}/${::puppet::params::hiera_dir}"
 
   # Not that it works on Windows yet but...
-  case $osfamily{
+  case $::osfamily{
     'Windows':{
       $factpath   = join($fact_paths, ';')
     }
@@ -157,29 +155,11 @@ class puppet (
     order   => '01',
   }
 
-  # Create the base auth.conf
-
-  if ! defined('puppet::fileserver') {
-    file {$fileserver_conf_path:
-      ensure => absent,
-    }
-  }
-  if ! defined('puppet::autosign') {
-    file {$autosign_conf_path:
-      ensure => absent,
-    }
-  }
-  if ! defined('puppet::hiera') {
-    file {$hiera_conf_path:
-      ensure => absent,
-    }
-  }
-
   if $agent == 'running' {
     concat::fragment{'puppet_conf_agent':
       target  => 'puppet_conf',
       content => template('puppet/puppet.conf.agent.erb'),
-      order   => '02',
+      order   => '03',
     }
   }
 

@@ -3,29 +3,13 @@
 # Hiera is installed as part of the Puppet package, hence it is appropriate
 class puppet::hiera(
   $ensure               = 'installed',
-  $hiera_config_file    = $puppet::params::hiera_config_file,
-  $hiera_datadir        = $puppet::params::hiera_datadir,
+  $hiera_config_file    = $::puppet::hiera_conf_path,
+  $hiera_data_dir       = $::puppet::hiera_data_dir,
   $hiera_config_source  = undef,
+  $hiera_config_content = undef,
   $hiera_backend        = 'yaml',
   $hiera_hierarchy      = ['commmon']
   ) inherits puppet::params {
-
-  require puppet
-
-  case $ensure {
-    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))?(|-(\S+))$/: {
-      $ensure_dir     = 'directory'
-      $ensure_file    = 'file'
-      $ensure_link    = 'link'
-      $ensure_present = 'present'
-    }
-    default: {
-      $ensure_dir     = 'absent'
-      $ensure_file    = 'absent'
-      $ensure_link    = 'absent'
-      $ensure_present = 'absent'
-    }
-  }
 
   # This package was most likely installed with Puppet, and this
   # just provides a definition to work on. The require here just
@@ -36,32 +20,29 @@ class puppet::hiera(
     require => Package['puppet'],
   }
 
-  if $ensure_present == 'present' {
-    $puppet_conf_hiera_change = "set master/hiera_config ${hiera_config_file}"
-  } else {
-    $puppet_conf_hiera_change = 'rm master/hiera_config'
-  }
-
-  # set the location of the hiera config file in the puppet config
-  augeas{'puppet_conf_hiera_config':
-    context => "/files${puppet::puppet_conf_path}",
-    changes => [$puppet_conf_hiera_change],
-    require => File['puppet_conf','hiera_conf'],
-  }
-
-  augeas{'puppet_conf_heira_dedup':
-    context => "/files${puppet::puppet_conf_path}",
-    changes => [
-      'rm main/hiera_config',
-      'rm agent/hiera_config',
-    ],
-    require => File['puppet_conf'],
+  case $ensure {
+    /^installed$|^(\d+)?(\.(x|\*|\d+))?(\.(x|\*|\d+))?(|-(\S+))$/: {
+      $ensure_dir     = 'directory'
+      $ensure_file    = 'file'
+      $ensure_link    = 'link'
+      $ensure_present = 'present'
+      concat::fragment{'puppet_conf_hiera':
+        target  => 'puppet_conf',
+        content => template('puppet/puppet.conf.hiera.erb'),
+        order   => '02',
+        require => Package['hiera'],
+      }
+    }
+    default: {
+      $ensure_dir     = 'absent'
+      $ensure_file    = 'absent'
+      $ensure_link    = 'absent'
+      $ensure_present = 'absent'
+    }
   }
 
   # This puts up a hiera.yaml template as a config file iff one does
-  # not exist.
-  # augeas is not suitable for managing YAML files as it doen't yet
-  # handle file formats that have meaningful line indentation
+  # not exist. Managment of YAML files with puppet not yet implemented.
   # ...more complex management could be done with Ruby
   if $hiera_config_source {
     file{'hiera_conf':
@@ -72,10 +53,15 @@ class puppet::hiera(
       require => Package['hiera'],
     }
   } else {
+    if $hiera_config_content {
+      $real_config_content = $hiera_config_content
+    } else {
+      $real_config_content = template('puppet/hiera.yaml.erb')
+    }
     file{'hiera_conf':
       ensure  => $ensure_file,
       path    => $hiera_config_file,
-      content => template('puppet/hiera.yaml.erb'),
+      content => $real_config_content,
       replace => false,
       require => Package['hiera'],
     }
@@ -90,10 +76,11 @@ class puppet::hiera(
 
   # Hiera does not require different data directories for different
   # environments, environments should be handled within the hiera
-  # hierachy.
-  file{'hiera_datadir':
+  # hierachy. This might change when directory environments are
+  # implemented.
+  file{'hiera_data_dir':
     ensure  => $ensure_dir,
-    path    => $hiera_datadir,
+    path    => $hiera_data_dir,
     require => Package['hiera'],
   }
 
