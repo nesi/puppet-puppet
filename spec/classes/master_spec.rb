@@ -83,19 +83,19 @@ describe 'puppet::master', :type => :class do
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  ssl_client_verify_header  = SSL_CLIENT_VERIFY$}
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  manifest                  = }
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  reports                   = }
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  reporturl                 = }
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs              = true$}
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs_backend      = }
         )}
       end
@@ -249,7 +249,7 @@ describe 'puppet::master', :type => :class do
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs              = true$}
         )}
-        it { should contain_concat__fragment('puppet_conf_master').without_content(
+        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs_backend      = }
         )}
       end

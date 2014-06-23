@@ -40,11 +40,11 @@ class puppet (
   $modulepath           = undef,
   $templatedir          = undef,
   $server               = undef,
+  $agent                = 'stopped',
   $report               = false,
   $report_server        = undef,
   $report_port          = undef,
-  $show_diff            = undef,
-  $agent                = 'stopped',
+  $showdiff             = undef,
   $pluginsync           = false,
   $environment          = 'production'
 ) inherits puppet::params {
@@ -56,14 +56,18 @@ class puppet (
   $hiera_conf_path      = "${conf_dir}/${::puppet::params::hiera_conf_file}"
   $hiera_data_dir       = "${conf_dir}/${::puppet::params::hiera_dir}"
 
-  # Not that it works on Windows yet but...
-  case $::osfamily{
-    'Windows':{
-      $factpath   = join($fact_paths, ';')
+  if is_array($fact_paths){
+    # Not that it works on Windows yet but...
+    case $::osfamily{
+      'Windows':{
+        $factpath = join($fact_paths, ';')
+      }
+      default:{
+        $factpath = join($fact_paths, ':')
+      }
     }
-    default:{
-      $factpath = join($fact_paths, ':')
-    }
+  } else {
+    $factpath = $fact_paths
   }
 
   package{'puppet':

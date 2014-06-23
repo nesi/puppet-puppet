@@ -2,7 +2,7 @@
 # These are set by the puppet base clase when the puppet agent is running
 [agent]
   environment   = <%= scope.lookupvar('::puppet::environment') %>
-  <%- if @report -%>
+  <%- if @report or @report_server -%>
   report        = true
     <%- if @report_server -%>
   report_server = <%= @report_server %>
