@@ -17,6 +17,11 @@ describe 'puppet::hiera', :type => :class do
         'name'    => 'hiera',
         'require' => 'Package[puppet]'
       )}
+      it { should contain_concat__fragment('puppet_conf_hiera').with(
+        'target'  => 'puppet_conf',
+        'order'   => '02',
+        'require' => 'Package[hiera]'
+      )}
       it { should contain_file('hiera_conf').with(
         'ensure'  => 'file',
         'path'    => '/etc/puppet/hiera.yaml',
@@ -34,8 +39,17 @@ describe 'puppet::hiera', :type => :class do
         'path'    => '/etc/puppet/hieradata',
         'require' => 'Package[hiera]'
       )}
-      it { should contain_file('hiera_conf').with_content(/^  - yaml$/)}
-      it { should contain_file('hiera_conf').with_content(/^:yaml:$/)}
+      it { should contain_concat__fragment('puppet_conf_hiera').with_content(
+        %r{^  # The class puppet::hiera creates a minimal hiera config to suppress warnings.$},
+        %r{^  hiera_config  = /etc/puppet/hiera.yaml$}
+      )}
+      it { should contain_file('hiera_conf').with_content(
+        %r{^# This is an example file provided by Puppet to suppress warnings.$},
+        %r{^# Puppet will make no further changes once the file exists.$},
+        %r{^:backends:$\s*^  - yaml$},
+        %r{^:yaml:$\s*^  :datadir: /etc/puppet/hieradata},
+        %r{^$:hierarchy:$\s*^  - common$}
+      )}
     end
     describe "with ensure => absent" do
       let :params do
@@ -47,6 +61,7 @@ describe 'puppet::hiera', :type => :class do
       it { should contain_package('hiera').with(
         'ensure'  => 'absent'
       )}
+      it { should_not contain_concat__fragment('puppet_conf_hiera')}
       it { should contain_file('hiera_conf').with(
         'ensure'  => 'absent'
       )}
@@ -64,6 +79,12 @@ describe 'puppet::hiera', :type => :class do
       it { should contain_file('hiera_conf').with(
         'path'    => '/some/other/path'
       )}
+      it { should contain_file('etc_hiera_conf').with(
+        'target'  => '/some/other/path'
+      )}
+      it { should contain_concat__fragment('puppet_conf_hiera').with_content(
+        %r{^  hiera_config  = /some/other/path$}
+      )}
     end
     describe 'with hiera_data_dir => /some/other/path' do
       let :params do
@@ -71,6 +92,9 @@ describe 'puppet::hiera', :type => :class do
       end
       it { should contain_file('hiera_data_dir').with(
         'path'    => '/some/other/path'
+      )}
+      it { should contain_file('hiera_conf').with_content(
+        %r{^:yaml:$\s*^  :datadir: /some/other/path}
       )}
     end
     describe 'with hiera_config_source => /some/other/path' do
@@ -85,8 +109,9 @@ describe 'puppet::hiera', :type => :class do
       let :params do
           { :hiera_backend => 'json' }
       end
-      it { should contain_file('hiera_conf').with_content(/^  - json$/)}
-      it { should contain_file('hiera_conf').with_content(/^:json:$/)}
+      it { should contain_file('hiera_conf').with_content(
+        %r{^:backends:$\s*^  - json$}
+      )}
     end
   end
 

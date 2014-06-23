@@ -1,7 +1,9 @@
+# This is an example file provided by Puppet to suppress warnings.
+# Puppet will make no further changes once the file exists.
 ---
 :backends:
   - <%= @hiera_backend %>
 :<%= @hiera_backend %>:
-  :datadir: <%= scope.lookupvar('puppet::hiera::hiera_datadir') %>
+  :datadir: <%= @hiera_data_dir %>
 :hierarchy:
 <%= @hiera_hierarchy.to_yaml.split("\n")[1..-1].join("\n") %>
