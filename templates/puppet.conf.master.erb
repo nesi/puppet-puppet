@@ -5,9 +5,9 @@
   ssl_client_header         = SSL_CLIENT_S_DN
   ssl_client_verify_header  = SSL_CLIENT_VERIFY
   <%- if @manifest -%>
-  manifest                  = <%= @mainifest %>
+  manifest                  = <%= @manifest %>
   <%- end -%>
-  <%- if @report_handlers -%>
+  <%- if @report_handlers or @reporturl-%>
   reports                   = <%= @reports_str %>
     <%- if @reporturl -%>
   reporturl                 = <%= @reporturl %>

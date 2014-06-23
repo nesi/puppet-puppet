@@ -33,6 +33,71 @@ describe 'puppet::master', :type => :class do
             'access_log_file' => 'puppetmaster_test.example.org_access_ssl.log'
           )
         }
+        it { should contain_exec('puppet_wipe_pkg_ssl').with(
+          'command'     => 'rm -rf /var/lib/puppet/ssl',
+          'path'        => ['/bin'],
+          'refreshonly' => true,
+          'before'      => 'File[puppet_ssl_dir]',
+          'subscribe'   => 'Package[puppetmaster_pkg]'
+        )}
+        it { should contain_exec('puppetmaster_generate_certs').with(
+          'command' => 'puppet cert list -a',
+          'creates' => '/var/lib/puppet/ssl/certs',
+          'path'    => ['/usr/bin'],
+          'before'  => ['Service[puppet]','Service[httpd]'],
+          'require' => ['File[puppet_ssl_dir]','Exec[puppet_wipe_pkg_ssl]'],
+          'notify'  => 'Service[httpd]'
+        )}
+        it { should contain_exec('puppetmaster_generate_master_certs').with(
+          'command'     => "timeout 30 puppet master --no-daemonize || echo 'Timed out is expected.'",
+          'creates'     => '/var/lib/puppet/ssl/certs/test.example.org.pem',
+          'path'        => ['/usr/bin', '/bin'],
+          'before'      => ['Service[puppet]','Service[httpd]'],
+          'require'     => 'Exec[puppetmaster_generate_certs]',
+          'notify'      => 'Service[httpd]'
+        )}
+        it { should contain_exec('puppet_wipe_pkg_site_files').with(
+          'command'     => "rm /etc/apache2/sites-available/puppetmaster* /etc/apache2/sites-enabled/puppetmaster*",
+          'path'        => ['/bin'],
+          'subscribe'   => 'Package[puppetmaster_pkg]',
+          'refreshonly' => true,
+          'before'      => 'Apache::Vhost[puppetmaster]',
+          'notify'      => 'Service[httpd]'
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with(
+          'target'  => 'puppet_conf',
+          'order'   => '04'
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^\[master\]$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  # These ssl_client settings are required for running$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  # puppetmaster under mod_passenger$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  ssl_client_header         = SSL_CLIENT_S_DN$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  ssl_client_verify_header  = SSL_CLIENT_VERIFY$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  manifest                  = }
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  reports                   = }
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  reporturl                 = }
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  storeconfigs              = true$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  storeconfigs_backend      = }
+        )}
       end
       describe "with ensure => absent" do
         let :params do
@@ -85,55 +150,45 @@ describe 'puppet::master', :type => :class do
             'access_log_file' => 'puppetmaster_some.other.name_access_ssl.log'
           )
         }
+        it { should contain_exec('puppetmaster_generate_master_certs').with(
+          'creates'     => '/var/lib/puppet/ssl/certs/some.other.name.pem'
+        )}
       end
-      describe 'with a manifest file and without fixing manifestdir' do
+      describe 'with a manifest file' do
         let :params do
             { :manifest => '/etc/puppet/test/test.pp' }
         end
-
-      end
-      describe 'with a manifest directory and without fixing manifestdir' do
-        let :params do
-            { :manifest => '/etc/puppet/test/test' }
-        end
-
-      end
-      describe 'with a manifest file and with fixing manifestdir' do
-        let :params do {
-          :manifest         => '/etc/puppet/test/test.pp',
-          :fix_manifestdir => true,
-        }
-        end
- 
-      end
-      describe 'with a manifest directory and with fixing manifestdir' do
-        let :params do {
-          :manifest         => '/etc/puppet/test/test',
-          :fix_manifestdir => true,
-        }
-        end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  manifest                  = /etc/puppet/test/test.pp$}
+        )}
       end
       describe 'with a report handler string' do
         let :params do {
           :report_handlers => 'store',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store$}
+        )}
       end
       describe 'with a list of report handlers' do
         let :params do {
           :report_handlers => ['store','log','tagmail'],
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store, log, tagmail$}
+        )}
       end
       describe 'with a list of report handlers, including http' do
         let :params do {
           :report_handlers => ['store','log','http'],
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store, log, http$}
+        )}
+        # There should be a check for a warning here. Not yet supported by rspec-puppet
       end
       describe 'with a list of report handlers, including http, and set report url' do
         let :params do {
@@ -141,7 +196,25 @@ describe 'puppet::master', :type => :class do
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store, log, http$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reporturl                 = http://reports.example.org:3000$}
+        )}
+      end
+      describe 'with a report handler, without http, and set report url' do
+        let :params do {
+          :report_handlers  => 'store',
+          :reporturl        => 'http://reports.example.org:3000',
+        }
+        end
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store, http$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reporturl                 = http://reports.example.org:3000$}
+        )}
       end
       describe 'with a list of report handlers, without http, and set report url' do
         let :params do {
@@ -149,21 +222,36 @@ describe 'puppet::master', :type => :class do
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = store, tagmail, http$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reporturl                 = http://reports.example.org:3000$}
+        )}
       end
       describe 'with report url, and missing report handers' do
         let :params do {
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reports                   = http$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  reporturl                 = http://reports.example.org:3000$}
+        )}
       end
       describe 'when storeconfigs is true' do
         let :params do {
           :storeconfigs => true,
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  storeconfigs              = true$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  storeconfigs_backend      = }
+        )}
       end
       describe 'when storeconfigs is true and a backend provided' do
         let :params do {
@@ -171,14 +259,24 @@ describe 'puppet::master', :type => :class do
           :storeconfigs_backend => 'active_record',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  storeconfigs              = true$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  storeconfigs_backend      = active_record$}
+        )}
       end
       describe 'when only a storeconfigs backend provided' do
         let :params do {
           :storeconfigs_backend => 'active_record',
         }
         end
-
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  storeconfigs              = true$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  storeconfigs_backend      = active_record$}
+        )}
       end
     end
   end

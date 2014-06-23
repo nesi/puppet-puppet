@@ -6,7 +6,6 @@ class puppet::master (
   $puppetmaster_docroot = $::puppet::params::puppetmaster_docroot,
   $servername           = $::fqdn,
   $manifest             = undef,
-  $fix_manifestdir      = undef,
   $report_handlers      = undef,
   $reporturl            = undef,
   $storeconfigs         = undef,
@@ -22,6 +21,7 @@ class puppet::master (
 
   # NOTE: Use passenger tuning to configure mod_passenger
   # DON'T uncommment this!
+  # May need to be modified for Apache 2.4
   # class {'apache::mod::passenger':
   #   passenger_high_performance    => 'off',
   #   passenger_max_pool_size       => 12,
@@ -87,16 +87,18 @@ class puppet::master (
   }
 
   # Set up report handling
-  if $report_handlers {
+  if $report_handlers or $reporturl{
     if $reporturl {
       if is_array($report_handlers) {
-        $reports_str = join(unique(flatten($report_handlers, ['http'])), ',')
+        $reports_str = join(unique(flatten([$report_handlers, ['http']])), ', ')
+      } elsif $report_handlers {
+        $reports_str = "${report_handlers}, http"
       } else {
-        $reports_str = "${report_handlers},http"
+        $reports_str = 'http'
       }
     } else {
       if is_array($report_handlers) {
-        $reports_str = join(unique($report_handlers), ',')
+        $reports_str = join(unique($report_handlers), ', ')
       } else {
         $reports_str = $report_handlers
       }
