@@ -3,7 +3,7 @@
 # Hiera is installed as part of the Puppet package, hence it is appropriate
 class puppet::hiera(
   $ensure               = 'installed',
-  $hiera_config_file    = $::puppet::hiera_conf_path,
+  $hiera_conf_path      = $::puppet::hiera_conf_path,
   $hiera_data_dir       = $::puppet::hiera_data_dir,
   $hiera_config_source  = undef,
   $hiera_config_content = undef,
@@ -47,7 +47,7 @@ class puppet::hiera(
   if $hiera_config_source {
     file{'hiera_conf':
       ensure  => $ensure_file,
-      path    => $hiera_config_file,
+      path    => $hiera_conf_path,
       source  => $hiera_config_source,
       replace => false,
       require => Package['hiera'],
@@ -60,7 +60,7 @@ class puppet::hiera(
     }
     file{'hiera_conf':
       ensure  => $ensure_file,
-      path    => $hiera_config_file,
+      path    => $hiera_conf_path,
       content => $real_config_content,
       replace => false,
       require => Package['hiera'],
@@ -70,7 +70,7 @@ class puppet::hiera(
   file{'etc_hiera_conf':
     ensure  => $ensure_link,
     path    => '/etc/hiera.yaml',
-    target  => $hiera_config_file,
+    target  => $hiera_conf_path,
     require => File['hiera_conf'],
   }
 

@@ -14,71 +14,12 @@ describe 'puppet::master', :type => :class do
             "include puppet\nclass { 'apache': }\nclass { 'apache::mod::passenger': passenger_high_performance => 'on', passenger_max_pool_size => 12, passenger_pool_idle_time => 1500, passenger_stat_throttle_rate => 120, rack_autodetect => 'off', rails_autodetect => 'off',}"
           end
       describe "with no parameters" do
-        it { should include_class('puppet::params') }
+        it { should contain_class('puppet::params') }
         it { should contain_package('puppetmaster_pkg').with(
             'ensure'  => 'installed',
             'name'    => 'puppetmaster-passenger'
           )
         }
-        it { should contain_augeas('puppetmaster_ssl_config').with(
-            'require' => 'File[puppet_conf]',
-            'context' => '/files/etc/puppet/puppet.conf'
-          )
-        }
-        describe_augeas 'puppetmaster_ssl_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should_not execute.with_change}
-          it 'master ssl config should be set' do
-            aug_get('master/ssl_client_header').should == 'SSL_CLIENT_S_DN'
-            aug_get('master/ssl_client_verify_header').should == 'SSL_CLIENT_VERIFY'
-          end
-          it { should execute.idempotently }
-        end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should_not execute.with_change}
-          it 'master reports and reporturl are not set' do
-            should_not aug_get('master/reports')
-            should_not aug_get('master/reporturl')
-          end
-          it { should execute.idempotently }
-        end
-        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should_not execute.with_change}
-          it 'master storeconfigs and storeconfigs_backend are not set' do
-            should_not aug_get('master/storeconfigs')
-            should_not aug_get('master/storeconfigs_backend')
-          end
-          it { should execute.idempotently }
-        end
-        describe_augeas 'puppet_conf_dedup_master', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should_not execute.with_change}
-          it 'without duplicate entries in the master block' do
-            should_not aug_get('main/ssl_client_header')
-            should_not aug_get('agent/ssl_client_header')
-            should_not aug_get('main/ssl_client_verify_header')
-            should_not aug_get('agent/ssl_client_verify_header')
-            should_not aug_get('main/manifest')
-            should_not aug_get('agent/manifest')
-            should_not aug_get('main/manifestdir')
-            should_not aug_get('agent/manifestdir')
-            should_not aug_get('main/reports')
-            should_not aug_get('agent/reports')
-            should_not aug_get('main/reporturl')
-            should_not aug_get('agent/reporturl')
-            should_not aug_get('main/storeconfigs')
-            should_not aug_get('agent/storeconfigs')
-            should_not aug_get('main/storeconfigs_backend')
-            should_not aug_get('agent/storeconfigs_backend')
-          end
-          it { should execute.idempotently }
-        end
-        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should_not execute.with_change}
-          it 'with no manifest or manifestdir entries' do
-            should_not aug_get('master/manifest')
-            should_not aug_get('master/manifestdir')
-          end
-          it { should execute.idempotently }
-        end
         # only testing parameters that change
         it { should contain_apache__vhost('puppetmaster').with(
             'servername'    => 'test.example.org',
@@ -99,7 +40,7 @@ describe 'puppet::master', :type => :class do
             :ensure => 'absent',
           }
         end
-        it { should include_class('puppet::params') }
+        it { should contain_class('puppet::params') }
         it { should contain_package('puppetmaster_pkg').with(
             'ensure'  => 'absent'
           )
@@ -111,7 +52,7 @@ describe 'puppet::master', :type => :class do
             :puppetmaster_package => 'not_puppetmaster',
           }
         end
-        it { should include_class('puppet::params') }
+        it { should contain_class('puppet::params') }
         it { should contain_package('puppetmaster_pkg').with(
             'name'  => 'not_puppetmaster'
           )
@@ -123,7 +64,7 @@ describe 'puppet::master', :type => :class do
             :puppetmaster_docroot => '/some/other/path',
           }
         end
-        it { should include_class('puppet::params') }
+        it { should contain_class('puppet::params') }
         it { should contain_apache__vhost('puppetmaster').with(
             'docroot'       => '/some/other/path'
           )
@@ -135,7 +76,7 @@ describe 'puppet::master', :type => :class do
             :servername => 'some.other.name',
           }
         end
-        it { should include_class('puppet::params') }
+        it { should contain_class('puppet::params') }
         it { should contain_apache__vhost('puppetmaster').with(
             'servername'      => 'some.other.name',
             'ssl_cert'        => '/var/lib/puppet/ssl/certs/some.other.name.pem',
@@ -149,27 +90,13 @@ describe 'puppet::master', :type => :class do
         let :params do
             { :manifest => '/etc/puppet/test/test.pp' }
         end
-        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the manifest and not set manifestdir' do
-            aug_get('master/manifest').should == '/etc/puppet/test/test.pp'
-            should_not aug_get('master/manifestdir')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a manifest directory and without fixing manifestdir' do
         let :params do
             { :manifest => '/etc/puppet/test/test' }
         end
-        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the manifest and not set manifestdir' do
-            aug_get('master/manifest').should == '/etc/puppet/test/test'
-            should_not aug_get('master/manifestdir')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a manifest file and with fixing manifestdir' do
         let :params do {
@@ -177,14 +104,7 @@ describe 'puppet::master', :type => :class do
           :fix_manifestdir => true,
         }
         end
-        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the manifest and set manifestdir' do
-            aug_get('master/manifest').should == '/etc/puppet/test/test.pp'
-            aug_get('master/manifestdir').should == '/etc/puppet/test'
-          end
-          it { should execute.idempotently }
-        end
+ 
       end
       describe 'with a manifest directory and with fixing manifestdir' do
         let :params do {
@@ -192,56 +112,28 @@ describe 'puppet::master', :type => :class do
           :fix_manifestdir => true,
         }
         end
-        describe_augeas 'puppetmaster_manifest_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the manifest and set manifestdir' do
-            aug_get('master/manifest').should == '/etc/puppet/test/test'
-            aug_get('master/manifestdir').should == '/etc/puppet/test/test'
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a report handler string' do
         let :params do {
           :report_handlers => 'store',
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handlers, but not set reporturl' do
-            aug_get('master/reports').should == 'store'
-            should_not aug_get('master/reporturl')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a list of report handlers' do
         let :params do {
           :report_handlers => ['store','log','tagmail'],
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handlers, but not set reporturl' do
-            aug_get('master/reports').should == 'store,log,tagmail'
-            should_not aug_get('master/reporturl')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a list of report handlers, including http' do
         let :params do {
           :report_handlers => ['store','log','http'],
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handlers, but not set reporturl' do
-            aug_get('master/reports').should == 'store,log,http'
-            should_not aug_get('master/reporturl')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a list of report handlers, including http, and set report url' do
         let :params do {
@@ -249,14 +141,7 @@ describe 'puppet::master', :type => :class do
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handlers, and set report url' do
-            aug_get('master/reports').should == 'store,log,http'
-            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with a list of report handlers, without http, and set report url' do
         let :params do {
@@ -264,42 +149,21 @@ describe 'puppet::master', :type => :class do
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handlers, append http, and set report url' do
-            aug_get('master/reports').should == 'store,tagmail,http'
-            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'with report url, and missing report handers' do
         let :params do {
           :reporturl        => 'http://reports.example.org:3000',
         }
         end
-        describe_augeas 'puppetmaster_reports_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set the report handler to http, and set report url' do
-            aug_get('master/reports').should == 'http'
-            aug_get('master/reporturl').should == 'http://reports.example.org:3000'
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'when storeconfigs is true' do
         let :params do {
           :storeconfigs => true,
         }
         end
-        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set storeconfigs to true, and but do not set storeconfigs backend' do
-            aug_get('master/storeconfigs').should == 'true'
-            should_not aug_get('master/storeconfigs_backend')
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'when storeconfigs is true and a backend provided' do
         let :params do {
@@ -307,28 +171,14 @@ describe 'puppet::master', :type => :class do
           :storeconfigs_backend => 'active_record',
         }
         end
-        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set storeconfigs to true, and a set storeconfigs backend' do
-            aug_get('master/storeconfigs').should == 'true'
-            aug_get('master/storeconfigs_backend').should == 'active_record'
-          end
-          it { should execute.idempotently }
-        end
+
       end
       describe 'when only a storeconfigs backend provided' do
         let :params do {
           :storeconfigs_backend => 'active_record',
         }
         end
-        describe_augeas 'puppetmaster_storeconfigs_config', :lens => 'Puppet', :target => 'etc/puppet/puppet.conf', :fixtures => 'etc/puppet/debian.puppet.conf' do
-          it { should execute.with_change}
-          it 'set storeconfigs to true, and a set storeconfigs backend' do
-            aug_get('master/storeconfigs').should == 'true'
-            aug_get('master/storeconfigs_backend').should == 'active_record'
-          end
-          it { should execute.idempotently }
-        end
+
       end
     end
   end
@@ -341,7 +191,7 @@ describe 'puppet::master', :type => :class do
     end
     it do
       expect {
-        should include_class('puppet::params')
+        should contain_class('puppet::params')
       }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/)
     end
   end
@@ -354,7 +204,7 @@ describe 'puppet::master', :type => :class do
     end
     it do
       expect {
-        should include_class('puppet::params')
+        should contain_class('puppet::params')
       }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/)
     end
   end

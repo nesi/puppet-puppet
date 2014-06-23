@@ -8,16 +8,10 @@ describe 'puppet', :type => :class do
       }
     end
     describe "with no parameters" do
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_package('puppet').with(
           'ensure'  => 'installed',
           'name'    => 'puppet'
-        )
-      }
-      it { should contain_file('puppet_user_home').with(
-          'ensure'  => 'directory',
-          'path'    => '/var/lib/puppet',
-          'require' => 'Package[puppet]'
         )
       }
       it { should contain_group('puppet_group').with(
@@ -43,10 +37,6 @@ describe 'puppet', :type => :class do
           'require' => 'Package[puppet]'
         )
       }
-      it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'absent'
-        )
-      }
       it { should contain_file('puppet_app_dir').with(
           'ensure'  => 'directory',
           'path'    => '/usr/share/puppet',
@@ -60,12 +50,8 @@ describe 'puppet', :type => :class do
           :ensure => 'absent',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_package('puppet').with(
-          'ensure'  => 'absent'
-        )
-      }
-      it { should contain_file('puppet_user_home').with(
           'ensure'  => 'absent'
         )
       }
@@ -78,10 +64,6 @@ describe 'puppet', :type => :class do
         )
       }
       it { should contain_file('puppet_app_dir').with(
-          'ensure'  => 'absent'
-        )
-      }
-      it { should contain_file('puppet_environments_dir').with(
           'ensure'  => 'absent'
         )
       }
@@ -93,13 +75,9 @@ describe 'puppet', :type => :class do
           :ensure => '2.7.18',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_package('puppet').with(
           'ensure'  => '2.7.18'
-        )
-      }
-      it { should contain_file('puppet_user_home').with(
-          'ensure'  => 'directory'
         )
       }
       it { should contain_group('puppet_group').with(
@@ -114,10 +92,6 @@ describe 'puppet', :type => :class do
           'ensure'  => 'directory'
         )
       }
-      it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'absent'
-        )
-      }
     end
     describe "with ensure => 3.3.1-1puppetlabs1" do
     # checking a complex version string
@@ -127,13 +101,9 @@ describe 'puppet', :type => :class do
           :ensure => '3.3.1-1puppetlabs1',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_package('puppet').with(
           'ensure'  => '3.3.1-1puppetlabs1'
-        )
-      }
-      it { should contain_file('puppet_user_home').with(
-          'ensure'  => 'directory'
         )
       }
       it { should contain_group('puppet_group').with(
@@ -152,10 +122,6 @@ describe 'puppet', :type => :class do
           'ensure'  => 'directory'
         )
       }
-      it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'absent'
-        )
-      }
     end
     describe "with puppet_package => puppet_custom" do
       let :params do
@@ -163,7 +129,7 @@ describe 'puppet', :type => :class do
           :puppet_package => 'puppet_custom',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_package('puppet').with(
           'name'  => 'puppet_custom'
         )
@@ -175,7 +141,7 @@ describe 'puppet', :type => :class do
           :user => 'not_puppet',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_user('puppet_user').with(
           'name'  => 'not_puppet'
         )
@@ -187,7 +153,7 @@ describe 'puppet', :type => :class do
           :gid => 'not_puppet',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_group('puppet_group').with(
           'name'  => 'not_puppet'
         )
@@ -203,7 +169,7 @@ describe 'puppet', :type => :class do
           :user_home => '/some/other/path',
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_user('puppet_user').with(
           'home'  => '/some/other/path'
         )
@@ -213,30 +179,11 @@ describe 'puppet', :type => :class do
       let :params do
         {
           :conf_dir     => '/some/other/path',
-          :environments => true
         }
       end
-      it { should include_class('puppet::params') }
+      it { should contain_class('puppet::params') }
       it { should contain_file('puppet_conf_dir').with(
           'path'  => '/some/other/path'
-        )
-      }
-      it { should contain_file('puppet_environments_dir').with(
-          'path'  => '/some/other/path/environments'
-        )
-      }
-    end
-    describe "with environments => true" do
-      let :params do
-        {
-          :environments => 'true',
-        }
-      end
-      it { should include_class('puppet::params') }
-      it { should contain_file('puppet_environments_dir').with(
-          'ensure'  => 'directory',
-          'path'    => '/etc/puppet/environments',
-          'require' => 'File[puppet_conf_dir]'
         )
       }
     end
@@ -251,7 +198,7 @@ describe 'puppet', :type => :class do
     end
     it do
       expect {
-        should include_class('puppet::params')
+        should contain_class('puppet::params')
       }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/)
     end
   end
@@ -265,7 +212,7 @@ describe 'puppet', :type => :class do
     end
     it do
       expect {
-        should include_class('puppet::params')
+        should contain_class('puppet::params')
       }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/)
     end
   end
