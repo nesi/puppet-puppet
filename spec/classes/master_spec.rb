@@ -7,6 +7,7 @@ describe 'puppet::master', :type => :class do
         :operatingsystemrelease => '6',
         :concat_basedir         => '/dne',
         :fqdn                   => 'test.example.org',
+        :environment            => 'production',
       }
     end
     describe 'with default puppet, and apache and mod_passenger' do

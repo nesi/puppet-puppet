@@ -46,7 +46,7 @@ class puppet (
   $report_port          = undef,
   $showdiff             = undef,
   $pluginsync           = false,
-  $environment          = 'production'
+  $environment          = $::environment
 ) inherits puppet::params {
 
   $puppet_conf_path     = "${conf_dir}/${::puppet::params::conf_file}"

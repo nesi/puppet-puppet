@@ -17,8 +17,6 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 The following puppet snippet will install puppet and enforce the default puppet configuration:  
 ```puppet
 include puppet
-include puppet::conf
-include puppet::hiera
 ```
 
 ## The `puppet` Class
@@ -27,46 +25,40 @@ The `puppet` class installs puppet from packages available to whichever reposito
 
 ### Parameters
 
-* **ensure**: The ensure parameter specifies the installation state of the puppet configuration. If it is `installed` or a valid semantic version number, Puppet will be installed. If it is `absent` then Puppet will be removed, including any configuration files and directories that were set up. The default value is `installed`.
+* **ensure**: The ensure parameter specifies the installation state of the puppet configuration. If it is `installed` or a valid version number, Puppet will be installed. If it is `absent` then Puppet will be removed, including any configuration files and directories that were set up. The default value is `installed`.
 * **puppet_package**: Specifies the name of the package used to install Puppet. The default value is `puppet`.
 * **user**: Specifies the puppet user account. The default value is `puppet`.
 * **gid**: The primary group identity of the puppet user. The default value is `puppet`.
 * **user_home**: Sets the home directory for the puppet user. The default value is `/var/lib/puppet`.
 * **conf_dir**: Sets the directory where the puppet configuration file is stored. The default is `/etc/puppet`.
-* **environments**: If this is set to true, the puppet configuration will be set to enable the use of puppet environments. The default value is `false`.
-
-## The `puppet::conf` Class
-
-The `puppet::conf` class manages the puppet configuration. It is dependent on the `puppet` class and requires that this be called first. The `puppet::conf` class can be called with no parameters for the default values, or called as a parametric class.
-
-### Parameters
-
-The parameters for `puppet::conf` correspond to setting in the [puppet configuration file](http://docs.puppetlabs.com/references/latest/configuration.html) (usually `/etc/puppet/puppet.conf`). It uses [augeas](http://augeas.net/) to manage the puppet configuration file.
-
-* **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
-* **pluginsync**: If this is set to `true` then plugins from modules will be used. The default value is `true`, and it is recommended that  it is not changed.
-* **puppetmaster**: This sets the name of the puppetmaster in the server value in the agent block. The default value is `puppet`.
-* **report**: This sets the `report` setting in the agent block. If it is set to true the puppet agent will send reports to the puppetmaster. The default value is `true`.
-* **show_diff**: Sets the `show_diff` setting in the agent block, if true the puppet agent will include file diffs in puppet reports. **NOTE:** this may expose security settings in clear text as part of a puppet agent report. The default value is `undef` which will ensure this setting is removed.
 * **var_dir**: This sets the puppet working directory that contains cached data, configurations and reports. The default is `/var/lib/puppet`.
 * **ssl_dir**: This sets the directory where puppet stores SSL state, including certificates and keys. The default is `/var/lib/puppet/ssl`.
 * **run_dir**: This sets the `rundir` setting in the `agent` block of the puppet conf. The default setting is `/var/run/puppet`.
-* **fact_path**: This sets the directory where facter facts are stored. The default is `/var/lib/puppet/facter`.q
-* **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`.
-* **module_path**: This sets the directory or list of directories that Puppet will use for the module path. The default is `$confdir/modules` for Puppet versions 3.4.3 or earlier, and `$basemodulepath` for Puppet version 3.5.0 or later.
-* **append_basemodulepath**: If this is set to true, the variable `$basemodulepath` will be appended at the end of the list of module paths. This parameter only works for Puppet versions 3.5.0 or later. The default value is `true`.
+* **fact_path**: This sets the directory where facter facts are stored. The default is `$vardir/lib/facter:$vardir/facts` which should resolve to `/var/lib/puppet/lib/facter:/var/lib/puppet/facts`.
+* **module_path**: This sets the directory or list of directories that Puppet will use for the module path. The default is not set. For Puppet version 3.5.0 or later the special variable `$basemodulepath` can be set to include the appropriate module path.
+* **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`. For Puppet version 3.5.0 or later setting the template directory is depreciated and will throw a warning.
+* **server**: This sets the name of the puppetmaster in the server value in the agent block. The default value is `puppet`.
+* **agent**: This enables the puppet agent daemon if set to `true`. The default is `false`. The parameters following this are specific to configuring the agent daemon and will not appear in the `puppet.conf` file if the agent is not enabled.
+* **report**: This sets the `report` setting in the agent block. If it is set to true the puppet agent will submit reports. The default value is `true`.
+* **report_server**: This sets the reporting server to send reports to. By default this is not set and reports are sent to the puppetmaster.
+* **report_port**: This sends the port on the reporting server to submit ports to. By default this setting is omitted. This setting is omitted if no `report_server` is configured.
+* **pluginsync**: If this is set to `true` then plugins from modules will be synchronised from the puppetmaster. The default value is `false`.
+* **showdiff**: If this is set to `true` file changes will be reported as diffs in the puppet agent reports. The default value is `false`. **WARNING**: Enabling this may expose sensitive information as clear text in puppet reports, this setting should only be used for debugging and testing purposes.
+* **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
 
-**NOTE:** This module does not manage the contents of the directories set by `var_dir`, `ssl_dir`, `run_dir`, `fact_path`, or `template_dir`. These will have to be managed separately. These settings are exposed to allow for customised puppet deployments.
+## The `puppet::conf` Class
+
+The `puppet::conf` class has been eliminated since version 1.x, and its function rolled into the base `puppet` class.
 
 ## The `puppet::hiera` Class
 
 [Hiera](http://projects.puppetlabs.com/projects/hiera) is a simple pluggable hierarchical database which is well suited for storing hierarchical configuration data for Puppet.
 
-The `puppet::hiera` class confirms the Hiera install that came in as a dependency of the puppet package, and manages it's configuration for puppet. It bootstraps the hiera database with a minimal default configuration file (`/etc/puppet/hiera.yaml`) and creates the hiera data store. It does not manage hiera any further from here.
+The `puppet::hiera` class confirms the Hiera install that came in as a dependency of the puppet package, and manages it's configuration for puppet. It bootstraps the hiera database with a minimal default configuration file (`/etc/puppet/hiera.yaml`) and creates the hiera data store. It makes no attempt to manage or enforce their contents, it only ensures they exist.
 
 When using version control with puppet and hiera, it is recommended that the hiera configuration (`hiera.yaml`) is included in the puppet repository, while the hiera datastore (by default `/etc/puppet/hieradata` with this module) is managed in a separate repository. This segregation allows the puppet configuration to be stored as a public repository, while the hiera data is kept private.
 
-The hiera class creates the configuration file (`hiera.yaml`) on it's first run, then does nothing more to manage it's contents.
+The hiera class currently makes the minimum changes required to suppress warnings that hiera is not configured.
 
 ### Parameters
 
@@ -74,14 +66,17 @@ The hiera class creates the configuration file (`hiera.yaml`) on it's first run,
 * **hiera_config_file**: Sets the path to the file to the hiera configuration in `puppet.conf`. The default is `/etc/puppet/hiera.yaml`.
 * **hiera_datadir**: Sets the path to the directory that holds the Hiera data store. The default is `/etc/puppet/hiradata`.
 * **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
+* **hiera_config_content**: If this is set, the string given will be used as a puppet file content for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
 * **hiera_backend**: Sets which back-end format for the Hiera data store, which can either be `yaml` or `json`. The default is `yaml`.
 * **hiera_hierarchy**: A list of lists used to create the base Hiera hierarchy.
 
 ## The `puppet::master` class
 
-**NOTE:** This class depends on the [Puppetlabs Apache Puppet Module](https://github.com/puppetlabs/puppetlabs-apache) and it's dependencies.
+This class depends on the [Puppetlabs Apache Puppet Module](https://github.com/puppetlabs/puppetlabs-apache) and it's dependencies. Check the [puppetmaster test script](tests/puppetmaster.pp) for more details.
 
-This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings.
+This class can be set up to work with the [Puppetlabs PuppetDB Module](https://github.com/puppetlabs/puppetlabs-puppetdb), check the [puppetmaster with puppetdb test script](tests/pm_with_puppetdb.pp) for more details.
+
+This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
 
 ### Parameters
 
@@ -90,26 +85,31 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **puppetmaster_docroot**: Sets the docroot where the puppetmasterd application is installed. The default setting is `/usr/share/puppet/rack/puppetmasterd/public`.
 * **servername**: Sets the servername used by the web application. The default value is the FQDN of the node.
 * **manifest**: This sets the manifest file or directory (file only for Puppet versions before 3.5.0) that puppet will use as the root manifest. The default is undefined, which removes the manifest setting from `puppet.conf` and the default value `/etc/puppet/manifests/site.pp` is used.
-* **fix_manifestdir**: When set, this should configure the `manifestdir` setting to be compatible with the `manifest` setting. This should prevent this [bug](https://tickets.puppetlabs.com/browse/PUP-1944) from producing inconsistent behavior. The default value is undefined. This module does not currently allow setting `manifestdir` directly as it is depreciated in favor of the `manifest` setting.
 * **report_handlers**: This parameter sets a list of report handlers for the Puppet Master to submit reports to. It should handle a list of handlers, or a formatted string. The default is undefined, which will omit the `reports` setting from the Puppet configuration.
 * **reporturl**: This parameter provides a report submission URL for the `http` report handler. If http is missing from the list of report handlers, it will be appended to the list. The default value is undefined, which will omit the `reporturl` setting from the Puppet configuration.
+* **storeconfigs**: If this is set to `true` the puppetmaster wills store all puppet clients' configuration, which allows exchanging resources between nodes (i.e. virtual and exported resources). The default value is `false`.
+* **storeconfigs_backend**: Setting this will configure the backend terminus for `storedconfigs`. The default omits the setting enabling the default ActiveRecord store. Setting this parameter automatically sets `storeconfigs` to `true.
+* **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
 
-**NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behavior by the Puppetmaster.
+**NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
 ### Troubleshooting
 
-If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenerate the SSL store, and then restart the Apache web service. As root execute the following commands:  
+If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenerate the SSL store, and then restart the Apache web service. This issue is often arises when puppetdb is installed. As root execute the following commands (omit puppetdb commands if it's not installed):
+
 ```
 $ service apache2 stop
-$ cd /var/lib/puppet
-$ rm -rf ssl
+$ service puppetdb stop
+$ rm -rf  /var/lib/puppet/ssl
 $ puppet master --no-daemonise
+$ puppetdb ssl-setup
+$ service puppetdb start
 $ service apache2 start
 ```
 
 **WARNING**: This resolution will destroy the ssl store of the Puppetmaster, all clients will need to resubmit certificate requests and have them signed.
 
-This procedure is only suitable for bootstrapping a Puppetmaster and is not good practice for automated deployment. A recommended automation strategy would be to have the certificates pregenerated and stored in a file server, and have them deployed to the server as part of the Puppet automation process. This is outside the scope of this module.
+This procedure is only suitable for bootstrapping a Puppetmaster. A recommended automation strategy would be to have the certificates pregenerated and stored in a file server, and have them deployed to the server as part of the Puppet automation process. This is outside the scope of this module, but possible if the `regenerate_certs` parameter is set to `false`.
 
 # Alternaive Repositories
 
@@ -118,6 +118,13 @@ This module does not manage repositories, but should install software from any r
 Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/latest/type.html#yumrepo), and the [Puppetlabs Apr Module](https://github.com/puppetlabs/puppetlabs-apt) provides a suitable resource for managing apt repositories.
 
 # Dependencies
+
+## Required
+
+* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib)
+* [puppetlabs-concat](https://github.com/puppetlabs/puppetlabs-concat)
+
+## Optional
 
 * [puppetlabs-apache](https://github.com/puppetlabs/puppetlabs-apache): This module is only a dependency when using the `puppet::master` class. The current master from the github repository is required until 0.10.0 is released.
 
@@ -147,19 +154,6 @@ This module is derived from the puppet-blank module by Aaron Hicks (aethylred@gm
 This module has been developed for the use with Open Source Puppet (Apache 2.0 license) for automating server & service deployment.
 
 * http://puppetlabs.com/puppet/puppet-open-source/
-
-## rspec-puppet-augeas
-
-This module includes the [Travis](https://travis-ci.org) configuration to use [`rspec-puppet-augeas`](https://github.com/domcleal/rspec-puppet-augeas) to test and verify changes made to files using the [`augeas` resource](http://docs.puppetlabs.com/references/latest/type.html#augeas) available in Puppet. Check the `rspec-puppet-augeas` [documentation](https://github.com/domcleal/rspec-puppet-augeas/blob/master/README.md) for usage.
-
-This will require a copy of the original input files to `spec/fixtures/augeas` using the same file system layout that the resource expects:  
-```
-$ tree spec/fixtures/augeas/
-spec/fixtures/augeas/
-`-- etc
-    `-- ssh
-        `-- sshd_config
-```
 
 # Gnu General Public License
 
