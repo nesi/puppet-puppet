@@ -1,0 +1,24 @@
+
+# <%= @order %><% if @description %>: <%= @description %><% end %>
+path <%= @real_path %>
+<%- if @environments -%>
+  environment <%= @environment_str %>
+<%- end -%>
+<%- if @methods -%>
+  method      <%= @method_str %>
+<%- end -%>
+<%- if @auth -%>
+  auth        <%= @auth %>
+<%- end -%>
+<%- if @allows -%>
+  allow       <%= @allow_str %>
+<%- end -%>
+<%- if @denys -%>
+  deny        <%= @deny_str %>
+<%- end -%>
+<%- if @allow_ips -%>
+  allow_ip    <%= @allow_ip_str %>
+<%- end -%>
+<%- if @deny_ips -%>
+  deny_ip     <%= @deny_ip_str %>
+<%- end -%>

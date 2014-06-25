@@ -1,0 +1,21 @@
+# A000: This file is managed by Puppet, changes may be overwitten
+#
+# This is a managed auth.conf file, which implements the ACL rules
+# used by the puppet master. Check the documentation for the puppet::auth
+# class for the puppet module: https://github.com/nesi/puppet-puppet
+#
+# The ACLs are evaluated in top-down order. More specific stanzas should
+# be towards the top of the file and more general ones at the bottom;
+# otherwise, the general rules may "steal" requests that should be
+# governed by the specific rules.
+#
+# As order is important, each puppet::auth declartion must have an order
+# parameter given in the form [A-Z]\d{3}, i.e a capital letter followed by 3
+# digits, triple zero entries [A-Z]000 are reserved for headings.
+# This give 26,000 slots which should give a fine grained enough order.
+#
+# See http://docs.puppetlabs.com/guides/rest_auth_conf.html for a more complete
+# description of auth.conf's behavior.
+#
+### A000: Blocks A to L contain authenticated ACLs - these rules apply only when
+### the client has a valid certificate and is thus authenticated

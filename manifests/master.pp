@@ -117,6 +117,117 @@ class puppet::master (
     order   => '04',
   }
 
+  concat{'puppet_auth_conf':
+    path    => $::puppet::auth_conf_path,
+    notify  => Service['httpd'],
+    require => Package['puppetmaster_pkg'],
+  }
+
+  concat::fragment{'auth_conf_boilerplate':
+    target  => 'puppet_auth_conf',
+    order   => 'A000',
+    content => template('puppet/auth.conf.boilerplate.erb'),
+  }
+
+  puppet::auth{'pm_retrieve_catalog':
+    path        => '^/catalog/([^/]+)$',
+    description => 'allow nodes to retrieve their own catalog',
+    is_regex    => true,
+    methods     => 'find',
+    allows      => '$1',
+    order       => 'A100',
+  }
+
+  puppet::auth{'pm_retrieve_node_definitions':
+    path        => '^/node/([^/]+)$',
+    description => 'allow nodes to retrieve their own node definition',
+    is_regex    => true,
+    methods     => 'find',
+    allows      => '$1',
+    order       => 'A200',
+  }
+
+  puppet::auth{'pm_allow_ca_services':
+    path        => '/certificate_revocation_list/ca',
+    description => 'allow all nodes to access the certificates services',
+    methods     => 'find',
+    allows      => '*',
+    order       => 'A300',
+  }
+
+  puppet::auth{'pm_allow_store_reports':
+    path        => '^/report/([^/]+)$',
+    description => 'allow all nodes to store their own reports',
+    is_regex    => true,
+    methods     => 'save',
+    allows      => '$1',
+    order       => 'A400',
+  }
+
+  puppet::auth{'pm_allow_file_access':
+    path        => '/file',
+    description => 'allow all nodes to access all file services; this is necessary for pluginsync, file serving from modules, and file serving from custom mount points.',
+    allows      => '*',
+    order       => 'A500',
+  }
+
+  puppet::auth::header{'unauthenticated':
+    order   => 'M',
+    content => "Blocks M to P contain unauthenticated ACLs, for clients without valid\n### certificates; authenticated clients can also access these paths.",
+  }
+
+  puppet::auth{'pm_allow_ca_cert_access':
+    path        => '/certificate/ca',
+    description => 'allow access to the CA certificate; unauthenticated nodes need this in order to validate the puppet master\'s certificate',
+    auth        => 'any',
+    methods     => 'find',
+    allows      => '*',
+    order       => 'M100',
+  }
+
+  puppet::auth{'pm_allow_ca_cert_retrieval':
+    path        => '/certificate/',
+    description => 'allow nodes to retrieve the certificate they requested earlier',
+    auth        => 'any',
+    methods     => 'find',
+    allows      => '*',
+    order       => 'M200',
+  }
+
+  puppet::auth{'pm_allow_ca_cert_request':
+    path        => '/certificate_request',
+    description => 'allow nodes to request a new certificate',
+    auth        => 'any',
+    methods     => ['find','save'],
+    allows      => '*',
+    order       => 'M300',
+  }
+
+  puppet::auth::header{'unknown':
+    order   => 'Q',
+    content => "policies in the Q block are not well described or unknown",
+  }
+
+  puppet::auth{'pm_v2_environments':
+    path        => '/v2.0/environments',
+    description => 'this entry exists in the default auth.conf without description',
+    methods     => 'find',
+    allows      => '*',
+    order       => 'Q100',
+  }
+
+  puppet::auth::header{'defaults':
+    order   => 'X',
+    content => 'policies after the X block are defaults',
+  }
+
+  puppet::auth{'pm_default_policy':
+    path        => '/',
+    description => 'deny everything else; this ACL is not strictly necessary, but illustrates the default policy.',
+    auth        => 'any',
+    order       => 'X100',
+  }
+
   # The ssl settings have been taken directly from the default vhost
   # configuration distributed with the puppetmaster-passenger package
   apache::vhost{'puppetmaster':
