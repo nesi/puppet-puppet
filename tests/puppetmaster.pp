@@ -15,6 +15,7 @@
 #
 # Set up Puppet
 include puppet
+include puppet::hiera
 
 # Set up apache
 include apache
