@@ -3,7 +3,7 @@ describe 'puppet::master', :type => :class do
   context "on a Debian OS" do
     let :facts do
       {
-        :osfamily   => 'Debian',
+        :osfamily               => 'Debian',
         :operatingsystemrelease => '6',
         :concat_basedir         => '/dne',
         :fqdn                   => 'test.example.org',
@@ -99,6 +99,34 @@ describe 'puppet::master', :type => :class do
         it { should_not contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs_backend      = }
         )}
+        it { should contain_concat('puppet_auth_conf').with(
+          'path'    => '/etc/puppet/auth.conf',
+          'notify'  => 'Service[httpd]',
+          'require' => 'Package[puppetmaster_pkg]'
+        )}
+        it { should contain_concat__fragment('auth_conf_boilerplate').with(
+          'target'  => 'puppet_auth_conf',
+          'order'   => 'A000'
+        )}
+        it { should contain_concat__fragment('auth_conf_boilerplate').with_content(
+          %r{^# This file is managed by Puppet, changes may be overwitten$}
+        )}
+        it { should contain_concat__fragment('auth_conf_boilerplate').with_content(
+          %r{^### A000: Blocks A to L contain authenticated ACLs - these rules apply only when$\s^### the client has a valid certificate and is thus authenticated$}
+        )}
+        # The content of these is static, just testing they exist.
+        it { should contain_puppet__auth('pm_retrieve_catalog') }
+        it { should contain_puppet__auth('pm_retrieve_node_definitions') }
+        it { should contain_puppet__auth('pm_allow_store_reports') }
+        it { should contain_puppet__auth('pm_allow_file_access') }
+        it { should contain_puppet__auth__header('unauthenticated') }
+        it { should contain_puppet__auth('pm_allow_ca_cert_access') }
+        it { should contain_puppet__auth('pm_allow_ca_cert_retrieval') }
+        it { should contain_puppet__auth('pm_allow_ca_cert_request') }
+        it { should contain_puppet__auth__header('unknown') }
+        it { should contain_puppet__auth('pm_v2_environments') }
+        it { should contain_puppet__auth__header('defaults') }
+        it { should contain_puppet__auth('pm_default_policy') }
       end
       describe "with ensure => absent" do
         let :params do

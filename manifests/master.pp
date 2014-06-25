@@ -205,7 +205,7 @@ class puppet::master (
 
   puppet::auth::header{'unknown':
     order   => 'Q',
-    content => "policies in the Q block are not well described or unknown",
+    content => 'policies in the Q block are not well described or unknown',
   }
 
   puppet::auth{'pm_v2_environments':
@@ -225,7 +225,7 @@ class puppet::master (
     path        => '/',
     description => 'deny everything else; this ACL is not strictly necessary, but illustrates the default policy.',
     auth        => 'any',
-    order       => 'X100',
+    order       => 'Z100',
   }
 
   # The ssl settings have been taken directly from the default vhost
