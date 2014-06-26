@@ -37,7 +37,7 @@ class puppet (
   $log_dir              = $::puppet::params::log_dir,
   $ssl_dir              = $::puppet::params::ssl_dir,
   $fact_paths           = $::puppet::params::fact_paths,
-  $modulepath           = undef,
+  $module_paths         = undef,
   $templatedir          = undef,
   $server               = undef,
   $agent                = 'stopped',
@@ -68,6 +68,20 @@ class puppet (
     }
   } else {
     $factpath = $fact_paths
+  }
+
+  if is_array($module_paths){
+    # Not that it works on Windows yet but...
+    case $::osfamily{
+      'Windows':{
+        $modulepath = join($module_paths, ';')
+      }
+      default:{
+        $modulepath = join($module_paths, ':')
+      }
+    }
+  } else {
+    $modulepath = $module_paths
   }
 
   package{'puppet':

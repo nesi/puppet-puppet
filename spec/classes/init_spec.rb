@@ -323,11 +323,21 @@ describe 'puppet', :type => :class do
     describe 'with a custom module path' do
       let :params do
         {
-          :modulepath => '/some/other/path',
+          :module_paths => '/some/other/path',
         }
       end
       it { should contain_concat__fragment('puppet_conf_base').with_content(
         %r{^  modulepath    = /some/other/path$}
+      )}
+    end
+    describe 'with a list of module paths' do
+      let :params do
+        {
+          :module_paths => ['/some/other/path','/this/path/too','/and/here'],
+        }
+      end
+      it { should contain_concat__fragment('puppet_conf_base').with_content(
+        %r{^  modulepath    = /some/other/path:/this/path/too:/and/here$}
       )}
     end
     describe 'with a custom template directory' do

@@ -6,7 +6,7 @@
   ssldir        = <%= @ssl_dir %>
   rundir        = <%= scope.lookupvar('::puppet::params::run_dir') %>
   factpath      = <%= @factpath %>
-  <%- if @modulepath -%>
+  <%- if @module_paths -%>
   # Setting modulepath is depreciated since version 3.6.0
   modulepath    = <%= @modulepath %>
   <%- end -%>

@@ -36,8 +36,8 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **var_dir**: This sets the puppet working directory that contains cached data, configurations and reports. The default is `/var/lib/puppet`.
 * **ssl_dir**: This sets the directory where puppet stores SSL state, including certificates and keys. The default is `/var/lib/puppet/ssl`.
 * **run_dir**: This sets the `rundir` setting in the `agent` block of the puppet conf. The default setting is `/var/run/puppet`.
-* **fact_path**: This sets the directory where facter facts are stored. The default is `$vardir/lib/facter:$vardir/facts` which should resolve to `/var/lib/puppet/lib/facter:/var/lib/puppet/facts`.
-* **module_path**: This sets the directory or list of directories that Puppet will use for the module path. The default is not set. For Puppet version 3.5.0 or later the special variable `$basemodulepath` can be set to include the appropriate module path.
+* **fact_paths**: This sets a directory or list of directories where facter facts are stored. The default is `$vardir/lib/facter:$vardir/facts` which should resolve to `/var/lib/puppet/lib/facter:/var/lib/puppet/facts`.
+* **module_paths**: This sets a directory or list of directories that Puppet will use for the module path. The default is not set. For Puppet version 3.5.0 or later the special variable `$basemodulepath` can be used to include all the default module paths.
 * **template_dir**: This sets where puppet file templates are found. The default is `$confdir/templates` which should resolve to `/etc/puppet/templates`. For Puppet version 3.5.0 or later setting the template directory is depreciated and will throw a warning.
 * **server**: This sets the name of the puppetmaster in the server value in the agent block. The default value is `puppet`.
 * **agent**: This enables the puppet agent daemon if set to `true`. The default is `false`. The parameters following this are specific to configuring the agent daemon and will not appear in the `puppet.conf` file if the agent is not enabled.
