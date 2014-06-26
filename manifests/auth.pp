@@ -1,7 +1,7 @@
 # This resource defines entries in auth.conf
 define puppet::auth (
   $order,
-  $path           = $title,
+  $path           = $name,
   $description    = undef,
   $is_regex       = false,
   $environments   = undef,

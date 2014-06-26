@@ -123,9 +123,29 @@ These are the resources and types defined by the puppet module.
 
 ## `puppet::auth`
 
-The `puppet::auth` resource inserts authorisation stanzas into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth' requires a value for the `order` parameter which matches the form `A100` (a capital letter followed by three digits). Triple zero values (e.g. `A000`, `B000`, `C000`, etc.) are reserved for header comments (defined with the `puppet::auth::header` resource). This `order` parameter defines where the stanza created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances.
+The `puppet::auth` resource inserts authorisation stanzas into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth` requires a value for the `order` parameter which matches the form `A100` (a capital letter followed by three digits). Triple zero values (e.g. `A000`, `B000`, `C000`, etc.) are reserved for header comments (defined with the `puppet::auth::header` resource). This `order` parameter defines where the stanza created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances.
 
 For the details on the `auth.conf` file and its format check the [PuppetLabs documentation](http://docs.puppetlabs.com/guides/rest_auth_conf.htm).
+
+### Usage
+
+This example creates a header comment and an ACL stanza in `auth.conf` that would allow a puppet dashboard server to access the fact inventory:
+
+```puppet
+puppet::auth::header{'dashboard':
+  order   => 'D',
+  content => 'the D block holds ACL declarations for the Puppet Dashboard'
+}
+
+puppet::auth{'pm_dashboard_access_facts':
+  order       => 'D100',
+  path        => '/facts',
+  description => 'allow the puppet dashboard server access to facts',
+  auth        => 'yes',
+  allows      => 'dashboard.example.org',
+  methods     => ['find','search'],
+}
+```
 
 ### Parameters
 
@@ -143,12 +163,54 @@ For the details on the `auth.conf` file and its format check the [PuppetLabs doc
 
 ## `puppet::auth::header`
 
-The `puppet::auth::header` resource inserts header comments into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth::header' requires a value for the `order` parameter as a capital letter (i.e A to Z). This `order` parameter defines where the header comment created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances. The following header locations have already been used; A,M,Q, and X.
+The `puppet::auth::header` resource inserts header comments into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth::header` requires a value for the `order` parameter as a capital letter (i.e A to Z). This `order` parameter defines where the header comment created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances. The following header locations have already been used; A,M,Q, and X.
 
 ### Parameters
 
 * **order** (required) : This sets the insert order of the header comment.
 * **content** (required) : This is the text for the header comment.
+
+## `puppet::fileserver`
+
+The `puppet::fileserver` resource inserts fileserver declarations into the `fileserver.conf` file. By default these entries will be entered in alphabetical order by their name. More details on the the `fileserver.conf` file can be found in the [PuppetLabs Documentation](http://docs.puppetlabs.com/puppet/latest/reference/config_file_fileserver.html).
+
+The `puppet::fileserver` resource does *not* create the path for the file server.
+
+When setting the `path` parameter for `puppet::fileserver` there are some special matchers available for the path:
+
+* `%H` The node's certname (i.e. the name given in the certificate used to identify the node to the puppetmaster).
+* `%h` The portion of the node's certname before the first dot. (Usually the node's short hostname.)
+* `%d` The portion of the node's certname after the first dot. (Usually the node's domain name.)
+
+### Usage
+
+As setting the ACL in `fileserver.conf` is now depreciated. the `puppet::fileserver` always sets the ACL rules to 'allow all' (actually `allow *`) this resources needs to be paired with a `puppet::auth` declaration. Hence correct usage in a node manifest after setting up `puppet::master` to provide a private file server that directs each node to a directory determined by its certname would be:
+
+```puppet
+
+file {'/private':
+  ensure => 'directory',
+}
+
+puppet::fileserver{'private':
+  path        => '/private/%H',
+  description => 'a private file share containing node specific files',
+  require     => File['private'],
+}
+
+puppet::auth{'private_fileserver:
+  order       => 'A550',
+  description => 'allow authenticated nodes access to the private file share',
+  path        => '/private',
+  allow       => '*',
+}
+```
+
+### Parameters
+
+* **path** (required) : This is the path to the directory containing the files for the file server.
+* **description** (required) : This is a description of purpose of the file sever.
+* **order**: This changes the insertion order of the file server declaration in `fileserver.conf`. The default is to use the `name` parameter.
 
 # Alternaive Repositories
 
