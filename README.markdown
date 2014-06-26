@@ -19,7 +19,9 @@ The following puppet snippet will install puppet and enforce the default puppet 
 include puppet
 ```
 
-## The `puppet` Class
+# Classes
+
+## `puppet`
 
 The `puppet` class installs puppet from packages available to whichever repositories have been [previously configured](#Alternative Repositories). The `puppet` class can be called without parameters to install with defaults, or as a parametric class.
 
@@ -46,11 +48,11 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **showdiff**: If this is set to `true` file changes will be reported as diffs in the puppet agent reports. The default value is `false`. **WARNING**: Enabling this may expose sensitive information as clear text in puppet reports, this setting should only be used for debugging and testing purposes.
 * **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
 
-## The `puppet::conf` Class
+## `puppet::conf`
 
 The `puppet::conf` class has been eliminated since version 1.x, and its function rolled into the base `puppet` class.
 
-## The `puppet::hiera` Class
+## `puppet::hiera`
 
 [Hiera](http://projects.puppetlabs.com/projects/hiera) is a simple pluggable hierarchical database which is well suited for storing hierarchical configuration data for Puppet.
 
@@ -70,11 +72,13 @@ The hiera class currently makes the minimum changes required to suppress warning
 * **hiera_backend**: Sets which back-end format for the Hiera data store, which can either be `yaml` or `json`. The default is `yaml`.
 * **hiera_hierarchy**: A list of lists used to create the base Hiera hierarchy.
 
-## The `puppet::master` class
+## `puppet::master`
 
 This class depends on the [Puppetlabs Apache Puppet Module](https://github.com/puppetlabs/puppetlabs-apache) and it's dependencies. Check the [puppetmaster test script](tests/puppetmaster.pp) for more details.
 
 This class can be set up to work with the [Puppetlabs PuppetDB Module](https://github.com/puppetlabs/puppetlabs-puppetdb), check the [puppetmaster with puppetdb test script](tests/pm_with_puppetdb.pp) for more details.
+
+The `puppet::master` class establishes puppet management of the `auth.conf` configuration file and allows the `puppet::auth` resource to add new auth stanzas.
 
 This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
 
@@ -95,6 +99,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 
 ### Troubleshooting
 
+If there are existing configuration files for the puppetmaster for PuppetDB (i.e. `routes.yaml` and `puppetdb.conf`), the PuppetDB service must be running for the puppetmaster service to start correctly. If PuppetDB is not currently in a running state, these files must be removed, or moved to a backup. This may involve running the `puppetdb ssl-setup` command to install correct certificates to the PuppetDB service.
+
 If the Puppetmaster Rack application won't start, it may have [improperly generated SSL certificates](https://ask.puppetlabs.com/question/365/bad-certificate-error-after-installing-puppetmaster-passenger-on-ubuntu-1204/), which is often caused by changing a server's hostname or the servername of an Apache application. When bootstrapping a puppetmaster the resolution is to stop Apache and the Puppetmaster application, delete the puppet SSL store, regenerate the SSL store, and then restart the Apache web service. This issue is often arises when puppetdb is installed. As root execute the following commands (omit puppetdb commands if it's not installed):
 
 ```
@@ -110,6 +116,39 @@ $ service apache2 start
 **WARNING**: This resolution will destroy the ssl store of the Puppetmaster, all clients will need to resubmit certificate requests and have them signed.
 
 This procedure is only suitable for bootstrapping a Puppetmaster. A recommended automation strategy would be to have the certificates pregenerated and stored in a file server, and have them deployed to the server as part of the Puppet automation process. This is outside the scope of this module, but possible if the `regenerate_certs` parameter is set to `false`.
+
+# Resources
+
+These are the resources and types defined by the puppet module.
+
+## `puppet::auth`
+
+The `puppet::auth` resource inserts authorisation stanzas into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth' requires a value for the `order` parameter which matches the form `A100` (a capital letter followed by three digits). Triple zero values (e.g. `A000`, `B000`, `C000`, etc.) are reserved for header comments (defined with the `puppet::auth::header` resource). This `order` parameter defines where the stanza created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances.
+
+For the details on the `auth.conf` file and its format check the [PuppetLabs documentation](http://docs.puppetlabs.com/guides/rest_auth_conf.htm).
+
+### Parameters
+
+* **order** (required) : This sets the insert location for the ACL stanza.
+* **path**: This is the path controlled by the ACL stanza. It defaults to the name of the instance. It can be a path fragment or a regular expression (if `is_regex` is true).
+* **description**: If provided, this string is appended to the stanza's header comment.
+* **is_regex**: If this parameter is `true`, the path is treated as if it were a regular expression. The default is `false`.
+* **environments**: Sets the environment, or a list of environments, in which this ACL stanza is valid. Accepts a string or a list of strings. The default is undefined and omitted from the stanza, which defaults to all environments.
+* **methods**: Sets the method, or a list of methods, that the ACL stanza uses. Accepts a string or a list of strings. Valid methods are; `find`, `search`, `save`, and `destroy`. The default is undefined and omitted from the stanza, which permits all methods.
+* **auth**: Sets the auth type for this ACL stanza. Valid auth types are; `yes` or `on`, `no` or `off`, or `any`. The default is undefined and omitted from the stanza, which defaults to `yes`.
+* **allows**: This sets an allow pattern, or list of allow patterns, used by the ACL stanza. Accepts a string or a list of strings. These strings can be host names, certificate names, `*` (all nodes), or regular expressions. The default is undefined and omitted from the stanza.
+* **denys**: This sets an deny pattern, or list of deny patterns, used by the ACL stanza. Accepts a string or a list of strings. These strings can be host names, certificate names, `*` (all nodes), or regular expressions. The default is undefined and omitted from the stanza. The deny entry is permitted, but has no effect.
+* **allow_ips**: This sets an allow pattern, or list of allow patterns, that are IP address based and used by the ACL stanza. Accepts a string or a list of strings. These strings can be an IP address, a glob (e.g `192.168.0.*`) representing a group of IP addesses, or a CDIR block (e.g. `10.0.0.0/24`) representing a group of IP addresses. The default is undefined and omitted from the stanza.
+* **deny_ips**: This sets an deny pattern, or list of deny patterns, that are IP address based and used by the ACL stanza. Accepts a string or a list of strings. These strings can be an IP address, a glob (e.g `192.168.0.*`) representing a group of IP addesses, or a CDIR block (e.g. `10.0.0.0/24`) representing a group of IP addresses. The default is undefined and omitted from the stanza. The deny_ip entry is permitted, but has no effect.
+
+## `puppet::auth::header`
+
+The `puppet::auth::header` resource inserts header comments into the `auth.conf` file (the default is `/etc/puppet/auth.conf`). As the order of these entries is important, each instance of `puppet::auth::header' requires a value for the `order` parameter as a capital letter (i.e A to Z). This `order` parameter defines where the header comment created by a `puppet::auth` instance will be inserted into `auth.conf` and is also used to check for collisions between two instances. The following header locations have already been used; A,M,Q, and X.
+
+### Parameters
+
+* **order** (required) : This sets the insert order of the header comment.
+* **content** (required) : This is the text for the header comment.
 
 # Alternaive Repositories
 
