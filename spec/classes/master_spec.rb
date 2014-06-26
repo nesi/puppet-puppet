@@ -128,7 +128,7 @@ describe 'puppet::master', :type => :class do
         it { should contain_puppet__auth__header('defaults') }
         it { should contain_puppet__auth('pm_default_policy') }
         it { should contain_concat('puppet_fileserver_conf').with(
-          'path'    => '/etc/puppet/auth.conf',
+          'path'    => '/etc/puppet/fileserver.conf',
           'notify'  => 'Service[httpd]',
           'require' => 'Package[puppetmaster_pkg]'
         )}
@@ -136,10 +136,10 @@ describe 'puppet::master', :type => :class do
           'target'  => 'puppet_fileserver_conf',
           'order'   => '0'
         )}
-        it { should contain_concat__fragment('auth_conf_boilerplate').with_content(
+        it { should contain_concat__fragment('fileserver_conf_boilerplate').with_content(
           %r{^# This file is managed by Puppet, changes may be overwitten$}
         )}
-        it { should contain_concat__fragment('auth_conf_boilerplate').with_content(
+        it { should contain_concat__fragment('fileserver_conf_boilerplate').with_content(
           %r{^### Fileserver mount point defintions:$}
         )}
       end

@@ -234,7 +234,7 @@ class puppet::master (
     require => Package['puppetmaster_pkg'],
   }
 
-  concat::fragment{'puppet_fileserver_conf_boilerplate':
+  concat::fragment{'fileserver_conf_boilerplate':
     target  => 'puppet_fileserver_conf',
     order   => '0',
     content => template('puppet/fileserver.conf.boilerplate.erb'),
