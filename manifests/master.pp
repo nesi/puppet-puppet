@@ -228,6 +228,18 @@ class puppet::master (
     order       => 'Z100',
   }
 
+  concat{'puppet_fileserver_conf':
+    path    => $::puppet::fileserver_conf_path,
+    notify  => Service['httpd'],
+    require => Package['puppetmaster_pkg'],
+  }
+
+  concat::fragment{'puppet_fileserver_conf_boilerplate':
+    target  => 'puppet_fileserver_conf',
+    order   => '0',
+    content => template('puppet/fileserver.conf.boilerplate.erb'),
+  }
+
   # The ssl settings have been taken directly from the default vhost
   # configuration distributed with the puppetmaster-passenger package
   apache::vhost{'puppetmaster':
