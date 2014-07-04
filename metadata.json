@@ -1,0 +1,21 @@
+{
+  "name": "Aethylred-puppet",
+  "version": "1.2.2",
+  "author": "Aaron Hicks <aethylred@gmail.com>",
+  "license": "Licensed under GPL3",
+  "summary": "A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.",
+  "source": "https://github.com/nesi/puppet-puppet",
+  "project_page": "https://github.com/nesi/puppet-puppet",
+  "issues_url": "https://github.com/nesi/puppet-puppet/issues",
+  "tags": ["puppet", "apache","passenger"],
+  "operatingsystem_support": [
+    {
+    "operatingsystem": "Ubuntu",
+    "operatingsystemrelease": [ "12.04", "13.10" ]
+    }
+   ],
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/concat", "version_requirement": ">=1.1.0" }
+  ] 
+}
