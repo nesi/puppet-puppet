@@ -3,7 +3,7 @@ require 'puppet-lint/tasks/puppet-lint'
 PuppetLint.configuration.send('disable_80chars')
 PuppetLint.configuration.send('disable_class_parameter_defaults')
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
-PuppetLint.configuration.ignore_paths = ['spec/**/*.pp', 'pkg/**/*.pp','tests/**/*.pp']
+PuppetLint.configuration.ignore_paths = ['spec/**/*.pp', 'pkg/**/*.pp', 'tests/**/*.pp']
 
 desc 'Check for puppet syntax errors.'
 task :validate_puppet_syntax do
@@ -27,7 +27,9 @@ end
 
 desc 'Check for evil line endings.'
 task :check_line_endings do
-  Dir['spec/**/*.rb','tests/**/*.rb','manifests/**/*.pp'].each do |path|
+  Dir['spec/**/*.rb', 'tests/**/*.rb', 'manifests/**/*.pp'].each do |path|
    sh "file #{path}|grep -v CRLF"
   end
 end
+
+# vim:ft=ruby
