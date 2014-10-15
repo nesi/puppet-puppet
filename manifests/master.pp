@@ -34,8 +34,8 @@ class puppet::master (
 
   # can't alias to puppetmaster because there is already a package of that name
   package{'puppetmaster_pkg':
-    ensure  => $ensure,
-    name    => $puppetmaster_package,
+    ensure => $ensure,
+    name   => $puppetmaster_package,
   }
 
   if $regenerate_certs {
@@ -56,12 +56,12 @@ class puppet::master (
       notify  => Service['httpd'],
     }
     exec{'puppetmaster_generate_master_certs':
-      command     => 'timeout 30 puppet master --no-daemonize || echo \'Timed out is expected.\'',
-      creates     => "${::puppet::ssl_dir}/certs/${servername}.pem",
-      path        => ['/usr/bin','/bin'],
-      before      => Service['puppet','httpd'],
-      require     => Exec['puppetmaster_generate_certs'],
-      notify      => Service['httpd'],
+      command => 'timeout 30 puppet master --no-daemonize || echo \'Timed out is expected.\'',
+      creates => "${::puppet::ssl_dir}/certs/${servername}.pem",
+      path    => ['/usr/bin','/bin'],
+      before  => Service['puppet','httpd'],
+      require => Exec['puppetmaster_generate_certs'],
+      notify  => Service['httpd'],
     }
   }
 
