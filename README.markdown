@@ -85,7 +85,7 @@ This class can be set up to work with the [Puppetlabs PuppetDB Module](https://g
 
 The `puppet::master` class establishes puppet management of the `auth.conf` configuration file and allows the `puppet::auth` resource to add new auth stanzas.
 
-This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
+This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings, by default. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/). Set `enable_vhost` to false to define your own `apache::vhost`.
 
 **NOTE:** This class only works in Ubuntu. Pull Requests to enable other operating systems and distributions is welcome.
 
@@ -112,6 +112,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **external_nodes**: ENC executable without any parameters
 * **access_log_format**: Specifies the logging format used in the vhost access log. The default is undefined which will use the default format configured for the Apache instance.
 * **custom_fragment**: Includes a custom fragment into the Puppet master application vhost configuration. The default is undefined, which does not add a custom fragment.
+* **enable_vhost**: When set to true the `puppet::master` class will create an
+`apache::vhost` instance with all the recommended settings. Defaults to true; set to false to define your own `apache::vhost` instance for the puppetmaster.
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
