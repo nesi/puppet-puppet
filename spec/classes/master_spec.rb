@@ -322,6 +322,13 @@ describe 'puppet::master', :type => :class do
           %r{^  storeconfigs_backend      = active_record$}
         )}
       end
+      describe 'with enable_vhost => false ' do
+        let :params do {
+          :enable_vhost => false,
+        }
+        end
+        it { should_not contain_apache__vhost('puppetmaster') }        
+      end
     end
   end
 
