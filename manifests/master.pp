@@ -22,6 +22,17 @@ class puppet::master (
   $external_nodes        = undef,
   $access_log_format     = undef,
   $custom_fragment       = undef,
+  $ensure               = 'installed',
+  $puppetmaster_package = $::puppet::params::puppetmaster_package,
+  $puppetmaster_docroot = $::puppet::params::puppetmaster_docroot,
+  $servername           = $::fqdn,
+  $manifest             = undef,
+  $report_handlers      = undef,
+  $reporturl            = undef,
+  $storeconfigs         = undef,
+  $storeconfigs_backend = undef,
+  $regenerate_certs     = true,
+  $enable_vhost         = true
 ) inherits puppet::params {
 
   # This class currently only works in Ubuntu
@@ -323,6 +334,7 @@ class puppet::master (
     content => template('puppet/fileserver.conf.boilerplate.erb'),
   }
 
+  if $enable_vhost {
   # The ssl settings have been taken directly from the default vhost
   # configuration distributed with the puppetmaster-passenger package
   apache::vhost{'puppetmaster':
@@ -370,6 +382,6 @@ class puppet::master (
       Package['puppetmaster_pkg'],
       File["${::puppet::master::app_dir}/rack/config.ru"]
     ],
+    }
   }
-
 }

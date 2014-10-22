@@ -415,6 +415,13 @@ describe 'puppet::master', :type => :class do
           %r{^  default_manifest = \$confdir/manifest/default.pp$}
         )}
       end
+      describe 'with enable_vhost => false ' do
+        let :params do {
+          :enable_vhost => false,
+        }
+        end
+        it { should_not contain_apache__vhost('puppetmaster') }        
+      end
     end
   end
   context 'on a RedHat 7 OS' do
