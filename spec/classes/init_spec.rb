@@ -510,11 +510,7 @@ describe 'puppet', :type => :class do
         :concat_basedir => '/dne',
       }
     end
-    it do
-      expect {
-        should contain_class('puppet::params')
-      }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/)
-    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/) }
   end
 
     context 'on an Unknown OS' do
@@ -524,11 +520,7 @@ describe 'puppet', :type => :class do
         :concat_basedir => '/dne',
       }
     end
-    it do
-      expect {
-        should contain_class('puppet::params')
-      }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/)
-    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/) }
   end
 
 end

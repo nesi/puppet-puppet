@@ -85,8 +85,8 @@ class puppet (
   }
 
   package{'puppet':
-    ensure  => $ensure,
-    name    => $puppet_package,
+    ensure => $ensure,
+    name   => $puppet_package,
   }
 
   # should match 'installed' or valid version numbers
@@ -104,20 +104,20 @@ class puppet (
   }
 
   group{'puppet_group':
-    ensure      => $ensure_present,
-    name        => $gid,
-    require     => Package['puppet'],
+    ensure  => $ensure_present,
+    name    => $gid,
+    require => Package['puppet'],
   }
 
   user{'puppet_user':
-    ensure      => $ensure_present,
-    name        => $user,
-    gid         => $gid,
-    comment     => 'Puppet configuration management daemon',
-    shell       => '/bin/false',
-    home        => $user_home,
-    managehome  => false,
-    require     => Package['puppet'],
+    ensure     => $ensure_present,
+    name       => $user,
+    gid        => $gid,
+    comment    => 'Puppet configuration management daemon',
+    shell      => '/bin/false',
+    home       => $user_home,
+    managehome => false,
+    require    => Package['puppet'],
   }
 
   file{'puppet_conf_dir':
@@ -183,12 +183,12 @@ class puppet (
 
   # Configure the puppet agent daemon
   service{'puppet_agent':
-    ensure      => $agent,
-    name        => 'puppet',
-    enable      => true,
-    hasrestart  => true,
-    hasstatus   => true,
-    require     => Concat['puppet_conf']
+    ensure     => $agent,
+    name       => 'puppet',
+    enable     => true,
+    hasrestart => true,
+    hasstatus  => true,
+    require    => Concat['puppet_conf']
   }
 
 }
