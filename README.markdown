@@ -96,6 +96,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
 * **environmentpath**: Path to the dynamic environments "Directory Environments".
 * **dns_alt_names**: The comma-separated list of alternative DNS names to use for the local host.
+* **autosign**: Autosign configuration. See [SSL Configuration: Autosigning Certificate Requests](https://docs.puppetlabs.com/puppet/latest/reference/ssl_autosign.html)
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 

@@ -13,6 +13,7 @@ class puppet::master (
   $regenerate_certs     = true,
   $environmentpath      = undef,
   $dns_alt_names        = undef,
+  $autosign             = undef,
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand
