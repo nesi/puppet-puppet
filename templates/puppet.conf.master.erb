@@ -20,3 +20,12 @@
   storeconfigs_backend      = <%= @storeconfigs_backend %>
     <%- end -%>
   <%- end -%>
+  <%- if @environmentpath -%>
+  environmentpath           = <%= @environmentpath %>
+  <%- end -%>
+  <%- if @dns_alt_names -%>
+  dns_alt_names             = <%= @dns_alt_names %>
+  <%- end -%>
+  <%- if @autosign -%>
+  autosign                  = <%= @autosign %>
+  <%- end -%>

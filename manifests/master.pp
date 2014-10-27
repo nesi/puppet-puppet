@@ -10,7 +10,10 @@ class puppet::master (
   $reporturl            = undef,
   $storeconfigs         = undef,
   $storeconfigs_backend = undef,
-  $regenerate_certs     = true
+  $regenerate_certs     = true,
+  $environmentpath      = undef,
+  $dns_alt_names        = undef,
+  $autosign             = undef,
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand

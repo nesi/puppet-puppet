@@ -94,6 +94,9 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **storeconfigs**: If this is set to `true` the puppetmaster wills store all puppet clients' configuration, which allows exchanging resources between nodes (i.e. virtual and exported resources). The default value is `false`.
 * **storeconfigs_backend**: Setting this will configure the backend terminus for `storedconfigs`. The default omits the setting enabling the default ActiveRecord store. Setting this parameter automatically sets `storeconfigs` to `true.
 * **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
+* **environmentpath**: Path to the dynamic environments "Directory Environments".
+* **dns_alt_names**: The comma-separated list of alternative DNS names to use for the local host.
+* **autosign**: Autosign configuration. See [SSL Configuration: Autosigning Certificate Requests](https://docs.puppetlabs.com/puppet/latest/reference/ssl_autosign.html)
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
