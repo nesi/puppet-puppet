@@ -46,7 +46,8 @@ class puppet (
   $report_port          = undef,
   $showdiff             = undef,
   $pluginsync           = false,
-  $environment          = $::environment
+  $environment          = $::environment,
+  $dns_alt_names        = undef
 ) inherits puppet::params {
 
   $puppet_conf_path     = "${conf_dir}/${::puppet::params::conf_file}"
@@ -82,6 +83,11 @@ class puppet (
     }
   } else {
     $modulepath = $module_paths
+  }
+
+  if @dns_alt_names {
+    validate_array($dns_alt_names)
+    $dns_alt_namse_str = unique(flatten($dns_alt_names),',')
   }
 
   package{'puppet':

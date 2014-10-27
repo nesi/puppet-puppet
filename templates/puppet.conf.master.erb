@@ -5,6 +5,9 @@
   # puppetmaster under mod_passenger
   ssl_client_header         = SSL_CLIENT_S_DN
   ssl_client_verify_header  = SSL_CLIENT_VERIFY
+  <%- if @autosign -%>
+  autosign = <%= @autosign %>
+  <%- end -%>
   <%- if @manifest -%>
   manifest                  = <%= @manifest %>
   <%- end -%>
