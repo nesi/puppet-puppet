@@ -10,6 +10,9 @@ class puppet::master (
   $reporturl            = undef,
   $storeconfigs         = undef,
   $storeconfigs_backend = undef,
+  $environmentpath      = undef,
+  $default_manifest     = undef,
+  $basemodulepaths      = undef,
   $regenerate_certs     = true
 ) inherits puppet::params {
 
@@ -32,10 +35,26 @@ class puppet::master (
   #   rails_autodetect              => 'off',
   # }
 
+  if $basemodulepaths {
+    $basemodulepath_str = join(unique(flatten([$basemodulepaths, $::puppet::params::minimum_basemodulepath])),':')
+  }
+
   # can't alias to puppetmaster because there is already a package of that name
   package{'puppetmaster_pkg':
     ensure => $ensure,
     name   => $puppetmaster_package,
+  }
+
+  if $environmentpath =~ /^\$confdir(.*$)/{
+    $environment_dir = "${::puppet::conf_dir}$1"
+  } else {
+    $environment_dir = $environmentpath
+  }
+
+  file{'environment_dir':
+    ensure  => 'directory',
+    path    => $environment_dir,
+    require => Package['puppetmaster_pkg'],
   }
 
   if $regenerate_certs {
@@ -111,10 +130,16 @@ class puppet::master (
     warning('The http report handler has been set, but no URL given to the reporturl parameter!')
   }
 
+  concat::fragment{'puppet_conf_environments':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.environments.erb'),
+    order   => '10',
+  }
+
   concat::fragment{'puppet_conf_master':
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.master.erb'),
-    order   => '04',
+    order   => '30',
   }
 
   concat{'puppet_auth_conf':
