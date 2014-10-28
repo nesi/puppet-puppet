@@ -24,6 +24,7 @@ class puppet::params{
   $puppetmaster_package   = 'puppetmaster-passenger'
   $puppetmaster_docroot   = "${app_dir}/rack/puppetmasterd/public"
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
+  $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
 
   case $::osfamily {

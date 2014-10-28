@@ -105,3 +105,5 @@ exec{'puppetdb_ssl_setup':
   require => Class['puppetdb::master::config','puppet::master'],
   notify  => Service['puppetdb','httpd']
 }
+
+puppet::autosign{'*.local': }

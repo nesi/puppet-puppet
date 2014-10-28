@@ -85,7 +85,7 @@ class puppet (
     $modulepath = $module_paths
   }
 
-  if @dns_alt_names {
+  if $dns_alt_names {
     validate_array($dns_alt_names)
     $dns_alt_namse_str = unique(flatten($dns_alt_names),',')
   }

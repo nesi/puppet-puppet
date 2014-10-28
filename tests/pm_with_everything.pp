@@ -96,6 +96,8 @@ class {'puppetdb::master::config':
   require                 => Class['puppet::master'],
 }
 
+puppet::autosign{'*.local': }
+
 exec{'puppetdb_ssl_setup':
   command => 'puppetdb ssl-setup',
   path    => ['/usr/sbin','/usr/bin','/bin'],
