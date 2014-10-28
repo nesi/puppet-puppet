@@ -1,5 +1,5 @@
 
-# These are set by the puppet base clase when the puppet agent is running
+# These are set by the puppet base class when the puppet agent is running
 [agent]
   environment   = <%= scope.lookupvar('::puppet::environment') %>
   <%- if @report or @report_server -%>

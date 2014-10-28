@@ -48,15 +48,17 @@ class puppet::master (
   }
 
   if $environmentpath =~ /^\$confdir(.*$)/{
-    $environment_dir = "${::puppet::conf_dir}$1"
+    $environment_dir = "${::puppet::conf_dir}${1}"
   } else {
     $environment_dir = $environmentpath
   }
 
-  file{'environment_dir':
-    ensure  => 'directory',
-    path    => $environment_dir,
-    require => Package['puppetmaster_pkg'],
+  if $environmentpath {
+    file{'environment_dir':
+      ensure  => 'directory',
+      path    => $environment_dir,
+      require => Package['puppetmaster_pkg'],
+    }
   }
 
   if $regenerate_certs {

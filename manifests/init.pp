@@ -87,7 +87,7 @@ class puppet (
 
   if $dns_alt_names {
     validate_array($dns_alt_names)
-    $dns_alt_namse_str = unique(flatten($dns_alt_names),',')
+    $dns_alt_names_str = join(unique(flatten($dns_alt_names)),',')
   }
 
   package{'puppet':

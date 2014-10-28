@@ -21,6 +21,7 @@ describe 'puppet::master', :type => :class do
             'name'    => 'puppetmaster-passenger'
           )
         }
+        it { should_not contain_file('environment_dir')}
         # only testing parameters that change
         it { should contain_apache__vhost('puppetmaster').with(
             'servername'    => 'test.example.org',
@@ -67,7 +68,7 @@ describe 'puppet::master', :type => :class do
         )}
         it { should contain_concat__fragment('puppet_conf_master').with(
           'target'  => 'puppet_conf',
-          'order'   => '04'
+          'order'   => '30'
         )}
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^\[master\]$}
@@ -84,20 +85,32 @@ describe 'puppet::master', :type => :class do
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  ssl_client_verify_header  = SSL_CLIENT_VERIFY$}
         )}
-        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
           %r{^  manifest                  = }
         )}
-        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
           %r{^  reports                   = }
         )}
-        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
           %r{^  reporturl                 = }
         )}
-        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
           %r{^  storeconfigs              = true$}
         )}
-        it { should_not contain_concat__fragment('puppet_conf_master').with_content(
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
           %r{^  storeconfigs_backend      = }
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').without_content(
+          %r{^  autosign = }
+        )}
+        it { should contain_concat__fragment('puppet_conf_environments').without_content(
+          %r{^  environmentpath =}
+        )}
+        it { should contain_concat__fragment('puppet_conf_environments').without_content(
+          %r{^  basemodulepath =}
+        )}
+        it { should contain_concat__fragment('puppet_conf_environments').without_content(
+          %r{^  default_manifest =}
         )}
         it { should contain_concat('puppet_auth_conf').with(
           'path'    => '/etc/puppet/auth.conf',
@@ -224,6 +237,15 @@ describe 'puppet::master', :type => :class do
           %r{^  reports                   = store, log, tagmail$}
         )}
       end
+      describe 'when setting autosign' do
+        let :params do {
+          :autosign => '/path/to/autosign/script.sh',
+        }
+        end
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  autosign = /path/to/autosign/script.sh$}
+        )}
+      end
       describe 'with a list of report handlers, including http' do
         let :params do {
           :report_handlers => ['store','log','http'],
@@ -320,6 +342,29 @@ describe 'puppet::master', :type => :class do
         )}
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  storeconfigs_backend      = active_record$}
+        )}
+      end
+      describe 'when setting up directory environments' do
+        let :params do
+          {
+            :environmentpath => '$confdir/environments',
+            :default_manifest => '$confdir/manifest/default.pp',
+            :basemodulepaths  => ['$confdir/library','$confdir/modules']
+          }
+        end
+        it { should contain_file('environment_dir').with(
+          'ensure'  => 'directory',
+          'path'    => '/etc/puppet/environments',
+          'require' => 'Package[puppetmaster_pkg]'
+        ) }
+        it { should contain_concat__fragment('puppet_conf_environments').with_content(
+          %r{^  environmentpath = \$confdir/environments$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_environments').with_content(
+          %r{^  basemodulepath = \$confdir/library:\$confdir/modules:/opt/puppet/share/puppet/modules$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_environments').with_content(
+          %r{^  default_manifest = \$confdir/manifest/default.pp$}
         )}
       end
     end
