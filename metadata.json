@@ -1,6 +1,6 @@
 {
   "name": "Aethylred-puppet",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "author": "Aaron Hicks <aethylred@gmail.com>",
   "license": "Licensed under GPL3",
   "summary": "A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.",

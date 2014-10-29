@@ -47,6 +47,7 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **pluginsync**: If this is set to `true` then plugins from modules will be synchronised from the puppetmaster. The default value is `false`.
 * **showdiff**: If this is set to `true` file changes will be reported as diffs in the puppet agent reports. The default value is `false`. **WARNING**: Enabling this may expose sensitive information as clear text in puppet reports, this setting should only be used for debugging and testing purposes.
 * **environment**: This sets the environment in the agent block. The default value is the same as the `environment` fact provided by facter.
+* **dns_alt_names**: Expects an array of names to add to the puppet master's certificate as aliases. The default is undefined which leaves this unconfigured.
 
 ## `puppet::conf`
 
@@ -94,6 +95,11 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **storeconfigs**: If this is set to `true` the puppetmaster wills store all puppet clients' configuration, which allows exchanging resources between nodes (i.e. virtual and exported resources). The default value is `false`.
 * **storeconfigs_backend**: Setting this will configure the backend terminus for `storedconfigs`. The default omits the setting enabling the default ActiveRecord store. Setting this parameter automatically sets `storeconfigs` to `true.
 * **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
+* **environmentpath**: This sets the path to a directory containing a collection of [directory environments](https://docs.puppetlabs.com/puppet/latest/reference/environments_configuring.html). This can use the internal puppet variables like `$confdir`. The default is undefined and leaves this value unconfigured.
+* **default_manifest**: This sets the default main manifest for directory environments, any environment that does not set a manifest will use this manifest. The default is undefined, which will revert to the puppet default of `./manifests`.
+* **basemodulepaths**: This expects an array of paths for a Puppetmaster to look for Puppet Modules. This list must include `/usr/share/puppet/modules` and will append it if omitted. The default is undefined, which will revert to the puppet default.
+* **autosign**: This sets the path to either an `autosign.conf` whitelist of approved domain names and globs, or an executable that can verifiy host names for [policy based autosigning](https://docs.puppetlabs.com/puppet/latest/reference/ssl_autosign.html). The default is undefined, which will use the whitelist in `$confdir/autosign.conf` by default.
+* **autosign_conf_path**: This sets the path to the `autosign.conf` whitelist file if the default path of `$confdir/autosign.conf` is not desired.
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
@@ -169,6 +175,17 @@ The `puppet::auth::header` resource inserts header comments into the `auth.conf`
 
 * **order** (required) : This sets the insert order of the header comment.
 * **content** (required) : This is the text for the header comment.
+
+## `puppet::autosign`
+
+The `puppet::autosign` resource inserts it's name as a whitelist entry into the `autosign.conf` file given by the `autosign_conf_path` paramter of the `puppet::master` class. This class has no parameters. This class performs a regular expression validation of the name which should be of the form of a fully qualified domain name, but can use a leading `*` prefix to as a glob matcher for sub-domains.
+
+### Usage
+
+```puppet
+puppet::autosign{'*.local': }
+puppet::autosign{'puppet.example.com': }
+```
 
 ## `puppet::fileserver`
 
