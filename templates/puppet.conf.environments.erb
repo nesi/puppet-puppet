@@ -1,0 +1,11 @@
+
+  # These settings should set up directory environments
+  <%- if @basemodulepaths -%>
+  basemodulepath = <%= @basemodulepath_str %>
+  <%- end -%>
+  <%- if @environmentpath -%>
+  environmentpath = <%= @environmentpath %>
+  <%- end -%>
+  <%- if @default_manifest -%>
+  default_manifest = <%= @default_manifest %>
+  <%- end -%>

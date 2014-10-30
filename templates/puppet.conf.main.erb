@@ -19,3 +19,6 @@
   <%- else -%>
   server        = puppet
   <%- end -%>
+  <%- if @dns_alt_names -%>
+  dns_alt_names = <%= @dns_alt_names_str %>
+  <%- end -%>

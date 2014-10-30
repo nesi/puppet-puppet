@@ -1,0 +1,10 @@
+# This file is managed by Puppet, changes may be overwritten.
+# Defaults for puppet - sourced by /etc/init.d/puppet
+
+# Enable puppet agent service?
+# Setting this to "yes" allows the puppet agent service to run.
+# Setting this to "no" keeps the puppet agent service from running.
+START=<%= @puppet_default_status %>
+
+# Startup options
+DAEMON_OPTS=""

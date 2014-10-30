@@ -5,6 +5,7 @@ describe 'puppet', :type => :class do
       {
         :osfamily       => 'Debian',
         :concat_basedir => '/dne',
+        :environment    => 'test',
       }
     end
     describe 'with no parameters' do
@@ -68,7 +69,7 @@ describe 'puppet', :type => :class do
       )}
       it { should contain_concat__fragment('puppet_conf_base').with(
         'target'  => 'puppet_conf',
-        'order'   => '01'
+        'order'   => '00'
       )}
       it { should_not contain_concat__fragment('puppet_conf_agent')}
       it { should contain_service('puppet_agent').with(
@@ -77,8 +78,15 @@ describe 'puppet', :type => :class do
         'enable'      => true,
         'hasrestart'  => true,
         'hasstatus'   => true,
-        'require'     => 'Concat[puppet_conf]'
+        'require'     => ['Concat[puppet_conf]','File[puppet_etc_default]']
       )}
+      it { should contain_file('puppet_etc_default').with(
+        'ensure'  => 'file',
+        'path'    => '/etc/default/puppet'
+      ) }
+      it { should contain_file('puppet_etc_default').with_content(
+        %r{^START=no$}
+      ) }
       it { should contain_concat__fragment('puppet_conf_base').with_content(
         %r{^# This file is managed by Puppet, changes may be overwritten$\s*^# These settings are set with the puppet base class$\s*^\[main\]$}
       )}
@@ -100,12 +108,13 @@ describe 'puppet', :type => :class do
       it { should contain_concat__fragment('puppet_conf_base').with_content(
         %r{^  server        = puppet$}
       )}
-      it { should_not contain_concat__fragment('puppet_conf_base').with_content(
+      it { should contain_concat__fragment('puppet_conf_base').without_content(
         %r{^  modulepath    = }
       )}
-      it { should_not contain_concat__fragment('puppet_conf_base').with_content(
+      it { should contain_concat__fragment('puppet_conf_base').without_content(
         %r{^  # Setting templatedir is depreciated since version 3.6.0$\s*^templatedir   = }
       )}
+      it { should_not contain_concat__fragment('puppet_conf_agent') }
     end
     describe 'with ensure => absent' do
       let :params do
@@ -360,6 +369,16 @@ describe 'puppet', :type => :class do
         %r{^  server        = puppet.example.org$}
       )}
     end
+    describe 'with a list of alternative DNS names' do
+      let :params do
+        {
+          :dns_alt_names => ['puppet.example.org','devops.local'],
+        }
+      end
+      it { should contain_concat__fragment('puppet_conf_base').with_content(
+        %r{^  dns_alt_names = puppet.example.org,devops.local$}
+      )}
+    end
     describe 'with the puppet agent enabled and no other parameters' do
       let :params do
         {
@@ -368,7 +387,7 @@ describe 'puppet', :type => :class do
       end
       it { should contain_concat__fragment('puppet_conf_agent').with(
         'target'  => 'puppet_conf',
-        'order'   => '03'
+        'order'   => '20'
       )}
       it { should contain_service('puppet_agent').with(
         'ensure'      => 'running',
@@ -376,13 +395,20 @@ describe 'puppet', :type => :class do
         'enable'      => true,
         'hasrestart'  => true,
         'hasstatus'   => true,
-        'require'     => 'Concat[puppet_conf]'
+        'require'     => ['Concat[puppet_conf]','File[puppet_etc_default]']
+      )}
+      it { should contain_file('puppet_etc_default').with(
+        'ensure'  => 'file',
+        'path'    => '/etc/default/puppet'
+      ) }
+      it { should contain_file('puppet_etc_default').with_content(
+        %r{^START=yes$}
+      ) }
+      it { should contain_concat__fragment('puppet_conf_agent').with_content(
+        %r{^# These are set by the puppet base class when the puppet agent is running$\s*^\[agent\]$}
       )}
       it { should contain_concat__fragment('puppet_conf_agent').with_content(
-        %r{^# These are set by the puppet base clase when the puppet agent is running$\s*^\[agent\]$}
-      )}
-      it { should contain_concat__fragment('puppet_conf_agent').with_content(
-        %r{^  environment   = production$}
+        %r{^  environment   = test$}
       )}
     end
     describe 'with the puppet agent enabled and reports enabled' do
@@ -510,11 +536,7 @@ describe 'puppet', :type => :class do
         :concat_basedir => '/dne',
       }
     end
-    it do
-      expect {
-        should contain_class('puppet::params')
-      }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/)
-    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support RedHat family of operating systems/) }
   end
 
     context 'on an Unknown OS' do
@@ -524,11 +546,7 @@ describe 'puppet', :type => :class do
         :concat_basedir => '/dne',
       }
     end
-    it do
-      expect {
-        should contain_class('puppet::params')
-      }.to raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/)
-    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/) }
   end
 
 end

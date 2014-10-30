@@ -46,7 +46,8 @@ class puppet (
   $report_port          = undef,
   $showdiff             = undef,
   $pluginsync           = false,
-  $environment          = $::environment
+  $environment          = $::environment,
+  $dns_alt_names        = undef
 ) inherits puppet::params {
 
   $puppet_conf_path     = "${conf_dir}/${::puppet::params::conf_file}"
@@ -84,9 +85,14 @@ class puppet (
     $modulepath = $module_paths
   }
 
+  if $dns_alt_names {
+    validate_array($dns_alt_names)
+    $dns_alt_names_str = join(unique(flatten($dns_alt_names)),',')
+  }
+
   package{'puppet':
-    ensure  => $ensure,
-    name    => $puppet_package,
+    ensure => $ensure,
+    name   => $puppet_package,
   }
 
   # should match 'installed' or valid version numbers
@@ -104,20 +110,20 @@ class puppet (
   }
 
   group{'puppet_group':
-    ensure      => $ensure_present,
-    name        => $gid,
-    require     => Package['puppet'],
+    ensure  => $ensure_present,
+    name    => $gid,
+    require => Package['puppet'],
   }
 
   user{'puppet_user':
-    ensure      => $ensure_present,
-    name        => $user,
-    gid         => $gid,
-    comment     => 'Puppet configuration management daemon',
-    shell       => '/bin/false',
-    home        => $user_home,
-    managehome  => false,
-    require     => Package['puppet'],
+    ensure     => $ensure_present,
+    name       => $user,
+    gid        => $gid,
+    comment    => 'Puppet configuration management daemon',
+    shell      => '/bin/false',
+    home       => $user_home,
+    managehome => false,
+    require    => Package['puppet'],
   }
 
   file{'puppet_conf_dir':
@@ -170,25 +176,34 @@ class puppet (
   concat::fragment{'puppet_conf_base':
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.main.erb'),
-    order   => '01',
+    order   => '00',
   }
 
   if $agent == 'running' {
     concat::fragment{'puppet_conf_agent':
       target  => 'puppet_conf',
       content => template('puppet/puppet.conf.agent.erb'),
-      order   => '03',
+      order   => '20',
     }
+    $puppet_default_status = 'yes'
+  } else {
+    $puppet_default_status = 'no'
+  }
+
+  file{'puppet_etc_default':
+    ensure  => 'file',
+    path    => '/etc/default/puppet',
+    content => template('puppet/puppet_default.erb'),
   }
 
   # Configure the puppet agent daemon
   service{'puppet_agent':
-    ensure      => $agent,
-    name        => 'puppet',
-    enable      => true,
-    hasrestart  => true,
-    hasstatus   => true,
-    require     => Concat['puppet_conf']
+    ensure     => $agent,
+    name       => 'puppet',
+    enable     => true,
+    hasrestart => true,
+    hasstatus  => true,
+    require    => [Concat['puppet_conf'],File['puppet_etc_default']]
   }
 
 }
