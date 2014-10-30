@@ -78,8 +78,15 @@ describe 'puppet', :type => :class do
         'enable'      => true,
         'hasrestart'  => true,
         'hasstatus'   => true,
-        'require'     => 'Concat[puppet_conf]'
+        'require'     => ['Concat[puppet_conf]','File[puppet_etc_default]']
       )}
+      it { should contain_file('puppet_etc_default').with(
+        'ensure'  => 'file',
+        'path'    => '/etc/default/puppet'
+      ) }
+      it { should contain_file('puppet_etc_default').with_content(
+        %r{^START=no$}
+      ) }
       it { should contain_concat__fragment('puppet_conf_base').with_content(
         %r{^# This file is managed by Puppet, changes may be overwritten$\s*^# These settings are set with the puppet base class$\s*^\[main\]$}
       )}
@@ -388,8 +395,15 @@ describe 'puppet', :type => :class do
         'enable'      => true,
         'hasrestart'  => true,
         'hasstatus'   => true,
-        'require'     => 'Concat[puppet_conf]'
+        'require'     => ['Concat[puppet_conf]','File[puppet_etc_default]']
       )}
+      it { should contain_file('puppet_etc_default').with(
+        'ensure'  => 'file',
+        'path'    => '/etc/default/puppet'
+      ) }
+      it { should contain_file('puppet_etc_default').with_content(
+        %r{^START=yes$}
+      ) }
       it { should contain_concat__fragment('puppet_conf_agent').with_content(
         %r{^# These are set by the puppet base class when the puppet agent is running$\s*^\[agent\]$}
       )}

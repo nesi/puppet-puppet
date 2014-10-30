@@ -185,6 +185,15 @@ class puppet (
       content => template('puppet/puppet.conf.agent.erb'),
       order   => '20',
     }
+    $puppet_default_status = 'yes'
+  } else {
+    $puppet_default_status = 'no'
+  }
+
+  file{'puppet_etc_default':
+    ensure  => 'file',
+    path    => '/etc/default/puppet',
+    content => template('puppet/puppet_default.erb'),
   }
 
   # Configure the puppet agent daemon
@@ -194,7 +203,7 @@ class puppet (
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    require    => Concat['puppet_conf']
+    require    => [Concat['puppet_conf'],File['puppet_etc_default']]
   }
 
 }
