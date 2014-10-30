@@ -31,8 +31,7 @@ class puppet::master (
   $reporturl            = undef,
   $storeconfigs         = undef,
   $storeconfigs_backend = undef,
-  $regenerate_certs     = true,
-  $enable_vhost         = true
+  $regenerate_certs     = true
 ) inherits puppet::params {
 
   # This class currently only works in Ubuntu
@@ -384,4 +383,5 @@ class puppet::master (
     ],
     }
   }
+
 }
