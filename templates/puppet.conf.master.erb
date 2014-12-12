@@ -23,3 +23,6 @@
   storeconfigs_backend      = <%= @storeconfigs_backend %>
     <%- end -%>
   <%- end -%>
+  <%- if @trusted_node_data -%>
+  trusted_node_data         = true
+  <%- end -%>

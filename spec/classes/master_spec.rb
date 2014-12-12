@@ -112,6 +112,9 @@ describe 'puppet::master', :type => :class do
         it { should contain_concat__fragment('puppet_conf_environments').without_content(
           %r{^  default_manifest =}
         )}
+        it { should contain_concat__fragment('puppet_conf_environments').without_content(
+          %r{^  trusted_node_data         =}
+        )}
         it { should contain_concat('puppet_auth_conf').with(
           'path'    => '/etc/puppet/auth.conf',
           'notify'  => 'Service[httpd]',
@@ -217,6 +220,14 @@ describe 'puppet::master', :type => :class do
         end
         it { should contain_concat__fragment('puppet_conf_master').with_content(
           %r{^  manifest                  = /etc/puppet/test/test.pp$}
+        )}
+      end
+      describe 'when enabling trusted node data' do
+        let :params do
+            { :trusted_node_data => true }
+        end
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  trusted_node_data         = true$}
         )}
       end
       describe 'with a report handler string' do

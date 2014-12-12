@@ -15,7 +15,8 @@ class puppet::master (
   $basemodulepaths      = undef,
   $regenerate_certs     = true,
   $autosign             = undef,
-  $autosign_conf_path   = $::puppet::params::autosign_conf_path
+  $autosign_conf_path   = $::puppet::params::autosign_conf_path,
+  $trusted_node_data    = false
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand
