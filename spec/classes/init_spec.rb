@@ -276,6 +276,16 @@ describe 'puppet', :type => :class do
         'home'  => '/some/other/path'
       )}
     end
+    describe 'with user_shell => /bin/bash' do
+      let :params do
+        {
+          :user_shell => '/bin/bash',
+        }
+      end
+      it { should contain_user('puppet_user').with(
+        'shell'  => '/bin/bash'
+      )}
+    end
     describe 'with a custom conf_dir' do
       let :params do
         {
