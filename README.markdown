@@ -101,6 +101,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **autosign**: This sets the path to either an `autosign.conf` whitelist of approved domain names and globs, or an executable that can verifiy host names for [policy based autosigning](https://docs.puppetlabs.com/puppet/latest/reference/ssl_autosign.html). The default is undefined, which will use the whitelist in `$confdir/autosign.conf` by default.
 * **autosign_conf_path**: This sets the path to the `autosign.conf` whitelist file if the default path of `$confdir/autosign.conf` is not desired.
 * **trusted_node_data*: If set to true this will enable the use of the `$trusted` has in puppet manifests and prevent the `$trusted` hash from being altered or set in manifests. The default setting is false.
+* **node_terminus**: This specifies the node_terminus setting for configuring an ENC
+* **external_nodes**: ENC executable without any parameters
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
