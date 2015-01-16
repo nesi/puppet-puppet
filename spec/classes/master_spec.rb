@@ -101,7 +101,7 @@ describe 'puppet::master', :type => :class do
           %r{^  storeconfigs_backend      = }
         )}
         it { should contain_concat__fragment('puppet_conf_master').without_content(
-          %r{^  autosign = }
+          %r{^  autosign                  = }
         )}
         it { should contain_concat__fragment('puppet_conf_environments').without_content(
           %r{^  environmentpath =}
@@ -254,7 +254,7 @@ describe 'puppet::master', :type => :class do
         }
         end
         it { should contain_concat__fragment('puppet_conf_master').with_content(
-          %r{^  autosign = /path/to/autosign/script.sh$}
+          %r{^  autosign                  = /path/to/autosign/script.sh$}
         )}
       end
       describe 'with a list of report handlers, including http' do
