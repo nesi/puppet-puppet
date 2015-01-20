@@ -180,12 +180,12 @@ class puppet (
     order   => '00',
   }
 
+  concat::fragment{'puppet_conf_agent':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.agent.erb'),
+    order   => '20',
+  }
   if $agent == 'running' {
-    concat::fragment{'puppet_conf_agent':
-      target  => 'puppet_conf',
-      content => template('puppet/puppet.conf.agent.erb'),
-      order   => '20',
-    }
     $puppet_default_status = 'yes'
   } else {
     $puppet_default_status = 'no'
