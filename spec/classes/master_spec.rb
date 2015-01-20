@@ -101,7 +101,7 @@ describe 'puppet::master', :type => :class do
           %r{^  storeconfigs_backend      = }
         )}
         it { should contain_concat__fragment('puppet_conf_master').without_content(
-          %r{^  autosign = }
+          %r{^  autosign                  = }
         )}
         it { should contain_concat__fragment('puppet_conf_environments').without_content(
           %r{^  environmentpath =}
@@ -230,6 +230,20 @@ describe 'puppet::master', :type => :class do
           %r{^  trusted_node_data         = true$}
         )}
       end
+      describe 'when configuring an enc' do
+        let :params do
+          {
+            :node_terminus => 'exec',
+            :external_nodes => '/usr/local/bin/myenc',
+          }
+        end
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  node_terminus             = exec$}
+        )}
+        it { should contain_concat__fragment('puppet_conf_master').with_content(
+          %r{^  external_nodes            = /usr/local/bin/myenc$}
+        )}
+      end
       describe 'with a report handler string' do
         let :params do {
           :report_handlers => 'store',
@@ -254,7 +268,7 @@ describe 'puppet::master', :type => :class do
         }
         end
         it { should contain_concat__fragment('puppet_conf_master').with_content(
-          %r{^  autosign = /path/to/autosign/script.sh$}
+          %r{^  autosign                  = /path/to/autosign/script.sh$}
         )}
       end
       describe 'with a list of report handlers, including http' do

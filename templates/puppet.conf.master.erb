@@ -6,7 +6,7 @@
   ssl_client_header         = SSL_CLIENT_S_DN
   ssl_client_verify_header  = SSL_CLIENT_VERIFY
   <%- if @autosign -%>
-  autosign = <%= @autosign %>
+  autosign                  = <%= @autosign %>
   <%- end -%>
   <%- if @manifest -%>
   manifest                  = <%= @manifest %>
@@ -25,4 +25,10 @@
   <%- end -%>
   <%- if @trusted_node_data -%>
   trusted_node_data         = true
+  <%- end -%>
+  <%- if @node_terminus -%>
+  node_terminus             = <%= @node_terminus %>
+  <%- end -%>
+  <%- if @external_nodes -%>
+  external_nodes            = <%= @external_nodes%>
   <%- end -%>
