@@ -5,6 +5,7 @@ class puppet::hiera(
   $ensure               = 'installed',
   $hiera_conf_path      = $::puppet::hiera_conf_path,
   $hiera_data_dir       = $::puppet::hiera_data_dir,
+  $hiera_config_manage  = false,
   $hiera_config_source  = undef,
   $hiera_config_content = undef,
   $hiera_backend        = 'yaml',
@@ -49,7 +50,7 @@ class puppet::hiera(
       ensure  => $ensure_file,
       path    => $hiera_conf_path,
       source  => $hiera_config_source,
-      replace => false,
+      replace => $hiera_config_manage,
       require => Package['hiera'],
     }
   } else {
@@ -62,7 +63,7 @@ class puppet::hiera(
       ensure  => $ensure_file,
       path    => $hiera_conf_path,
       content => $real_config_content,
-      replace => false,
+      replace => $hiera_config_manage,
       require => Package['hiera'],
     }
   }

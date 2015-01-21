@@ -67,6 +67,7 @@ The hiera class currently makes the minimum changes required to suppress warning
 ### Parameters
 
 * **ensure**: Sets the ensure state of the heira package and configuration. The default is to match the same state as given the `puppet` class.
+* **hiera_config_manage**: true or false. Default: false. If set to false, the hiera.yaml file will just be placed there once. Setting it to true also updates the config when changed in Puppet.
 * **hiera_config_file**: Sets the path to the file to the hiera configuration in `puppet.conf`. The default is `/etc/puppet/hiera.yaml`.
 * **hiera_datadir**: Sets the path to the directory that holds the Hiera data store. The default is `/etc/puppet/hiradata`.
 * **hiera_config_source**: If this is set, the string given will be used as a puppet file source for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
