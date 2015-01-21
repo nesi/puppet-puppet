@@ -59,6 +59,10 @@ class puppet::master (
   if $environmentpath {
     file{'environment_dir':
       ensure  => 'directory',
+      owner   => $::puppet::user,
+      group   => $::puppet::group,
+      ignore  => ['.git'],
+      recurse => true,
       path    => $environment_dir,
       require => Package['puppetmaster_pkg'],
     }
