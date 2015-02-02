@@ -73,6 +73,8 @@ The hiera class currently makes the minimum changes required to suppress warning
 * **hiera_config_content**: If this is set, the string given will be used as a puppet file content for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
 * **hiera_backend**: Sets which back-end format for the Hiera data store, which can either be `yaml` or `json`. The default is `yaml`.
 * **hiera_hierarchy**: A list of lists used to create the base Hiera hierarchy.
+* **user**: Sets the owner of the managed hiera configuration and data store. Defaults to the same user set by the `puppet` class.
+* **group**: Sets the group of the managed hiera configuration and data store. Defaults to the same user set by the `gid` parameter of the `puppet` class.
 
 ## `puppet::master`
 

@@ -8,7 +8,9 @@ class puppet::hiera(
   $hiera_config_source  = undef,
   $hiera_config_content = undef,
   $hiera_backend        = 'yaml',
-  $hiera_hierarchy      = ['commmon']
+  $hiera_hierarchy      = ['commmon'],
+  $user                 = $::puppet::user,
+  $group                = $::puppet::gid
   ) inherits puppet::params {
 
   # This package was most likely installed with Puppet, and this
@@ -49,6 +51,8 @@ class puppet::hiera(
       ensure  => $ensure_file,
       path    => $hiera_conf_path,
       source  => $hiera_config_source,
+      owner   => $user,
+      group   => $group,
       replace => false,
       require => Package['hiera'],
     }
@@ -62,6 +66,8 @@ class puppet::hiera(
       ensure  => $ensure_file,
       path    => $hiera_conf_path,
       content => $real_config_content,
+      owner   => $user,
+      group   => $group,
       replace => false,
       require => Package['hiera'],
     }
@@ -81,6 +87,9 @@ class puppet::hiera(
   file{'hiera_data_dir':
     ensure  => $ensure_dir,
     path    => $hiera_data_dir,
+    owner   => $user,
+    group   => $group,
+    recurse => true,
     require => Package['hiera'],
   }
 
