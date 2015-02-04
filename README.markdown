@@ -104,6 +104,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **trusted_node_data**: If set to true this will enable the use of the `$trusted` has in puppet manifests and prevent the `$trusted` hash from being altered or set in manifests. The default setting is false.
 * **node_terminus**: This specifies the node_terminus setting for configuring an ENC
 * **external_nodes**: ENC executable without any parameters
+* **manage_env_og**: Manage the environments directory username and group. Default: true.
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 

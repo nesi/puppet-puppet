@@ -19,6 +19,7 @@ class puppet::master (
   $trusted_node_data    = false,
   $node_terminus        = undef,
   $external_nodes       = undef,
+  $manage_env_og        = true,
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand
@@ -57,10 +58,17 @@ class puppet::master (
   }
 
   if $environmentpath {
+    if $manage_env_og {
+      $_user  = $::puppet::user
+      $_group = $::puppet::group
+    } else {
+      $_user  = undef
+      $_group = undef
+    }
     file{'environment_dir':
       ensure  => 'directory',
-      owner   => $::puppet::user,
-      group   => $::puppet::group,
+      owner   => $_user,
+      group   => $_group,
       ignore  => ['.git'],
       recurse => true,
       path    => $environment_dir,
