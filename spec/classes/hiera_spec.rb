@@ -34,7 +34,7 @@ describe 'puppet::hiera', :type => :class do
         'ensure'  => 'link',
         'path'    => '/etc/hiera.yaml',
         'target'  => '/etc/puppet/hiera.yaml',
-        'require' => 'File[hiera_conf]',
+        'require' => 'File[hiera_conf]'
       )}
       it { should contain_file('hiera_data_dir').with(
         'ensure'  => 'directory',
