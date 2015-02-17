@@ -24,24 +24,23 @@ describe 'puppet::master', :type => :class do
         it { should_not contain_file('environment_dir')}
         # only testing parameters that change
         it { should contain_apache__vhost('puppetmaster').with(
-            'servername'    => 'test.example.org',
-            'docroot'       => '/usr/share/puppet/rack/puppetmasterd/public',
-            'ssl_certs_dir' => '/var/lib/puppet/ssl',
-            'ssl_cert'      => '/var/lib/puppet/ssl/certs/test.example.org.pem',
-            'ssl_key'       => '/var/lib/puppet/ssl/private_keys/test.example.org.pem',
-            'ssl_ca'        => '/var/lib/puppet/ssl/certs/ca.pem',
-            'ssl_chain'     => '/var/lib/puppet/ssl/certs/ca.pem',
-            'error_log_file'  => 'puppetmaster_test.example.org_error_ssl.log',
-            'access_log_file' => 'puppetmaster_test.example.org_access_ssl.log'
-          )
-        }
+          'servername'      => 'test.example.org',
+          'docroot'         => '/usr/share/puppet/rack/puppetmasterd/public',
+          'ssl_certs_dir'   => '/var/lib/puppet/ssl',
+          'ssl_cert'        => '/var/lib/puppet/ssl/certs/test.example.org.pem',
+          'ssl_key'         => '/var/lib/puppet/ssl/private_keys/test.example.org.pem',
+          'ssl_ca'          => '/var/lib/puppet/ssl/certs/ca.pem',
+          'ssl_chain'       => '/var/lib/puppet/ssl/certs/ca.pem',
+          'error_log_file'  => 'puppetmaster_test.example.org_error_ssl.log',
+          'access_log_file' => 'puppetmaster_test.example.org_access_ssl.log'
+        ) }
         it { should contain_exec('puppet_wipe_pkg_ssl').with(
           'command'     => 'rm -rf /var/lib/puppet/ssl',
           'path'        => ['/bin'],
           'refreshonly' => true,
           'before'      => 'File[puppet_ssl_dir]',
           'subscribe'   => 'Package[puppetmaster_pkg]'
-        )}
+        ) }
         it { should contain_exec('puppetmaster_generate_certs').with(
           'command' => 'puppet cert list -a',
           'creates' => '/var/lib/puppet/ssl/certs',
@@ -192,6 +191,28 @@ describe 'puppet::master', :type => :class do
         it { should contain_class('puppet::params') }
         it { should contain_apache__vhost('puppetmaster').with(
             'docroot'       => '/some/other/path'
+          )
+        }
+      end
+      describe 'when setting the access log format' do
+        let :params do
+          {
+            :access_log_format => 'log_format',
+          }
+        end
+        it { should contain_apache__vhost('puppetmaster').with(
+            'access_log_format' => 'log_format'
+          )
+        }
+      end
+      describe 'when passing a custom fragment for the vhost' do
+        let :params do
+          {
+            :custom_fragment => '# This is a custom fragment',
+          }
+        end
+        it { should contain_apache__vhost('puppetmaster').with(
+            'custom_fragment' => '# This is a custom fragment'
           )
         }
       end

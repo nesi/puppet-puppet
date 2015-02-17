@@ -19,6 +19,8 @@ class puppet::master (
   $trusted_node_data    = false,
   $node_terminus        = undef,
   $external_nodes       = undef,
+  $access_log_format    = undef,
+  $custom_fragment      = undef,
 ) inherits puppet::params {
 
   # Apache and Passenger need to be installed and set up beforehand
@@ -290,6 +292,7 @@ class puppet::master (
     docroot           => $puppetmaster_docroot,
     access_log        => true,
     access_log_file   => "puppetmaster_${servername}_access_ssl.log",
+    access_log_format => $access_log_format,
     error_log         => true,
     error_log_file    => "puppetmaster_${servername}_error_ssl.log",
     port              => 8140,
@@ -312,6 +315,7 @@ class puppet::master (
                             'set X-Client-DN %{SSL_CLIENT_S_DN}e',
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
+    custom_fragment   => $custom_fragment,
     subscribe         => Concat['puppet_conf'],
     require           => Package['puppetmaster_pkg'],
   }
