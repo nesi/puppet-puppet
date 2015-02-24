@@ -57,33 +57,33 @@ class puppet::master (
     $environment_dir = $environmentpath
   }
 
-  file { "$::puppet::master::app_dir/rack":
-    ensure  => directory,
-    owner   => $::puppet::user,
-    group   => $::puppet::gid,
-    mode    => '0644',
+  file { "${::puppet::master::app_dir}/rack":
+    ensure => directory,
+    owner  => $::puppet::user,
+    group  => $::puppet::gid,
+    mode   => '0644',
   }
 
-  file { "$::puppet::master::app_dir/rack/tmp":
-    ensure  => directory,
-    owner   => $::puppet::user,
-    group   => $::puppet::gid,
-    mode    => '0644',
+  file { "${::puppet::master::app_dir}/rack/tmp":
+    ensure => directory,
+    owner  => $::puppet::user,
+    group  => $::puppet::gid,
+    mode   => '0644',
   }
 
-  file { "$::puppet::params::var_dir/reports":
+  file { "${::puppet::params::var_dir}/reports":
       ensure => directory,
-      owner   => $::puppet::user,
-      group   => $::puppet::gid,
+      owner  => $::puppet::user,
+      group  => $::puppet::gid,
   }
 
-  file { "$::puppet::master::app_dir/rack/config.ru":
+  file { "${::puppet::master::app_dir}/rack/config.ru":
     ensure  => present,
     owner   => $::puppet::user,
     group   => $::puppet::gid,
     content => file('puppet/config.ru'),
     mode    => '0644',
-    require => File["$::puppet::master::app_dir/rack"],
+    require => File["${::puppet::master::app_dir}/rack"],
     notify  => Service['httpd'],
   }
 
@@ -347,19 +347,19 @@ class puppet::master (
                             'set X-Client-DN %{SSL_CLIENT_S_DN}e',
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
-    directories          => [
+    directories       => [
       {
-        path => $docroot,
+        path => $::docroot,
       },
       {
-        path    => "$::puppet::master::app_dir/rack",
+        path    => "${::puppet::master::app_dir}/rack",
         options => 'None',
       },
     ],
     subscribe         => Concat['puppet_conf'],
     require           => [
       Package['puppetmaster_pkg'],
-      File["$::puppet::master::app_dir/rack/config.ru"]
+      File["${::puppet::master::app_dir}/rack/config.ru"]
     ],
   }
 
