@@ -4,6 +4,7 @@ class puppet::master (
   $ensure               = 'installed',
   $puppetmaster_package = $::puppet::params::puppetmaster_package,
   $puppetmaster_docroot = $::puppet::params::puppetmaster_docroot,
+  $app_dir              = $::puppet::params::app_dir,
   $servername           = $::fqdn,
   $manifest             = undef,
   $report_handlers      = undef,
@@ -56,11 +57,41 @@ class puppet::master (
     $environment_dir = $environmentpath
   }
 
+  file { "${::puppet::master::app_dir}/rack":
+    ensure => directory,
+    owner  => $::puppet::user,
+    group  => $::puppet::gid,
+    mode   => '0644',
+  }
+
+  file { "${::puppet::master::app_dir}/rack/tmp":
+    ensure => directory,
+    owner  => $::puppet::user,
+    group  => $::puppet::gid,
+    mode   => '0644',
+  }
+
+  file { "${::puppet::params::var_dir}/reports":
+      ensure => directory,
+      owner  => $::puppet::user,
+      group  => $::puppet::gid,
+  }
+
+  file { "${::puppet::master::app_dir}/rack/config.ru":
+    ensure  => present,
+    owner   => $::puppet::user,
+    group   => $::puppet::gid,
+    content => file('puppet/config.ru'),
+    mode    => '0644',
+    require => File["${::puppet::master::app_dir}/rack"],
+    notify  => Service['httpd'],
+  }
+
   if $environmentpath {
     file{'environment_dir':
       ensure  => 'directory',
       owner   => $::puppet::user,
-      group   => $::puppet::group,
+      group   => $::puppet::gid,
       ignore  => ['.git'],
       recurse => true,
       path    => $environment_dir,
@@ -108,7 +139,7 @@ class puppet::master (
   # - they don't trigger a change in the next puppet run
   # - make Apache 2.4 whine about broken conf files
   exec{'puppet_wipe_pkg_site_files':
-    command     => "rm ${puppet_pkg_site_files}",
+    command     => "rm -f ${puppet_pkg_site_files}",
     path        => ['/bin'],
     refreshonly => true,
     subscribe   => Package['puppetmaster_pkg'],
@@ -145,12 +176,14 @@ class puppet::master (
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.environments.erb'),
     order   => '10',
+    notify  => Service['httpd'],
   }
 
   concat::fragment{'puppet_conf_master':
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.master.erb'),
     order   => '30',
+    notify  => Service['httpd'],
   }
 
   concat{'puppet_auth_conf':
@@ -288,6 +321,8 @@ class puppet::master (
   apache::vhost{'puppetmaster':
     servername        => $servername,
     docroot           => $puppetmaster_docroot,
+    docroot_owner     => $::puppet::user,
+    docroot_mode      =>  '0644',
     access_log        => true,
     access_log_file   => "puppetmaster_${servername}_access_ssl.log",
     error_log         => true,
@@ -295,8 +330,8 @@ class puppet::master (
     port              => 8140,
     priority          => 50,
     ssl               => true,
-    ssl_protocol      => '-ALL +SSLv3 +TLSv1',
-    ssl_cipher        => 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP',
+    ssl_protocol      => 'ALL -SSLv2 -SSLv3',
+    ssl_cipher        => 'EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:kEDH:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA',
     ssl_verify_client => 'optional',
     ssl_options       => '+StdEnvVars +ExportCertData',
     ssl_verify_depth  => 1,
@@ -312,8 +347,20 @@ class puppet::master (
                             'set X-Client-DN %{SSL_CLIENT_S_DN}e',
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
+    directories       => [
+      {
+        path => $::docroot,
+      },
+      {
+        path    => "${::puppet::master::app_dir}/rack",
+        options => 'None',
+      },
+    ],
     subscribe         => Concat['puppet_conf'],
-    require           => Package['puppetmaster_pkg'],
+    require           => [
+      Package['puppetmaster_pkg'],
+      File["${::puppet::master::app_dir}/rack/config.ru"]
+    ],
   }
 
 }

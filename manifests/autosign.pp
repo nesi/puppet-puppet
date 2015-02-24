@@ -5,6 +5,6 @@ define puppet::autosign
   concat::fragment{"autosign_conf_fragment_${name}":
     target  => 'puppet_autosign_conf',
     order   => $name,
-    content => $name,
+    content => "${name}\n",
   }
 }
