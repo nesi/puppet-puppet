@@ -59,11 +59,31 @@ class puppet::master (
     $environment_dir = $environmentpath
   }
 
+  file { "$::puppet::master::app_dir/rack":
+    ensure  => directory,
+    owner   => $::puppet::user,
+    group   => $::puppet::gid,
+    mode    => '0644',
+  }
+
+  file { "$::puppet::master::app_dir/rack/tmp":
+    ensure  => directory,
+    owner   => $::puppet::user,
+    group   => $::puppet::gid,
+    mode    => '0644',
+  }
+
+  file { "$::puppet::params::var_dir/reports":
+      ensure => directory,
+      owner   => $::puppet::user,
+      group   => $::puppet::gid,
+  }
+
   if $environmentpath {
     file{'environment_dir':
       ensure  => 'directory',
       owner   => $::puppet::user,
-      group   => $::puppet::group,
+      group   => $::puppet::gid,
       ignore  => ['.git'],
       recurse => true,
       path    => $environment_dir,
@@ -291,6 +311,8 @@ class puppet::master (
   apache::vhost{'puppetmaster':
     servername        => $servername,
     docroot           => $puppetmaster_docroot,
+    docroot_owner     => $::puppet::user,
+    docroot_mode      =>  '0644',
     access_log        => true,
     access_log_file   => "puppetmaster_${servername}_access_ssl.log",
     access_log_format => $access_log_format,
@@ -317,6 +339,15 @@ class puppet::master (
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
     custom_fragment   => $custom_fragment,
+    directories          => [
+      {
+        path => $docroot,
+      },
+      {
+        path    => "$::puppet::master::app_dir/rack",
+        options => 'None',
+      },
+    ],
     subscribe         => Concat['puppet_conf'],
     require           => Package['puppetmaster_pkg'],
   }
