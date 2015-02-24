@@ -22,15 +22,17 @@ class puppet::params{
   $hiera_conf_file        = 'hiera.yaml'
   $hiera_dir              = 'hieradata'
   $hiera_package          = 'hiera'
-  $puppetmaster_package   = 'puppetmaster-passenger'
-  $puppetmaster_docroot   = "${app_dir}/rack/puppetmasterd/public"
+  $puppetmaster_docroot   = "${app_dir}/rack/public"
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
 
   case $::osfamily {
     Debian:{
-      # Do nothing
+      $puppetmaster_package   = 'puppetmaster-passenger'
+    }
+    RedHat:{
+      $puppetmaster_package   = 'puppetserver'
     }
     default:{
       fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
