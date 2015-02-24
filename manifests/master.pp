@@ -79,6 +79,16 @@ class puppet::master (
       group   => $::puppet::gid,
   }
 
+  file { "$::puppet::master::app_dir/rack/config.ru":
+    ensure  => present,
+    owner   => $::puppet::user,
+    group   => $::puppet::gid,
+    content => file('puppet/config.ru'),
+    mode    => '0644',
+    require => File["$::puppet::master::app_dir/rack"],
+    notify  => Service['httpd'],
+  }
+
   if $environmentpath {
     file{'environment_dir':
       ensure  => 'directory',
@@ -351,7 +361,10 @@ class puppet::master (
       },
     ],
     subscribe         => Concat['puppet_conf'],
-    require           => Package['puppetmaster_pkg'],
+    require           => [
+      Package['puppetmaster_pkg'],
+      File["$::puppet::master::app_dir/rack/config.ru"]
+    ],
   }
 
 }
