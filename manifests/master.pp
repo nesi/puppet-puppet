@@ -168,12 +168,14 @@ class puppet::master (
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.environments.erb'),
     order   => '10',
+    notify  => Service['httpd'],
   }
 
   concat::fragment{'puppet_conf_master':
     target  => 'puppet_conf',
     content => template('puppet/puppet.conf.master.erb'),
     order   => '30',
+    notify  => Service['httpd'],
   }
 
   concat{'puppet_auth_conf':
