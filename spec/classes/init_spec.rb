@@ -1077,8 +1077,6 @@ describe 'puppet', :type => :class do
       )}
     end
   end
-  end
-
     context 'on an Unknown OS' do
     let :facts do
       {
