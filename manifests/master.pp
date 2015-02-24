@@ -129,7 +129,7 @@ class puppet::master (
   # - they don't trigger a change in the next puppet run
   # - make Apache 2.4 whine about broken conf files
   exec{'puppet_wipe_pkg_site_files':
-    command     => "rm ${puppet_pkg_site_files}",
+    command     => "rm -f ${puppet_pkg_site_files}",
     path        => ['/bin'],
     refreshonly => true,
     subscribe   => Package['puppetmaster_pkg'],
