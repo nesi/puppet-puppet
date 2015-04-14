@@ -9,5 +9,15 @@ fixtures:
     concat:
       repo: 'puppetlabs-concat'
       ref:  '1.1.1'
+  repositories:
+    stdlib:
+      repo: "git://github.com/puppetlabs/puppetlabs-stdlib"
+      ref: "4.3.2"
+    apache:
+      repo: 'git://github.com/puppetlabs/puppetlabs-apache'
+      ref:  '1.1.1'
+    concat:
+      repo: 'git://github.com/puppetlabs/puppetlabs-concat'
+      ref:  '1.1.1'
   symlinks:
     puppet: "#{source_dir}"
