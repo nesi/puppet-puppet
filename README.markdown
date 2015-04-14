@@ -84,7 +84,7 @@ This class can be set up to work with the [Puppetlabs PuppetDB Module](https://g
 
 The `puppet::master` class establishes puppet management of the `auth.conf` configuration file and allows the `puppet::auth` resource to add new auth stanzas.
 
-This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
+This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings, by default. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/). Set `enable_vhost` to false to define your own `apache::vhost`.
 
 ### Parameters
 
@@ -98,6 +98,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **storeconfigs**: If this is set to `true` the puppetmaster wills store all puppet clients' configuration, which allows exchanging resources between nodes (i.e. virtual and exported resources). The default value is `false`.
 * **storeconfigs_backend**: Setting this will configure the backend terminus for `storedconfigs`. The default omits the setting enabling the default ActiveRecord store. Setting this parameter automatically sets `storeconfigs` to `true.
 * **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
+<<<<<<< HEAD
 * **environmentpath**: This sets the path to a directory containing a collection of [directory environments](https://docs.puppetlabs.com/puppet/latest/reference/environments_configuring.html). This can use the internal puppet variables like `$confdir`. The default is undefined and leaves this value unconfigured.
 * **default_manifest**: This sets the default main manifest for directory environments, any environment that does not set a manifest will use this manifest. The default is undefined, which will revert to the puppet default of `./manifests`.
 * **basemodulepaths**: This expects an array of paths for a Puppetmaster to look for Puppet Modules. This list must include `/usr/share/puppet/modules` and will append it if omitted. The default is undefined, which will revert to the puppet default.
@@ -106,6 +107,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **trusted_node_data**: If set to true this will enable the use of the `$trusted` has in puppet manifests and prevent the `$trusted` hash from being altered or set in manifests. The default setting is false.
 * **node_terminus**: This specifies the node_terminus setting for configuring an ENC
 * **external_nodes**: ENC executable without any parameters
+* **enable_vhost**: When set to true the `puppet::master` class will create an
+`apache::vhost` instance with all the recommended settings. Defaults to true; set to false to define your own `apache::vhost` instance for the puppetmaster.
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
