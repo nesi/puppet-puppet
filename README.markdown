@@ -32,6 +32,7 @@ The `puppet` class installs puppet from packages available to whichever reposito
 * **user**: Specifies the puppet user account. The default value is `puppet`.
 * **gid**: The primary group identity of the puppet user. The default value is `puppet`.
 * **user_home**: Sets the home directory for the puppet user. The default value is `/var/lib/puppet`.
+* **user_shell**: Sets the shell command for the puppet user. The default value is `/bin/false` which prevents shell access for the puppet user.
 * **conf_dir**: Sets the directory where the puppet configuration file is stored. The default is `/etc/puppet`.
 * **var_dir**: This sets the puppet working directory that contains cached data, configurations and reports. The default is `/var/lib/puppet`.
 * **ssl_dir**: This sets the directory where puppet stores SSL state, including certificates and keys. The default is `/var/lib/puppet/ssl`.
@@ -72,6 +73,8 @@ The hiera class currently makes the minimum changes required to suppress warning
 * **hiera_config_content**: If this is set, the string given will be used as a puppet file content for the yaml configuration. The default is `undef` which will use the minimal bootstrap template.
 * **hiera_backend**: Sets which back-end format for the Hiera data store, which can either be `yaml` or `json`. The default is `yaml`.
 * **hiera_hierarchy**: A list of lists used to create the base Hiera hierarchy.
+* **user**: Sets the owner of the managed hiera configuration and data store. Defaults to the same user set by the `puppet` class.
+* **group**: Sets the group of the managed hiera configuration and data store. Defaults to the same user set by the `gid` parameter of the `puppet` class.
 
 ## `puppet::master`
 
@@ -100,6 +103,9 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **basemodulepaths**: This expects an array of paths for a Puppetmaster to look for Puppet Modules. This list must include `/usr/share/puppet/modules` and will append it if omitted. The default is undefined, which will revert to the puppet default.
 * **autosign**: This sets the path to either an `autosign.conf` whitelist of approved domain names and globs, or an executable that can verifiy host names for [policy based autosigning](https://docs.puppetlabs.com/puppet/latest/reference/ssl_autosign.html). The default is undefined, which will use the whitelist in `$confdir/autosign.conf` by default.
 * **autosign_conf_path**: This sets the path to the `autosign.conf` whitelist file if the default path of `$confdir/autosign.conf` is not desired.
+* **trusted_node_data**: If set to true this will enable the use of the `$trusted` has in puppet manifests and prevent the `$trusted` hash from being altered or set in manifests. The default setting is false.
+* **node_terminus**: This specifies the node_terminus setting for configuring an ENC
+* **external_nodes**: ENC executable without any parameters
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 

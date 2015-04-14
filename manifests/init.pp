@@ -33,6 +33,7 @@ class puppet (
   $user                 = $::puppet::params::user,
   $gid                  = $::puppet::params::gid,
   $user_home            = $::puppet::params::user_home,
+  $user_shell           = $::puppet::params::user_shell,
   $conf_dir             = $::puppet::params::conf_dir,
   $log_dir              = $::puppet::params::log_dir,
   $ssl_dir              = $::puppet::params::ssl_dir,
@@ -120,7 +121,7 @@ class puppet (
     name       => $user,
     gid        => $gid,
     comment    => 'Puppet configuration management daemon',
-    shell      => '/bin/false',
+    shell      => $user_shell,
     home       => $user_home,
     managehome => false,
     require    => Package['puppet'],
@@ -179,12 +180,12 @@ class puppet (
     order   => '00',
   }
 
+  concat::fragment{'puppet_conf_agent':
+    target  => 'puppet_conf',
+    content => template('puppet/puppet.conf.agent.erb'),
+    order   => '20',
+  }
   if $agent == 'running' {
-    concat::fragment{'puppet_conf_agent':
-      target  => 'puppet_conf',
-      content => template('puppet/puppet.conf.agent.erb'),
-      order   => '20',
-    }
     $puppet_default_status = 'yes'
   } else {
     $puppet_default_status = 'no'

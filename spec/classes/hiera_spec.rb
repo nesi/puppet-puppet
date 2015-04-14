@@ -26,18 +26,23 @@ describe 'puppet::hiera', :type => :class do
         'ensure'  => 'file',
         'path'    => '/etc/puppet/hiera.yaml',
         'replace' => false,
+        'owner'   => 'puppet',
+        'group'   => 'puppet',
         'require' => 'Package[hiera]'
       )}
       it { should contain_file('etc_hiera_conf').with(
         'ensure'  => 'link',
         'path'    => '/etc/hiera.yaml',
         'target'  => '/etc/puppet/hiera.yaml',
-        'require' => 'File[hiera_conf]'
+        'require' => 'File[hiera_conf]',
       )}
       it { should contain_file('hiera_data_dir').with(
         'ensure'  => 'directory',
         'path'    => '/etc/puppet/hieradata',
-        'require' => 'Package[hiera]'
+        'require' => 'Package[hiera]',
+        'recurse' => true,
+        'owner'   => 'puppet',
+        'group'   => 'puppet'
       )}
       it { should contain_concat__fragment('puppet_conf_hiera').with_content(
         %r{^  # The class puppet::hiera creates a minimal hiera config to suppress warnings.$},
@@ -95,6 +100,22 @@ describe 'puppet::hiera', :type => :class do
       )}
       it { should contain_file('hiera_conf').with_content(
         %r{^:yaml:$\s*^  :datadir: /some/other/path}
+      )}
+    end
+    describe 'with different user and group' do
+      let :params do
+        {
+          :user  => 'someone',
+          :group => 'someone'
+        }
+      end
+      it { should contain_file('hiera_data_dir').with(
+        'owner' => 'someone',
+        'group' => 'someone'
+      )}
+      it { should contain_file('hiera_conf').with(
+        'owner' => 'someone',
+        'group' => 'someone'
       )}
     end
     describe 'with hiera_config_source => /some/other/path' do

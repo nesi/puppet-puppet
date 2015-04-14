@@ -71,7 +71,7 @@ describe 'puppet', :type => :class do
         'target'  => 'puppet_conf',
         'order'   => '00'
       )}
-      it { should_not contain_concat__fragment('puppet_conf_agent')}
+      it { should contain_concat__fragment('puppet_conf_agent')}
       it { should contain_service('puppet_agent').with(
         'ensure'      => 'stopped',
         'name'        => 'puppet',
@@ -114,7 +114,7 @@ describe 'puppet', :type => :class do
       it { should contain_concat__fragment('puppet_conf_base').without_content(
         %r{^  # Setting templatedir is depreciated since version 3.6.0$\s*^templatedir   = }
       )}
-      it { should_not contain_concat__fragment('puppet_conf_agent') }
+      it { should contain_concat__fragment('puppet_conf_agent') }
     end
     describe 'with ensure => absent' do
       let :params do
@@ -274,6 +274,16 @@ describe 'puppet', :type => :class do
       end
       it { should contain_user('puppet_user').with(
         'home'  => '/some/other/path'
+      )}
+    end
+    describe 'with user_shell => /bin/bash' do
+      let :params do
+        {
+          :user_shell => '/bin/bash',
+        }
+      end
+      it { should contain_user('puppet_user').with(
+        'shell'  => '/bin/bash'
       )}
     end
     describe 'with a custom conf_dir' do

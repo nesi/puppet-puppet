@@ -12,6 +12,7 @@ class puppet::params{
   $user                   = 'puppet'
   $gid                    = 'puppet'
   $user_home              = '/var/lib/puppet'
+  $user_shell             = '/bin/false'
   $log_dir                = '/var/log/puppet'
   $var_dir                = '/var/lib/puppet'
   $ssl_dir                = "${var_dir}/ssl"
