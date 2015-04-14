@@ -98,7 +98,6 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **storeconfigs**: If this is set to `true` the puppetmaster wills store all puppet clients' configuration, which allows exchanging resources between nodes (i.e. virtual and exported resources). The default value is `false`.
 * **storeconfigs_backend**: Setting this will configure the backend terminus for `storedconfigs`. The default omits the setting enabling the default ActiveRecord store. Setting this parameter automatically sets `storeconfigs` to `true.
 * **regenerate_certs**: When set to true the `puppet::master` class will regenerate the puppetmaster SSL certificates post install, which [can resolve some SSL issues](#Troubleshooting).
-<<<<<<< HEAD
 * **environmentpath**: This sets the path to a directory containing a collection of [directory environments](https://docs.puppetlabs.com/puppet/latest/reference/environments_configuring.html). This can use the internal puppet variables like `$confdir`. The default is undefined and leaves this value unconfigured.
 * **default_manifest**: This sets the default main manifest for directory environments, any environment that does not set a manifest will use this manifest. The default is undefined, which will revert to the puppet default of `./manifests`.
 * **basemodulepaths**: This expects an array of paths for a Puppetmaster to look for Puppet Modules. This list must include `/usr/share/puppet/modules` and will append it if omitted. The default is undefined, which will revert to the puppet default.
