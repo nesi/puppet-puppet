@@ -391,6 +391,7 @@ describe 'puppet::master', :type => :class do
         it { should contain_concat__fragment('puppet_conf_environments').with_content(
           %r{^  default_manifest = \$confdir/manifest/default.pp$}
         )}
+      end
       describe 'with enable_vhost => false ' do
         let :params do {
           :enable_vhost => false,
