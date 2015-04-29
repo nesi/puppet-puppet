@@ -2,10 +2,10 @@ fixtures:
   forge_modules:
     stdlib:
       repo: 'puppetlabs-stdlib'
-      ref:  '4.3.2'
+      ref:  '4.6.0'
     apache:
       repo: 'puppetlabs-apache'
-      ref:  '1.1.1'
+      ref:  '1.3.0'
     concat:
       repo: 'puppetlabs-concat'
       ref:  '1.1.1'

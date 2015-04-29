@@ -1,8 +1,8 @@
 {
   "name": "Aethylred-puppet",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "author": "Aaron Hicks <aethylred@gmail.com>",
-  "license": "Licensed under GPL3",
+  "license": "GPL-3.0",
   "summary": "A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.",
   "source": "https://github.com/nesi/puppet-puppet",
   "project_page": "https://github.com/nesi/puppet-puppet",
@@ -11,7 +11,7 @@
   "operatingsystem_support": [
     {
     "operatingsystem": "Ubuntu",
-    "operatingsystemrelease": [ "12.04", "13.10" ]
+    "operatingsystemrelease": [ "12.04", "13.10", "14.04"]
     }
    ],
   "dependencies": [
