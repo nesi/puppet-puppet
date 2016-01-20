@@ -14,7 +14,7 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 
 ## Default Usage
 
-The following puppet snippet will install puppet and enforce the default puppet configuration:  
+The following puppet snippet will install puppet and enforce the default puppet configuration:
 ```puppet
 include puppet
 ```
@@ -105,6 +105,7 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **autosign_conf_path**: This sets the path to the `autosign.conf` whitelist file if the default path of `$confdir/autosign.conf` is not desired.
 * **trusted_node_data**: If set to true this will enable the use of the `$trusted` has in puppet manifests and prevent the `$trusted` hash from being altered or set in manifests. The default setting is false.
 * **node_terminus**: This specifies the node_terminus setting for configuring an ENC
+* **data_binding_terminus**: This specifies the data_binding_terminus setting.
 * **external_nodes**: ENC executable without any parameters
 * **access_log_format**: Specifies the logging format used in the vhost access log. The default is undefined which will use the default format configured for the Apache instance.
 * **custom_fragment**: Includes a custom fragment into the Puppet master application vhost configuration. The default is undefined, which does not add a custom fragment.
