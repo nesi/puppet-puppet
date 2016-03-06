@@ -350,9 +350,7 @@ class puppet::master (
                             'set X-Client-DN %{SSL_CLIENT_S_DN}e',
                             'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
                           ],
-    directories          => [
     custom_fragment   => $custom_fragment,
-    directories          => [
     directories       => [
       {
         path => $::docroot,
