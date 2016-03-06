@@ -83,7 +83,7 @@ class puppet::master (
     ensure  => present,
     owner   => $::puppet::user,
     group   => $::puppet::gid,
-    content => file('puppet/config.ru'),
+    content => template('puppet/config.ru'),
     mode    => '0644',
     require => File["${::puppet::master::app_dir}/rack"],
     notify  => Service['httpd'],
