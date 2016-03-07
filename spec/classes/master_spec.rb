@@ -58,7 +58,7 @@ describe 'puppet::master', :type => :class do
           'notify'      => 'Service[httpd]'
         )}
         it { should contain_exec('puppet_wipe_pkg_site_files').with(
-          'command'     => "rm /etc/apache2/sites-available/puppetmaster* /etc/apache2/sites-enabled/puppetmaster*",
+          'command'     => "rm -f /etc/apache2/sites-available/puppetmaster* /etc/apache2/sites-enabled/puppetmaster*",
           'path'        => ['/bin'],
           'subscribe'   => 'Package[puppetmaster_pkg]',
           'refreshonly' => true,
