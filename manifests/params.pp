@@ -22,7 +22,7 @@ class puppet::params{
   $hiera_conf_file        = 'hiera.yaml'
   $hiera_dir              = 'hieradata'
   $hiera_package          = 'hiera'
-  $puppetmaster_docroot   = "${app_dir}/rack/public"
+  $puppetmaster_docroot   = "${app_dir}/rack/puppetmasterd/public"
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
