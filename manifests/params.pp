@@ -27,13 +27,19 @@ class puppet::params{
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
+  if (versioncmp($::facterversion, "3.0") > 0) {
+    $family = $::os[family]
+  } else {
+    $family = $::osfamily
+  }
 
-  case $::osfamily {
-    Debian:{
+  case $family {
+    "Debian":{
       # Do nothing
     }
     default:{
       fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
     }
   }
+
 }
