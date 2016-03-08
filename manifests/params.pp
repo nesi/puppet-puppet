@@ -27,15 +27,7 @@ class puppet::params{
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
-  if (versioncmp($::facterversion, "3.0") > 0) {
-    $family = $::os[family]
-  } else {
-    $family = $::osfamily
-  }
-
-  notify{"This is my family: $family":}
-
-  case $family {
+  case $::osfamily {
     "Debian":{
       # Do nothing
     }
