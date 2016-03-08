@@ -40,7 +40,7 @@ class puppet::params{
       # Do nothing
     }
     default:{
-      fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
+      #fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
     }
   }
 
