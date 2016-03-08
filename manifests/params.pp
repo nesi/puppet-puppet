@@ -36,7 +36,7 @@ class puppet::params{
   notify{"This is my family: $family":}
 
   case $family {
-    Debian:{
+    "Debian":{
       # Do nothing
     }
     default:{
