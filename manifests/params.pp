@@ -27,7 +27,7 @@ class puppet::params{
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
 
-  if ($::facterversion > 3) {
+  if (versioncmp($::facterversion) > 3) {
     $family = $::os[family]
   } else {
     $family = $::osfamily
