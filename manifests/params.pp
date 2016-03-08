@@ -33,8 +33,6 @@ class puppet::params{
     $family = $::osfamily
   }
 
-  notify{"This is my family: $family":}
-
   case $family {
     "Debian":{
       # Do nothing
