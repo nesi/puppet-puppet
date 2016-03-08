@@ -35,13 +35,13 @@ class puppet::params{
 
   notify{"This is my family: $family":}
 
-  #case $family {
-  #  Debian:{
-  #    # Do nothing
-  #  }
-  #  default:{
-  #    fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
-  #  }
-  #}
+  case $family {
+    Debian:{
+      # Do nothing
+    }
+    default:{
+      fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
+    }
+  }
 
 }
