@@ -41,6 +41,7 @@ class puppet::params{
     }
     default:{
       #fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")
+      notify{"What's up":}
     }
   }
 
