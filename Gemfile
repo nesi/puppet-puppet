@@ -16,6 +16,7 @@ gem 'facter',                 '>= 1.7.0'
 # rspec must be v2 for ruby 1.8.7
 if RUBY_VERSION >= '1.8.7' and RUBY_VERSION < '1.9'
   gem 'rspec', '~> 2.0'
+  gem 'rake', '~> 10.2'
 end
 
 # vim:ft=ruby
