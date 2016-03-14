@@ -20,7 +20,7 @@ describe 'puppet::autosign', :type => :define do
       it { should contain_concat__fragment('autosign_conf_fragment_*.test').with(
         'target'  => 'puppet_autosign_conf',
         'order'   => '*.test',
-        'content' => '*.test'
+        'content' => "*.test\n"
       )}
     end
     describe 'with a bad name' do
