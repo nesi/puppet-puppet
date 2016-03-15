@@ -539,12 +539,13 @@ describe 'puppet', :type => :class do
     end
   end
 
-  context 'on a RedHat OS' do
+  context 'on a RedHat 7 OS' do
     let :facts do
       {
-        :osfamily       => 'RedHat',
-        :concat_basedir => '/dne',
-        :environment    => 'test',
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '7',
+        :concat_basedir            => '/dne',
+        :environment               => 'test',
       }
     end
     describe 'with no parameters' do
@@ -1077,7 +1078,37 @@ describe 'puppet', :type => :class do
       )}
     end
   end
-    context 'on an Unknown OS' do
+  context 'on a RedHat 4 OS' do
+    let :facts do
+      {
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '4',
+        :concat_basedir            => '/dne',
+      }
+    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support release 4 of RedHat family of operating systems/) }
+  end
+  context 'on a RedHat 5 OS' do
+    let :facts do
+      {
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '5',
+        :concat_basedir            => '/dne',
+      }
+    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support release 5 of RedHat family of operating systems/) }
+  end
+  context 'on a RedHat 6 OS' do
+    let :facts do
+      {
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '6',
+        :concat_basedir            => '/dne',
+      }
+    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support release 6 of RedHat family of operating systems/) }
+  end
+  context 'on an Unknown OS' do
     let :facts do
       {
         :osfamily       => 'Unknown',
