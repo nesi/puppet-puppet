@@ -28,8 +28,7 @@ class{'::puppet::master':
   storeconfigs_backend  => 'puppetdb',
   require               => [
     Class[
-      'apache::mod::passenger',
-      'ruby::dev'
+      'apache::mod::passenger'
     ]
   ],
 }

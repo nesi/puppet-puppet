@@ -432,7 +432,7 @@ describe 'puppet::master', :type => :class do
       it { should contain_class('puppet::params') }
       it { should contain_package('puppetmaster_pkg').with(
           'ensure'  => 'installed',
-          'name'    => 'puppetserver'
+          'name'    => 'puppet-server'
         )
       }
     end

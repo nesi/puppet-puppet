@@ -87,6 +87,8 @@ The `puppet::master` class establishes puppet management of the `auth.conf` conf
 
 This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
 
+This class is not currently working for CentOS!
+
 ### Parameters
 
 * **ensure**: Sets the ensure parameter for the puppetmaster package. The default value is `installed`,
@@ -255,6 +257,7 @@ Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/lat
 ## Optional
 
 * [puppetlabs-apache](https://github.com/puppetlabs/puppetlabs-apache): This module is only a dependency when using the `puppet::master` class. The current master from the github repository is required until 0.10.0 is released.
+* The Phusion Passenger repository has to be installed to use `puppet::master` for RedHat/CentOS (https://www.phusionpassenger.com/library/install/apache/install/oss/el7/), example puppet code can be found [here](https://github.com/tag1consulting/puppet-yumrepos)
 
 # References
 
