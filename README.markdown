@@ -87,7 +87,7 @@ The `puppet::master` class establishes puppet management of the `auth.conf` conf
 
 This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
 
-This class is not currently working for CentOS!
+**NOTE:** This class only works in Ubuntu. Pull Requests to enable other operating systems and distributions is welcome.
 
 ### Parameters
 

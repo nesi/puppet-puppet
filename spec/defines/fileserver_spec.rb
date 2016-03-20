@@ -4,6 +4,7 @@ describe 'puppet::fileserver', :type => :define do
     let :facts do
       {
         :osfamily               => 'Debian',
+        :operatingsystem        => 'Ubuntu',
         :operatingsystemrelease => '6',
         :concat_basedir         => '/dne',
         :fqdn                   => 'test.example.org',

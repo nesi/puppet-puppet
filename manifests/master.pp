@@ -24,6 +24,11 @@ class puppet::master (
   $custom_fragment       = undef,
 ) inherits puppet::params {
 
+  # This class currently only works in Ubuntu
+  if $::operatingsystem != 'Ubuntu' {
+    fail('The puppet::master class only supports the Ubuntu operating systems')
+  }
+
   # Apache and Passenger need to be installed and set up beforehand
   # Use the Puppetlabs Apache module (or a fork):
   # https://forge.puppetlabs.com/puppetlabs/apache
