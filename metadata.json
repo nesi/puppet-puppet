@@ -1,6 +1,6 @@
 {
   "name": "Aethylred-puppet",
-  "version": "1.5.4",
+  "version": "1.5.6",
   "author": "Aaron Hicks <aethylred@gmail.com>",
   "license": "GPL-3.0",
   "summary": "A Puppet module for installing, configuring and managing puppet, puppetmaster, and hiera.",
@@ -13,8 +13,8 @@
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         // "4",
-        // "5",
-        // "6",
+        "5",
+        "6",
         "7"
       ]
     },
@@ -22,8 +22,8 @@
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
         // "4",
-        // "5",
-        // "6",
+        "5",
+        "6",
         "7"
       ]
     },

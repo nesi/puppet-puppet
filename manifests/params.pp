@@ -32,7 +32,7 @@ class puppet::params{
       $puppetmaster_package   = 'puppetmaster-passenger'
     }
     RedHat:{
-      if $::operatingsystemmajrelease in ['7'] {
+      if $::operatingsystemmajrelease in ['7','6','5'] {
         $puppetmaster_package   = 'puppet-server'
       } else {
         fail("The NeSI Puppet Puppet module does not support release ${::operatingsystemmajrelease} of ${::osfamily} family of operating systems")

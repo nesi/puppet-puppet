@@ -1096,7 +1096,7 @@ describe 'puppet', :type => :class do
         :concat_basedir            => '/dne',
       }
     end
-    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support release 5 of RedHat family of operating systems/) }
+    it { should compile }
   end
   context 'on a RedHat 6 OS' do
     let :facts do
@@ -1106,7 +1106,7 @@ describe 'puppet', :type => :class do
         :concat_basedir            => '/dne',
       }
     end
-    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support release 6 of RedHat family of operating systems/) }
+    it { should compile }
   end
   context 'on an Unknown OS' do
     let :facts do

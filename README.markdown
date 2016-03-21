@@ -257,7 +257,7 @@ Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/lat
 ## Optional
 
 * [puppetlabs-apache](https://github.com/puppetlabs/puppetlabs-apache): This module is only a dependency when using the `puppet::master` class. The current master from the github repository is required until 0.10.0 is released.
-* The Phusion Passenger repository has to be installed to use `puppet::master` for RedHat/CentOS (https://www.phusionpassenger.com/library/install/apache/install/oss/el7/), example puppet code can be found [here](https://github.com/tag1consulting/puppet-yumrepos)
+* The Phusion Passenger repository has to be installed to use `puppet::master` for RedHat/CentOS (https://www.phusionpassenger.com/library/install/apache/install/oss/el7/), example puppet code can be found [here](https://github.com/tag1consulting/puppet-yumrepos), however the `puppet::master` class does not currenty work for these operating systems.
 
 # References
 
