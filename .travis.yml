@@ -2,11 +2,11 @@ language: ruby
 sudo: false
 
 before_script:
-  - bundle exec metadata-json-lint metadata.json
-  - bundle exec rake validate_ruby_syntax
   - bundle exec rake check_line_endings
   - bundle exec rake syntax
   - bundle exec rake lint
+  - bundle exec rake validate_ruby_syntax
+  - bundle exec rake metadata_lint
 
 script:
   - bundle exec rake spec SPEC_OPTS='--format documentation'

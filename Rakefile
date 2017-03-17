@@ -1,11 +1,13 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
 require 'puppet-syntax/tasks/puppet-syntax'
+require 'metadata-json-lint/rake_task'
 
 exclude_paths = [
-  'spec/**/*',
-  'pkg/**/*',
-  'tests/**/*'
+  "spec/**/*",
+  "pkg/**/*",
+  "tests/**/*",
+  "vendor/**/*.pp"
 ]
 
 PuppetSyntax.exclude_paths = exclude_paths
@@ -14,6 +16,9 @@ Rake::Task[:lint].clear
 PuppetLint::RakeTask.new :lint do |config|
   # Pattern of files to ignore
   config.ignore_paths = exclude_paths
+
+  # Specify log format:
+  config.log_format = '%{path}:%{linenumber}:%{KIND}: %{message}'
 
   # List of checks to disable
   config.disable_checks = [
