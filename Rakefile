@@ -16,9 +16,6 @@ PuppetLint::RakeTask.new :lint do |config|
   # Pattern of files to ignore
   config.ignore_paths = exclude_paths
 
-  # Specify log format:
-  # config.log_format = '%{path}:%{linenumber}:%{KIND}: %{message}'
-
   # List of checks to disable
   config.disable_checks = [
     '140chars',
@@ -35,7 +32,7 @@ PuppetLint::RakeTask.new :lint do |config|
 
   # Format string for puppet-lint's output (see the puppet-lint help output
   # for details
-  config.log_format = "%{path}:%{linenumber}:%{check}:%{KIND}:%{message}"
+  config.log_format = "%{path}:%{line}:%{check}:%{KIND}:%{message}"
 
   # Compare module layout relative to the module root
   # config.relative = true
