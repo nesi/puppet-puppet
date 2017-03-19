@@ -4,10 +4,9 @@ require 'puppet-syntax/tasks/puppet-syntax'
 require 'metadata-json-lint/rake_task'
 
 exclude_paths = [
-  "spec/**/*",
   "pkg/**/*",
-  "tests/**/*",
-  "vendor/**/*.pp"
+  "vendor/**/*",
+  "spec/**/*",
 ]
 
 PuppetSyntax.exclude_paths = exclude_paths
@@ -18,11 +17,11 @@ PuppetLint::RakeTask.new :lint do |config|
   config.ignore_paths = exclude_paths
 
   # Specify log format:
-  config.log_format = '%{path}:%{linenumber}:%{KIND}: %{message}'
+  # config.log_format = '%{path}:%{linenumber}:%{KIND}: %{message}'
 
   # List of checks to disable
   config.disable_checks = [
-    '80chars',
+    '140chars',
     'class_parameter_defaults',
     'class_inherits_from_params_class',
     'autoloader_layout'
