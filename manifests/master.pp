@@ -31,7 +31,8 @@ class puppet::master (
   $reporturl            = undef,
   $storeconfigs         = undef,
   $storeconfigs_backend = undef,
-  $regenerate_certs     = true
+  $regenerate_certs     = true,
+  $enable_vhost         = true
 ) inherits puppet::params {
 
   # This class currently only works in Ubuntu
@@ -334,53 +335,53 @@ class puppet::master (
   }
 
   if $enable_vhost {
-  # The ssl settings have been taken directly from the default vhost
-  # configuration distributed with the puppetmaster-passenger package
-  apache::vhost{'puppetmaster':
-    servername        => $servername,
-    docroot           => $puppetmaster_docroot,
-    docroot_owner     => $::puppet::user,
-    docroot_mode      =>  '0644',
-    access_log        => true,
-    access_log_file   => "puppetmaster_${servername}_access_ssl.log",
-    access_log_format => $access_log_format,
-    error_log         => true,
-    error_log_file    => "puppetmaster_${servername}_error_ssl.log",
-    port              => 8140,
-    priority          => 50,
-    ssl               => true,
-    ssl_protocol      => 'ALL -SSLv2 -SSLv3',
-    ssl_cipher        => 'EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:kEDH:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA',
-    ssl_verify_client => 'optional',
-    ssl_options       => '+StdEnvVars +ExportCertData',
-    ssl_verify_depth  => 1,
-    ssl_certs_dir     => $::puppet::ssl_dir,
-    ssl_cert          => "${::puppet::ssl_dir}/certs/${servername}.pem",
-    ssl_key           => "${::puppet::ssl_dir}/private_keys/${servername}.pem",
-    ssl_ca            => "${::puppet::ssl_dir}/certs/ca.pem",
-    ssl_chain         => "${::puppet::ssl_dir}/certs/ca.pem",
-    rack_base_uris    => ['/'],
-    request_headers   =>  [
-                            'unset X-Forwarded-For',
-                            'set X-SSL-Subject %{SSL_CLIENT_S_DN}e',
-                            'set X-Client-DN %{SSL_CLIENT_S_DN}e',
-                            'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
-                          ],
-    custom_fragment   => $custom_fragment,
-    directories       => [
-      {
-        path => $puppetmaster_docroot,
-      },
-      {
-        path    => "${::puppet::master::app_dir}/rack",
-        options => 'None',
-      },
-    ],
-    subscribe         => Concat['puppet_conf'],
-    require           => [
-      Package['puppetmaster_pkg'],
-      File["${::puppet::master::app_dir}/rack/config.ru"]
-    ],
+    # The ssl settings have been taken directly from the default vhost
+    # configuration distributed with the puppetmaster-passenger package
+    apache::vhost{'puppetmaster':
+      servername        => $servername,
+      docroot           => $puppetmaster_docroot,
+      docroot_owner     => $::puppet::user,
+      docroot_mode      =>  '0644',
+      access_log        => true,
+      access_log_file   => "puppetmaster_${servername}_access_ssl.log",
+      access_log_format => $access_log_format,
+      error_log         => true,
+      error_log_file    => "puppetmaster_${servername}_error_ssl.log",
+      port              => 8140,
+      priority          => 50,
+      ssl               => true,
+      ssl_protocol      => 'ALL -SSLv2 -SSLv3',
+      ssl_cipher        => 'EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:kEDH:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA',
+      ssl_verify_client => 'optional',
+      ssl_options       => '+StdEnvVars +ExportCertData',
+      ssl_verify_depth  => 1,
+      ssl_certs_dir     => $::puppet::ssl_dir,
+      ssl_cert          => "${::puppet::ssl_dir}/certs/${servername}.pem",
+      ssl_key           => "${::puppet::ssl_dir}/private_keys/${servername}.pem",
+      ssl_ca            => "${::puppet::ssl_dir}/certs/ca.pem",
+      ssl_chain         => "${::puppet::ssl_dir}/certs/ca.pem",
+      rack_base_uris    => ['/'],
+      request_headers   =>  [
+                              'unset X-Forwarded-For',
+                              'set X-SSL-Subject %{SSL_CLIENT_S_DN}e',
+                              'set X-Client-DN %{SSL_CLIENT_S_DN}e',
+                              'set X-Client-Verify %{SSL_CLIENT_VERIFY}e',
+                            ],
+      custom_fragment   => $custom_fragment,
+      directories       => [
+        {
+          path => $puppetmaster_docroot,
+        },
+        {
+          path    => "${::puppet::master::app_dir}/rack",
+          options => 'None',
+        },
+      ],
+      subscribe         => Concat['puppet_conf'],
+      require           => [
+        Package['puppetmaster_pkg'],
+        File["${::puppet::master::app_dir}/rack/config.ru"]
+      ],
     }
   }
 
