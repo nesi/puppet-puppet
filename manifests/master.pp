@@ -358,7 +358,7 @@ class puppet::master (
     custom_fragment   => $custom_fragment,
     directories       => [
       {
-        path => $::docroot,
+        path => $puppetmaster_docroot,
       },
       {
         path    => "${::puppet::master::app_dir}/rack",

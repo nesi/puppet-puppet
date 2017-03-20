@@ -6,6 +6,7 @@ describe 'puppet::auth::header', :type => :define do
         :osfamily               => 'Debian',
         :operatingsystem        => 'Ubuntu',
         :operatingsystemrelease => '6',
+        :lsbdistrelease         => '14.04',
         :concat_basedir         => '/dne',
         :fqdn                   => 'test.example.org',
         :environment            => 'production',

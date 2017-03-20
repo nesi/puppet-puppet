@@ -6,6 +6,7 @@ describe 'puppet::master', :type => :class do
         :osfamily               => 'Debian',
         :operatingsystem        => 'Ubuntu',
         :operatingsystemrelease => '6',
+        :lsbdistrelease         => '14.04',
         :concat_basedir         => '/dne',
         :fqdn                   => 'test.example.org',
         :environment            => 'production',
@@ -420,6 +421,7 @@ describe 'puppet::master', :type => :class do
     let :facts do
       {
         :osfamily                  => 'RedHat',
+        :operatingsystem           => 'RedHat',
         :operatingsystemmajrelease => '7',
         :operatingsystemrelease    => '7',
         :concat_basedir            => '/dne',
