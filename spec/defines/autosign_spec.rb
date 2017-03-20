@@ -2,11 +2,7 @@ require 'spec_helper'
 describe 'puppet::autosign', :type => :define do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
-      let(:facts) do
-        facts.merge({
-          :foo => 'bar',
-        })
-      end
+      let(:facts) { facts }
       let :pre_condition do
         "include puppet\nclass { 'apache': }\nclass { 'apache::mod::passenger': passenger_high_performance => 'on', passenger_max_pool_size => 12, passenger_pool_idle_time => 1500, passenger_stat_throttle_rate => 120, rack_autodetect => 'off', rails_autodetect => 'off',}\ninclude puppet::master"
       end
