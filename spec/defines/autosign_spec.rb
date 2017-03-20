@@ -24,6 +24,7 @@ describe 'puppet::autosign', :type => :define do
       end
     end
   end
+  
   context 'on an Unknown OS' do
     let :facts do
       {
@@ -34,6 +35,9 @@ describe 'puppet::autosign', :type => :define do
     let :title do
       '*.test'
     end
-    # No tests.
+    let :pre_condition do
+      "include puppet\nclass { 'apache': }\nclass { 'apache::mod::passenger': passenger_high_performance => 'on', passenger_max_pool_size => 12, passenger_pool_idle_time => 1500, passenger_stat_throttle_rate => 120, rack_autodetect => 'off', rails_autodetect => 'off',}\ninclude puppet::master"
+    end
+    it { should raise_error(Puppet::Error, /The NeSI Puppet Puppet module does not support Unknown family of operating systems/) }
   end
 end
