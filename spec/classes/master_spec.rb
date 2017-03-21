@@ -2,16 +2,29 @@ require 'spec_helper'
 describe 'puppet::master', :type => :class do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
-      let(:facts) { facts }
+      let(:facts) do
+        facts.merge({
+            :fqdn                   => 'test.example.org', 
+            :environment            => 'production', 
+          })
+      end
       describe 'with default puppet, and apache and mod_passenger' do
         let :pre_condition do 
           "include puppet\nclass { 'apache': }\nclass { 'apache::mod::passenger': passenger_high_performance => 'on', passenger_max_pool_size => 12, passenger_pool_idle_time => 1500, passenger_stat_throttle_rate => 120, rack_autodetect => 'off', rails_autodetect => 'off',}"
         end
+        case facts[:osfamily]
+        when 'Debian'
+          package_name = 'puppetmaster-passenger'
+        when 'RedHat'
+          package_name = 'puppet-server'
+        else
+          package_name = 'unknown!'
+        end          
         describe "with no parameters" do
           it { should contain_class('puppet::params') }
           it { should contain_package('puppetmaster_pkg').with(
               'ensure'  => 'installed',
-              'name'    => 'puppetmaster-passenger'
+              'name'    => package_name
             )
           }
           it { should_not contain_file('environment_dir')}
