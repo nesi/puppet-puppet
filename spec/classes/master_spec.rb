@@ -15,10 +15,13 @@ describe 'puppet::master', :type => :class do
         case facts[:osfamily]
         when 'Debian'
           package_name = 'puppetmaster-passenger'
+          rm_site_files_cmd = 'rm -f /etc/apache2/sites-available/puppetmaster* /etc/apache2/sites-enabled/puppetmaster*'
         when 'RedHat'
           package_name = 'puppet-server'
+          rm_site_files_cmd = 'rm -f /etc/httpd/conf.d/puppetmaster*'
         else
           package_name = 'unknown!'
+          rm_site_files_cmd = 'unknown!'
         end          
         describe "with no parameters" do
           it { should contain_class('puppet::params') }
@@ -64,7 +67,7 @@ describe 'puppet::master', :type => :class do
             'notify'      => 'Service[httpd]'
           )}
           it { should contain_exec('puppet_wipe_pkg_site_files').with(
-            'command'     => "rm -f /etc/apache2/sites-available/puppetmaster* /etc/apache2/sites-enabled/puppetmaster*",
+            'command'     => rm_site_files_cmd,
             'path'        => ['/bin'],
             'subscribe'   => 'Package[puppetmaster_pkg]',
             'refreshonly' => true,
