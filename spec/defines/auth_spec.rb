@@ -1,6 +1,7 @@
 require 'spec_helper'
 describe 'puppet::auth', :type => :define do
   on_supported_os.each do |os, facts|
+    if os != 'redhat-6-x86_64' and os != 'ubuntu-14.04-x86_64' then next end
     context "on #{os}" do
       let(:facts) { facts }
       let :title do
