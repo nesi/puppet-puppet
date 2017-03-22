@@ -5,31 +5,30 @@ include puppet::hiera
 # Set up apache
 include apache
 class {'apache::mod::passenger':
-  passenger_high_performance    => 'off',
-  passenger_max_pool_size       => 12,
-  passenger_pool_idle_time      => 1500,
+  passenger_high_performance   => 'off',
+  passenger_max_pool_size      => 12,
+  passenger_pool_idle_time     => 1500,
   # passenger_max_requests        => 1000,
-  passenger_stat_throttle_rate  => 120,
+  passenger_stat_throttle_rate => 120,
 }
 
 # Set up the puppetdb
 class { 'puppetdb::server':
-  database            => 'embedded',
-  listen_address      => '0.0.0.0',
-  ssl_listen_address  => '0.0.0.0',
+  database           => 'embedded',
+  listen_address     => '0.0.0.0',
+  ssl_listen_address => '0.0.0.0',
 }
 
 # Set up the puppetmaster
 class{'::puppet::master':
-  ensure                => installed,
-  manifest              => '$confdir/manifests',
-  report_handlers       => ['http','puppetdb'],
-  reporturl             => 'http://localhost/reports/upload',
-  storeconfigs_backend  => 'puppetdb',
-  require               => [
+  ensure               => installed,
+  manifest             => '$confdir/manifests',
+  report_handlers      => ['http','puppetdb'],
+  reporturl            => 'http://localhost/reports/upload',
+  storeconfigs_backend => 'puppetdb',
+  require              => [
     Class[
-      'apache::mod::passenger',
-      'ruby::dev'
+      'apache::mod::passenger'
     ]
   ],
 }

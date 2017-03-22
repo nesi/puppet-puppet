@@ -22,7 +22,6 @@ class puppet::params{
   $hiera_conf_file        = 'hiera.yaml'
   $hiera_dir              = 'hieradata'
   $hiera_package          = 'hiera'
-  $puppetmaster_package   = 'puppetmaster-passenger'
   $puppetmaster_docroot   = "${app_dir}/rack/puppetmasterd/public"
   $minimum_basemodulepath = ['/opt/puppet/share/puppet/modules']
   $autosign_conf_path     = "${conf_dir}/autosign.conf"
@@ -30,7 +29,14 @@ class puppet::params{
 
   case $::osfamily {
     Debian:{
-      # Do nothing
+      $puppetmaster_package   = 'puppetmaster-passenger'
+    }
+    RedHat:{
+      if $::operatingsystemmajrelease in ['7','6','5'] {
+        $puppetmaster_package   = 'puppet-server'
+      } else {
+        fail("The NeSI Puppet Puppet module does not support release ${::operatingsystemmajrelease} of ${::osfamily} family of operating systems")
+      }
     }
     default:{
       fail("The NeSI Puppet Puppet module does not support ${::osfamily} family of operating systems")

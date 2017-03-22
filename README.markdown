@@ -10,6 +10,10 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 
 ...thus we get puppet recursively puppetising puppet, which can only end in wondrous singularity, or fiery loops of oblivion.
 
+# Milestones
+
+Version 1.6.x of this module will support Puppet 3.x and test against Ruby 1.8.7 and 1.9.3, however version 2.x will (eventually) target Puppet 4.x with Ruby 2.1 onward and no longer test against Ubuntu 10.04 and 12.04 or RedHat/CentOS 5.
+
 # Usage
 
 ## Default Usage
@@ -87,6 +91,8 @@ The `puppet::master` class establishes puppet management of the `auth.conf` conf
 
 This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.com/) under [Apache](http://apache.org/) with all the recommended settings. However it may not be entirely compatible with [Apache 2.4](http://httpd.apache.org/docs/2.4/).
 
+**NOTE:** This class only works in Ubuntu. Pull Requests to enable other operating systems and distributions is welcome.
+
 ### Parameters
 
 * **ensure**: Sets the ensure parameter for the puppetmaster package. The default value is `installed`,
@@ -110,6 +116,8 @@ This class installs a Puppetmaster on [Passenger](https://www.phusionpassenger.c
 * **external_nodes**: ENC executable without any parameters
 * **access_log_format**: Specifies the logging format used in the vhost access log. The default is undefined which will use the default format configured for the Apache instance.
 * **custom_fragment**: Includes a custom fragment into the Puppet master application vhost configuration. The default is undefined, which does not add a custom fragment.
+* **enable_vhost**: When set to true the `puppet::master` class will create an
+`apache::vhost` instance with all the recommended settings. Defaults to true; set to false to define your own `apache::vhost` instance for the puppetmaster.
 
 **NOTE**: Setting the `http` report handler without providing a reporting URL to the `reporturl` parameter may lead to unexpected behaviour by the Puppetmaster.
 
@@ -255,6 +263,7 @@ Puppet has a native [resource for yum](http://docs.puppetlabs.com/references/lat
 ## Optional
 
 * [puppetlabs-apache](https://github.com/puppetlabs/puppetlabs-apache): This module is only a dependency when using the `puppet::master` class. The current master from the github repository is required until 0.10.0 is released.
+* The Phusion Passenger repository has to be installed to use `puppet::master` for RedHat/CentOS (https://www.phusionpassenger.com/library/install/apache/install/oss/el7/), example puppet code can be found [here](https://github.com/tag1consulting/puppet-yumrepos)
 
 # References
 

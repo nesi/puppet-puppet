@@ -5,24 +5,24 @@ include puppet::hiera
 # Set up apache
 include apache
 class {'apache::mod::passenger':
-  passenger_high_performance    => 'off',
-  passenger_max_pool_size       => 12,
-  passenger_pool_idle_time      => 1500,
-  # passenger_max_requests        => 1000,
-  passenger_stat_throttle_rate  => 120,
+  passenger_high_performance   => 'off',
+  passenger_max_pool_size      => 12,
+  passenger_pool_idle_time     => 1500,
+  # passenger_max_requests       => 1000,
+  passenger_stat_throttle_rate => 120,
 }
 
 # Set up the puppetdb
 class { 'puppetdb::server':
-  database            => 'embedded',
-  listen_address      => '0.0.0.0',
-  ssl_listen_address  => '0.0.0.0',
+  database           => 'embedded',
+  listen_address     => '0.0.0.0',
+  ssl_listen_address => '0.0.0.0',
 }
 
 # Set up the puppetmaster
 class {'puppet::master':
-  storeconfigs_backend  => 'puppetdb',
-  report_handlers       => ['store','puppetdb'],
+  storeconfigs_backend => 'puppetdb',
+  report_handlers      => ['store','puppetdb'],
 }
 
 class {'puppetdb::master::config':
