@@ -32,6 +32,15 @@ describe 'puppet::master', :type => :class do
           }
           it { should_not contain_file('environment_dir')}
           # only testing parameters that change
+          if facts[:osfamily] != 'Debian'
+            it { should contain_exec('Create /usr/share/puppet/rack/puppetmasterd/public').with(
+              'creates' => '/usr/share/puppet/rack/puppetmasterd/public',
+              'command' => 'mkdir -p /usr/share/puppet/rack/puppetmasterd/public',
+              'before'  => 'Apache::Vhost[puppetmaster]'
+            )}
+          else
+            it { should_not contain_exec('Create /usr/share/puppet/rack/puppetmasterd/public') }
+          end
           it { should contain_apache__vhost('puppetmaster').with(
             'servername'      => 'test.example.org',
             'docroot'         => '/usr/share/puppet/rack/puppetmasterd/public',
@@ -202,6 +211,14 @@ describe 'puppet::master', :type => :class do
               'docroot'       => '/some/other/path'
             )
           }
+          if facts[:osfamily] != 'Debian'
+            it { should contain_exec('Create /some/other/path').with(
+              'creates' => '/some/other/path',
+              'command' => 'mkdir -p /some/other/path'
+            )}
+          else
+            it { should_not contain_exec('Create /some/other/path') }
+          end
         end
         describe 'when setting the access log format' do
           let :params do
@@ -427,6 +444,7 @@ describe 'puppet::master', :type => :class do
             :enable_vhost => false,
           }
           end
+          it { should_not contain_exec('Create /usr/share/puppet/rack/puppetmasterd/public') }
           it { should_not contain_apache__vhost('puppetmaster') }        
         end
       end

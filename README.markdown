@@ -10,9 +10,9 @@ While working on the [dynaguppy](https://github.com/Aethylred/dynaguppy) project
 
 ...thus we get puppet recursively puppetising puppet, which can only end in wondrous singularity, or fiery loops of oblivion.
 
-# Milestones
+# Depreciation Notice
 
-Version 1.6.x of this module will support Puppet 3.x and test against Ruby 1.8.7 and 1.9.3, however version 2.x will (eventually) target Puppet 4.x with Ruby 2.1 onward and no longer test against Ubuntu 10.04 and 12.04 or RedHat/CentOS 5.
+Version 1.6.x of this module will continue to support Puppet 3.x and test against Ruby 1.8.7 and 1.9.3, however version 2.x will (eventually) target Puppet 4.x with Ruby 2.1 onward and no longer test against Ubuntu 10.04 and 12.04 or RedHat/CentOS 5.
 
 # Usage
 

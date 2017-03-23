@@ -335,6 +335,16 @@ class puppet::master (
   }
 
   if $enable_vhost {
+    # The default docroot is not created by the package in non-Debian distributions
+    # Using an Exec here (hopefully) avoids double declarations or dependency issues
+    if $::osfamily != 'Debian' {
+      exec { "Create ${puppetmaster_docroot}":
+        creates => $puppetmaster_docroot,
+        command => "mkdir -p ${puppetmaster_docroot}",
+        path    => $::path,
+        before  => Apache::Vhost['puppetmaster']
+      }
+    }
     # The ssl settings have been taken directly from the default vhost
     # configuration distributed with the puppetmaster-passenger package
     apache::vhost{'puppetmaster':
